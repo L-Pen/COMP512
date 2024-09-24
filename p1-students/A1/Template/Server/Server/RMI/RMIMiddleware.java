@@ -244,11 +244,17 @@ public class RMIMiddleware implements IResourceManager {
             // }
 
         }
+        System.out.println("PreSuccess: " + preSuccess);
+        System.out.println("Reserving car: " + car);
         if (car && preSuccess) {
-            RMIMiddleware.carsResourceManager.reserveCar(customerID, location);
+            System.out.println("Reserving car");
+            preSuccess = preSuccess && RMIMiddleware.carsResourceManager.reserveCar(customerID, location);
         }
+        System.out.println("Reserving room: " + room);
+        System.out.println("PreSuccess: " + preSuccess);
         if (room && preSuccess) {
-            RMIMiddleware.roomsResourceManager.reserveRoom(customerID, location);
+            System.out.println("Reserving room");
+            preSuccess = preSuccess && RMIMiddleware.roomsResourceManager.reserveRoom(customerID, location);
         }
 
         if(preSuccess){
