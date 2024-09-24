@@ -232,7 +232,30 @@ public class RMIMiddleware implements IResourceManager {
     @Override
     public boolean bundle(int customerID, Vector<String> flightNumbers, String location, boolean car, boolean room)
             throws RemoteException {
-        throw new UnsupportedOperationException("Unimplemented method 'bundle'");
+
+        boolean preSuccess = true;
+
+        for (String flightNumber : flightNumbers) {
+            preSuccess = preSuccess && RMIMiddleware.flightsResourceManager.reserveFlight(customerID, Integer.parseInt(flightNumber));
+
+            //TO DO: check with prof to see if we need to unreserve flights if one of them fails
+            // if (!preSuccess) {
+            //     break;
+            // }
+
+        }
+        if (car && preSuccess) {
+            RMIMiddleware.carsResourceManager.reserveCar(customerID, location);
+        }
+        if (room && preSuccess) {
+            RMIMiddleware.roomsResourceManager.reserveRoom(customerID, location);
+        }
+
+        if(preSuccess){
+            return RMIMiddleware.customersResourceManager.bundle(customerID, flightNumbers, location, car, room);
+        }        
+
+        return false;
     }
 
     @Override

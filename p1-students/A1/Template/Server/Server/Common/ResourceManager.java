@@ -327,9 +327,19 @@ public class ResourceManager implements IResourceManager {
 	}
 
 	// Reserve bundle
-	public boolean bundle(int customerId, Vector<String> flightNumbers, String location, boolean car, boolean room)
-			throws RemoteException {
-		return false;
+	public boolean bundle(int customerId, Vector<String> flightNumbers, String location, boolean car, boolean room) throws RemoteException {
+		for(String flightNumber : flightNumbers) {
+			if (!reserveFlight(customerId, Integer.parseInt(flightNumber))) {
+				return false;
+			}
+		}
+		if (car && !reserveCar(customerId, location)) {
+			return false;
+		}
+		if (room && !reserveRoom(customerId, location)) {
+			return false;
+		}
+		return true;
 	}
 
 	public String getName() throws RemoteException {
