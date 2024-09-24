@@ -93,7 +93,11 @@ public class RMIMiddleware implements IResourceManager {
 
     @Override
     public boolean addCars(String location, int numCars, int price) throws RemoteException {
-        return RMIMiddleware.carsResourceManager.addCars(location, numCars, price);
+        boolean success = RMIMiddleware.carsResourceManager.addCars(location, numCars, price);
+        if (success) {
+            RMIMiddleware.customersResourceManager.addCars(location, numCars, price);
+        }
+        return success;
     }
 
     @Override
@@ -124,7 +128,11 @@ public class RMIMiddleware implements IResourceManager {
 
     @Override
     public boolean deleteCars(String location) throws RemoteException {
-        return RMIMiddleware.carsResourceManager.deleteCars(location);
+        boolean success = RMIMiddleware.carsResourceManager.deleteCars(location);
+        if (success) {
+            RMIMiddleware.customersResourceManager.deleteCars(location);
+        }
+        return success;
     }
 
     @Override
@@ -188,7 +196,11 @@ public class RMIMiddleware implements IResourceManager {
 
     @Override
     public boolean reserveCar(int customerID, String location) throws RemoteException {
-        return RMIMiddleware.carsResourceManager.reserveCar(customerID, location);
+        boolean success = RMIMiddleware.carsResourceManager.reserveCar(customerID, location);
+        if (success) {
+            RMIMiddleware.customersResourceManager.reserveCar(customerID, location);
+        }
+        return success;
     }
 
     @Override
