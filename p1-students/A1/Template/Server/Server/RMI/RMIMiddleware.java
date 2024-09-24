@@ -176,8 +176,7 @@ public class RMIMiddleware implements IResourceManager {
     @Override
     public boolean reserveCar(int customerID, String location) throws RemoteException {
         // TODO Auto-generated method stub
-        return RMIMiddleware.carsResourceManager.reserveCar(customerID, location)
-        throw new UnsupportedOperationException("Unimplemented method 'reserveCar'");
+        return RMIMiddleware.carsResourceManager.reserveCar(customerID, location);
     }
 
     @Override
