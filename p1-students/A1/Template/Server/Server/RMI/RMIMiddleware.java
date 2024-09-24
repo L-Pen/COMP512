@@ -1,16 +1,16 @@
-package Server.Middleware;
+package Server.RMI;
 
 import java.rmi.RemoteException;
 import java.util.Vector;
 
 import Server.Interface.IResourceManager;
-import Server.RMI.RMIResourceManager;
+
 import java.rmi.registry.Registry;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
-public class Middleware implements IResourceManager {
+public class RMIMiddleware implements IResourceManager {
     private static String s_serverName = "Middleware";
     private static String s_rmiPrefix = "group_30_";
 
@@ -18,7 +18,7 @@ public class Middleware implements IResourceManager {
 
         try {
             // Create a new Server object
-            Middleware server = new Middleware();
+            RMIMiddleware server = new RMIMiddleware();
 
             // Dynamically generate the stub (client proxy)
             IResourceManager middleware = (IResourceManager) UnicastRemoteObject.exportObject(server, 0);
