@@ -16,6 +16,11 @@ public class RMIMiddleware implements IResourceManager {
     private static String s_rmiPrefix = "group_30_";
 
     private static IResourceManager flightsResourceManager;
+    private static IResourceManager carsResourceManager;
+    private static IResourceManager roomsResourceManager;
+    private static IResourceManager customersResourceManager;
+
+    private static int registryPortNumber = 1030;
 
     public static void main(String args[]) {
 
@@ -29,18 +34,23 @@ public class RMIMiddleware implements IResourceManager {
             // Bind the remote object's stub in the registry; adjust port if appropriate
             Registry l_registry;
             try {
-                l_registry = LocateRegistry.createRegistry(1030);
+                l_registry = LocateRegistry.createRegistry(registryPortNumber);
             } catch (RemoteException e) {
-                l_registry = LocateRegistry.getRegistry(1030);
+                l_registry = LocateRegistry.getRegistry(registryPortNumber);
             }
             final Registry registry = l_registry;
-
-            String flightMiddlewareServeName = args[0];
 
             // group_30_Middleware in registry
             registry.rebind(s_rmiPrefix + s_serverName, middleware);
 
-            RMIMiddleware.flightsResourceManager = connectServer(flightMiddlewareServeName, 1030, "Flights");
+            if (args.length != 4)
+                throw new Exception(
+                        "We need a flights, cars, rooms and customer server names. Whatever u put is not equal to 4");
+
+            RMIMiddleware.flightsResourceManager = connectServer(args[0], registryPortNumber, "Flights");
+            RMIMiddleware.carsResourceManager = connectServer(args[1], registryPortNumber, "Cars");
+            RMIMiddleware.roomsResourceManager = connectServer(args[2], registryPortNumber, "Rooms");
+            RMIMiddleware.customersResourceManager = connectServer(args[3], registryPortNumber, "Customers");
 
             Runtime.getRuntime().addShutdownHook(new Thread() {
                 public void run() {
@@ -79,14 +89,12 @@ public class RMIMiddleware implements IResourceManager {
 
     @Override
     public boolean addCars(String location, int numCars, int price) throws RemoteException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'addCars'");
+        return RMIMiddleware.carsResourceManager.addCars(location, numCars, price);
     }
 
     @Override
     public boolean addRooms(String location, int numRooms, int price) throws RemoteException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'addRooms'");
+        return RMIMiddleware.roomsResourceManager.addCars(location, numRooms, price);
     }
 
     @Override
@@ -182,7 +190,7 @@ public class RMIMiddleware implements IResourceManager {
     @Override
     public boolean reserveRoom(int customerID, String location) throws RemoteException {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'reserveRoom'");
+        RMIMiddleware.roomsResourceManager.reserveRoom(customerID, location);
     }
 
     @Override
