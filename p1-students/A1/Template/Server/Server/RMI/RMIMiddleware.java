@@ -102,6 +102,10 @@ public class RMIMiddleware implements IResourceManager {
 
     @Override
     public boolean addRooms(String location, int numRooms, int price) throws RemoteException {
+        boolean success = RMIMiddleware.roomsResourceManager.addRooms(location, numRooms, price);
+        if (success) {
+            RMIMiddleware.customersResourceManager.addRooms(location, numRooms, price);
+        }
         return RMIMiddleware.roomsResourceManager.addCars(location, numRooms, price);
     }
 
@@ -109,12 +113,20 @@ public class RMIMiddleware implements IResourceManager {
     public int newCustomer() throws RemoteException {
         int customerId = RMIMiddleware.customersResourceManager.newCustomer();
         RMIMiddleware.flightsResourceManager.newCustomer(customerId);
+        RMIMiddleware.roomsResourceManager.newCustomer(customerId);
+        RMIMiddleware.carsResourceManager.newCustomer(customerId);
         return customerId;
     }
 
     @Override
     public boolean newCustomer(int cid) throws RemoteException {
-        return RMIMiddleware.customersResourceManager.newCustomer(cid);
+        boolean success = RMIMiddleware.customersResourceManager.newCustomer(cid);
+        if (success) {
+            RMIMiddleware.flightsResourceManager.newCustomer(cid);
+            RMIMiddleware.roomsResourceManager.newCustomer(cid);
+            RMIMiddleware.carsResourceManager.newCustomer(cid);
+        }
+        return success;
     }
 
     @Override
@@ -137,7 +149,11 @@ public class RMIMiddleware implements IResourceManager {
 
     @Override
     public boolean deleteRooms(String location) throws RemoteException {
-        return RMIMiddleware.roomsResourceManager.deleteRooms(location);
+        boolean success = RMIMiddleware.roomsResourceManager.deleteRooms(location);
+        if (success) {
+            RMIMiddleware.customersResourceManager.deleteRooms(location);
+        }
+        return success;
     }
 
     @Override
@@ -145,6 +161,8 @@ public class RMIMiddleware implements IResourceManager {
         boolean success = RMIMiddleware.customersResourceManager.deleteCustomer(customerID);
         if (success) {
             RMIMiddleware.flightsResourceManager.deleteCustomer(customerID);
+            RMIMiddleware.roomsResourceManager.deleteCustomer(customerID);
+            RMIMiddleware.carsResourceManager.deleteCustomer(customerID);
         }
         return success;
     }
@@ -159,7 +177,6 @@ public class RMIMiddleware implements IResourceManager {
         return RMIMiddleware.carsResourceManager.queryCars(location);
     }
 
-    // up to here
     @Override
     public int queryRooms(String location) throws RemoteException {
         return RMIMiddleware.roomsResourceManager.queryRooms(location);
@@ -205,7 +222,11 @@ public class RMIMiddleware implements IResourceManager {
 
     @Override
     public boolean reserveRoom(int customerID, String location) throws RemoteException {
-        return RMIMiddleware.roomsResourceManager.reserveRoom(customerID, location);
+        boolean success = RMIMiddleware.roomsResourceManager.reserveRoom(customerID, location);
+        if (success) {
+            RMIMiddleware.customersResourceManager.reserveRoom(customerID, location);
+        }
+        return success;
     }
 
     @Override
