@@ -99,50 +99,42 @@ public class RMIMiddleware implements IResourceManager {
 
     @Override
     public int newCustomer() throws RemoteException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'newCustomer'");
+        return RMIMiddleware.customersResourceManager.newCustomer();
     }
 
     @Override
     public boolean newCustomer(int cid) throws RemoteException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'newCustomer'");
+        return RMIMiddleware.customersResourceManager.newCustomer(cid);
     }
 
     @Override
     public boolean deleteFlight(int flightNum) throws RemoteException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteFlight'");
+        return RMIMiddleware.flightsResourceManager.deleteFlight(flightNum);
     }
 
     @Override
     public boolean deleteCars(String location) throws RemoteException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteCars'");
+        return RMIMiddleware.carsResourceManager.deleteCars(location);
     }
 
     @Override
     public boolean deleteRooms(String location) throws RemoteException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteRooms'");
+        return RMIMiddleware.roomsResourceManager.deleteRooms(location);
     }
 
     @Override
     public boolean deleteCustomer(int customerID) throws RemoteException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteCustomer'");
+        return RMIMiddleware.customersResourceManager.deleteCustomer(customerID);
     }
 
     @Override
     public int queryFlight(int flightNumber) throws RemoteException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryFlight'");
+        return RMIMiddleware.flightsResourceManager.queryFlight(flightNumber);
     }
 
     @Override
     public int queryCars(String location) throws RemoteException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryCars'");
+        return RMIMiddleware.carsResourceManager.queryCars(location);
     }
 
     @Override
