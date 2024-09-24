@@ -136,53 +136,54 @@ public class RMIMiddleware implements IResourceManager {
     public int queryCars(String location) throws RemoteException {
         return RMIMiddleware.carsResourceManager.queryCars(location);
     }
-
+    //up to here
     @Override
     public int queryRooms(String location) throws RemoteException {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryRooms'");
+        return RMIMiddleware.roomsResourceManager.queryRooms(location);
     }
 
     @Override
     public String queryCustomerInfo(int customerID) throws RemoteException {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryCustomerInfo'");
+        return RMIMiddleware.customersResourceManager.queryCustomerInfo(customerID);
     }
 
     @Override
     public int queryFlightPrice(int flightNumber) throws RemoteException {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryFlightPrice'");
+        return RMIMiddleware.flightsResourceManager.queryFlightPrice(flightNumber);
     }
 
     @Override
     public int queryCarsPrice(String location) throws RemoteException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryCarsPrice'");
+        // TODO Auto-generated method stubr
+        return RMIMiddleware.carsResourceManager.queryCarsPrice(location);
     }
 
     @Override
     public int queryRoomsPrice(String location) throws RemoteException {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryRoomsPrice'");
+        return RMIMiddleware.roomsResourceManager.queryRoomsPrice(location);
     }
 
     @Override
     public boolean reserveFlight(int customerID, int flightNumber) throws RemoteException {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'reserveFlight'");
+        return RMIMiddleware.flightsResourceManager.reserveFlight(customerID, flightNumber);
     }
 
     @Override
     public boolean reserveCar(int customerID, String location) throws RemoteException {
         // TODO Auto-generated method stub
+        return RMIMiddleware.carsResourceManager.reserveCar(customerID, location)
         throw new UnsupportedOperationException("Unimplemented method 'reserveCar'");
     }
 
     @Override
     public boolean reserveRoom(int customerID, String location) throws RemoteException {
         // TODO Auto-generated method stub
-        RMIMiddleware.roomsResourceManager.reserveRoom(customerID, location);
+        return RMIMiddleware.roomsResourceManager.reserveRoom(customerID, location);
     }
 
     @Override
