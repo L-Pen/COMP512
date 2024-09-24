@@ -84,7 +84,11 @@ public class RMIMiddleware implements IResourceManager {
 
     @Override
     public boolean addFlight(int flightNum, int flightSeats, int flightPrice) throws RemoteException {
-        return RMIMiddleware.flightsResourceManager.addFlight(flightNum, flightSeats, flightPrice);
+        boolean success = RMIMiddleware.flightsResourceManager.addFlight(flightNum, flightSeats, flightPrice);
+        if (success) {
+            RMIMiddleware.customersResourceManager.addFlight(flightNum, flightSeats, flightPrice);
+        }
+        return success;
     }
 
     @Override
@@ -99,7 +103,9 @@ public class RMIMiddleware implements IResourceManager {
 
     @Override
     public int newCustomer() throws RemoteException {
-        return RMIMiddleware.customersResourceManager.newCustomer();
+        int customerId = RMIMiddleware.customersResourceManager.newCustomer();
+        RMIMiddleware.flightsResourceManager.newCustomer(customerId);
+        return customerId;
     }
 
     @Override
@@ -109,7 +115,11 @@ public class RMIMiddleware implements IResourceManager {
 
     @Override
     public boolean deleteFlight(int flightNum) throws RemoteException {
-        return RMIMiddleware.flightsResourceManager.deleteFlight(flightNum);
+        boolean success = RMIMiddleware.flightsResourceManager.deleteFlight(flightNum);
+        if (success) {
+            RMIMiddleware.customersResourceManager.deleteFlight(flightNum);
+        }
+        return success;
     }
 
     @Override
@@ -124,7 +134,11 @@ public class RMIMiddleware implements IResourceManager {
 
     @Override
     public boolean deleteCustomer(int customerID) throws RemoteException {
-        return RMIMiddleware.customersResourceManager.deleteCustomer(customerID);
+        boolean success = RMIMiddleware.customersResourceManager.deleteCustomer(customerID);
+        if (success) {
+            RMIMiddleware.flightsResourceManager.deleteCustomer(customerID);
+        }
+        return success;
     }
 
     @Override
@@ -165,7 +179,11 @@ public class RMIMiddleware implements IResourceManager {
 
     @Override
     public boolean reserveFlight(int customerID, int flightNumber) throws RemoteException {
-        return RMIMiddleware.flightsResourceManager.reserveFlight(customerID, flightNumber);
+        boolean success = RMIMiddleware.flightsResourceManager.reserveFlight(customerID, flightNumber);
+        if (success) {
+            RMIMiddleware.customersResourceManager.reserveFlight(customerID, flightNumber);
+        }
+        return success;
     }
 
     @Override
