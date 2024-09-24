@@ -1,5 +1,6 @@
 package Server.RMI;
 
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.Vector;
 
@@ -13,6 +14,8 @@ import java.rmi.server.UnicastRemoteObject;
 public class RMIMiddleware implements IResourceManager {
     private static String s_serverName = "Middleware";
     private static String s_rmiPrefix = "group_30_";
+
+    private static IResourceManager flightsResourceManager;
 
     public static void main(String args[]) {
 
@@ -32,8 +35,12 @@ public class RMIMiddleware implements IResourceManager {
             }
             final Registry registry = l_registry;
 
+            String flightMiddlewareServeName = args[0];
+
             // group_30_Middleware in registry
             registry.rebind(s_rmiPrefix + s_serverName, middleware);
+
+            RMIMiddleware.flightsResourceManager = connectServer(flightMiddlewareServeName, 1030, "Flights");
 
             Runtime.getRuntime().addShutdownHook(new Thread() {
                 public void run() {
@@ -54,13 +61,20 @@ public class RMIMiddleware implements IResourceManager {
             e.printStackTrace();
             System.exit(1);
         }
+    }
 
+    private static IResourceManager connectServer(String server, int port, String name)
+            throws RemoteException, NotBoundException {
+        Registry registry = LocateRegistry.getRegistry(server, port);
+        IResourceManager m_resourceManager = (IResourceManager) registry.lookup(s_rmiPrefix + name);
+        System.out.println("Connected to '" + name + "' server [" + server + ":" + port + "/" + s_rmiPrefix
+                + name + "]");
+        return m_resourceManager;
     }
 
     @Override
     public boolean addFlight(int flightNum, int flightSeats, int flightPrice) throws RemoteException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'addFlight'");
+        return RMIMiddleware.flightsResourceManager.addFlight(flightNum, flightSeats, flightPrice);
     }
 
     @Override
