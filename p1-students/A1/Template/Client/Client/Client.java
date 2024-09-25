@@ -417,6 +417,9 @@ public abstract class Client {
 
 	public static boolean toBoolean(String string)// throws Exception
 	{
+		System.out.println("toBoolean: " + string);
+		System.out.println("toBoolean: " + Boolean.valueOf(string));
+		System.out.println("toBoolean: " + Boolean.valueOf(string).booleanValue());
 		return (Boolean.valueOf(string)).booleanValue();
 	}
 }
