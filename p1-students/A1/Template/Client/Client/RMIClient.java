@@ -77,8 +77,6 @@ public class RMIClient extends Client {
 
 	}
 
-	}
-
 	public RMIClient() {
 		super();
 	}
