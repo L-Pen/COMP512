@@ -63,10 +63,16 @@ public class RMIClient extends Client {
 			{
 				System.out.print((char) 27 + "[32;1m\n>] " + (char) 27 + "[0m");
 				String readerInput = bufferedReader.readLine().trim(); // read user's input
-				if (readerInput.equals("quit"))
+				Vector<String> arguments = parse(readerInput);
+				Command cmd = Command.fromString((String) arguments.elementAt(0));
+				if (cmd.equals(Command.Quit))
 					break;
 
-				outToServer.println(readerInput); // send the user's input via the output stream to the server
+				String commandString = cmd.name() + ",";
+				for (int i = 1; i < arguments.size(); i++) {
+					commandString += (String) arguments.elementAt(i) + ",";
+				}
+				outToServer.println(commandString); // send the user's input via the output stream to the server
 				String res = inFromServer.readLine(); // receive the server's result via the input stream from the
 														// server
 				System.out.println("result: " + res); // print the server result to the user

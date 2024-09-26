@@ -21,7 +21,7 @@ public class serverSocketThread extends Thread {
             String message = null;
             while ((message = inFromClient.readLine()) != null) {
                 System.out.println("message:" + message);
-                String result = "Working!";
+                String result = "";
                 String[] params = message.split(",");
                 String commandName = params[0];
                 // check which function client is trying to call eg AddFlights
