@@ -10,6 +10,9 @@ import java.rmi.registry.Registry;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
 
 public class RMIMiddleware implements IResourceManager {
     private static String s_serverName = "Middleware";
@@ -22,11 +25,48 @@ public class RMIMiddleware implements IResourceManager {
 
     private static int registryPortNumber = 1030;
 
-    public static void main(String args[]) {
+    private static String runType;
 
+    public static void main(String args[]) throws Exception {
+
+        if (args.length != 5)
+            throw new Exception(
+                    "We need a flights, cars, rooms and customer server names. Whatever u put is not equal to 4");
+
+        // Create a new Server object
+        RMIMiddleware server = new RMIMiddleware();
+
+        String flightsServer = args[0];
+        String carsServer = args[1];
+        String roomsServer = args[2];
+        String customersServer = args[3];
+        runType = args[4];
+
+        if (runType.equals("rmi")) {
+            runRMI(flightsServer, carsServer, roomsServer, customersServer, server);
+        } else if (runType.equals("tcp")) {
+            runTCP(flightsServer, carsServer, roomsServer, customersServer, server);
+        } else {
+            System.err.println("Unknown run type");
+        }
+
+    }
+
+    private static void runTCP(String flightsServer, String carsServer, String roomsServer, String customersServer,
+            RMIMiddleware server)
+            throws IOException {
+        ServerSocket serverSocket = new ServerSocket(1030);
+        System.out.println("Server ready...");
+        // connect to resource managers...
+        while (true) {
+            Socket socket = serverSocket.accept();
+            new serverSocketThread(socket, server).start();
+        }
+    }
+
+    private static void runRMI(String flightsServer, String carsServer, String roomsServer, String customersServer,
+            RMIMiddleware server) {
         try {
-            // Create a new Server object
-            RMIMiddleware server = new RMIMiddleware();
 
             // Dynamically generate the stub (client proxy)
             IResourceManager middleware = (IResourceManager) UnicastRemoteObject.exportObject(server, 0);
@@ -43,14 +83,10 @@ public class RMIMiddleware implements IResourceManager {
             // group_30_Middleware in registry
             registry.rebind(s_rmiPrefix + s_serverName, middleware);
 
-            if (args.length != 4)
-                throw new Exception(
-                        "We need a flights, cars, rooms and customer server names. Whatever u put is not equal to 4");
-
-            RMIMiddleware.flightsResourceManager = connectServer(args[0], registryPortNumber, "Flights");
-            RMIMiddleware.carsResourceManager = connectServer(args[1], registryPortNumber, "Cars");
-            RMIMiddleware.roomsResourceManager = connectServer(args[2], registryPortNumber, "Rooms");
-            RMIMiddleware.customersResourceManager = connectServer(args[3], registryPortNumber, "Customers");
+            RMIMiddleware.flightsResourceManager = connectServer(flightsServer, registryPortNumber, "Flights");
+            RMIMiddleware.carsResourceManager = connectServer(carsServer, registryPortNumber, "Cars");
+            RMIMiddleware.roomsResourceManager = connectServer(roomsServer, registryPortNumber, "Rooms");
+            RMIMiddleware.customersResourceManager = connectServer(customersServer, registryPortNumber, "Customers");
 
             Runtime.getRuntime().addShutdownHook(new Thread() {
                 public void run() {
@@ -236,11 +272,13 @@ public class RMIMiddleware implements IResourceManager {
         boolean preSuccess = true;
 
         for (String flightNumber : flightNumbers) {
-            preSuccess = preSuccess && RMIMiddleware.flightsResourceManager.reserveFlight(customerID, Integer.parseInt(flightNumber));
+            preSuccess = preSuccess
+                    && RMIMiddleware.flightsResourceManager.reserveFlight(customerID, Integer.parseInt(flightNumber));
 
-            //TO DO: check with prof to see if we need to unreserve flights if one of them fails
+            // TO DO: check with prof to see if we need to unreserve flights if one of them
+            // fails
             // if (!preSuccess) {
-            //     break;
+            // break;
             // }
 
         }
@@ -257,9 +295,9 @@ public class RMIMiddleware implements IResourceManager {
             preSuccess = preSuccess && RMIMiddleware.roomsResourceManager.reserveRoom(customerID, location);
         }
 
-        if(preSuccess){
+        if (preSuccess) {
             return RMIMiddleware.customersResourceManager.bundle(customerID, flightNumbers, location, car, room);
-        }        
+        }
 
         return false;
     }

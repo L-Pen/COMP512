@@ -6,7 +6,8 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.RemoteException;
 import java.rmi.NotBoundException;
-
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.*;
 import java.io.*;
 
@@ -18,29 +19,64 @@ public class RMIClient extends Client {
 
 	private static String s_rmiPrefix = "group_30_";
 
-	public static void main(String args[]) {
+	public static void main(String args[]) throws UnknownHostException, IOException {
 		if (args.length > 0) {
 			s_serverHost = args[0];
 		}
 		if (args.length > 1) {
 			s_serverName = args[1];
 		}
-		if (args.length > 2) {
+		if (args.length > 3) {
 			System.err.println((char) 27 + "[31;1mClient exception: " + (char) 27
 					+ "[0mUsage: java client.RMIClient [server_hostname [server_rmiobject]]");
 			System.exit(1);
 		}
 
 		// Get a reference to the RMIRegister
-		try {
-			RMIClient client = new RMIClient();
-			client.connectServer();
-			client.start();
-		} catch (Exception e) {
-			System.err.println((char) 27 + "[31;1mClient exception: " + (char) 27 + "[0mUncaught exception");
-			e.printStackTrace();
-			System.exit(1);
+		if (args[2].equals("rmi")) {
+			try {
+				RMIClient client = new RMIClient();
+				client.connectServer();
+				client.start();
+			} catch (Exception e) {
+				System.err.println((char) 27 + "[31;1mClient exception: " + (char) 27 + "[0mUncaught exception");
+				e.printStackTrace();
+				System.exit(1);
+			}
 		}
+		if (args[2].equals("tcp")) {
+			Socket socket = new Socket(s_serverHost, 1030); // establish a socket with a server using the given port#
+
+			PrintWriter outToServer = new PrintWriter(socket.getOutputStream(), true); // open an output stream to the
+																						// server...
+			BufferedReader inFromServer = new BufferedReader(new InputStreamReader(socket.getInputStream())); // open an
+																												// input
+																												// stream
+																												// from
+																												// the
+																												// server...
+
+			BufferedReader bufferedReader = new java.io.BufferedReader(new InputStreamReader(System.in)); // to read
+																											// user's
+																											// input
+
+			while (true) // works forever
+			{
+				String readerInput = bufferedReader.readLine(); // read user's input
+				if (readerInput.equals("quit"))
+					break;
+
+				outToServer.println(readerInput); // send the user's input via the output stream to the server
+				String res = inFromServer.readLine(); // receive the server's result via the input stream from the
+														// server
+				System.out.println("result: " + res); // print the server result to the user
+			}
+
+			socket.close();
+		}
+
+	}
+
 	}
 
 	public RMIClient() {
