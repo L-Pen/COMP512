@@ -13,6 +13,11 @@ import java.rmi.server.UnicastRemoteObject;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
+import java.util.Date;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 
 public class RMIMiddleware implements IResourceManager {
     private static String s_serverName = "Middleware";
@@ -22,6 +27,11 @@ public class RMIMiddleware implements IResourceManager {
     private static IResourceManager carsResourceManager;
     private static IResourceManager roomsResourceManager;
     private static IResourceManager customersResourceManager;
+
+    private static Socket flightsSocket;
+    private static Socket carsSocket;
+    private static Socket roomsSocket;
+    private static Socket customersSocket;
 
     private static int registryPortNumber = 1030;
 
@@ -58,10 +68,18 @@ public class RMIMiddleware implements IResourceManager {
         ServerSocket serverSocket = new ServerSocket(9030);
         System.out.println("Server ready...");
         // connect to resource managers...
+        flightsSocket = connectTcp(flightsServer);
+        carsSocket = connectTcp(carsServer);
+        roomsSocket = connectTcp(roomsServer);
+        customersSocket = connectTcp(customersServer);
         while (true) {
             Socket socket = serverSocket.accept();
             new serverSocketThread(socket, server).start();
         }
+    }
+
+    private static Socket connectTcp(String hostname) throws UnknownHostException, IOException {
+        return new Socket(hostname, 9030); // establish a socket with a server using the given port#
     }
 
     private static void runRMI(String flightsServer, String carsServer, String roomsServer, String customersServer,
