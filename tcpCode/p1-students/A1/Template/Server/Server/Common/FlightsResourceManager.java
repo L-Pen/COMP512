@@ -3,19 +3,28 @@
 // CSE 593
 // -------------------------------
 
-package Server.Common;
+package Server.RMI;
 
+import Server.Common.Car;
+import Server.Common.Customer;
+import Server.Common.Flight;
+import Server.Common.RMHashMap;
+import Server.Common.RMItem;
+import Server.Common.ReservableItem;
+import Server.Common.ReservedItem;
+import Server.Common.Room;
+import Server.Common.Trace;
 import Server.Interface.*;
 
 import java.util.*;
 import java.rmi.RemoteException;
 import java.io.*;
 
-public class ResourceManager implements IResourceManager {
+public class FlightsResourceManager implements IResourceManager {
 	protected String m_name = "";
 	protected RMHashMap m_data = new RMHashMap();
 
-	public ResourceManager(String p_name) {
+	public FlightsResourceManager(String p_name) {
 		m_name = p_name;
 	}
 
@@ -327,19 +336,9 @@ public class ResourceManager implements IResourceManager {
 	}
 
 	// Reserve bundle
-	public boolean bundle(int customerId, Vector<String> flightNumbers, String location, boolean car, boolean room) throws RemoteException {
-		for(String flightNumber : flightNumbers) {
-			if (!reserveFlight(customerId, Integer.parseInt(flightNumber))) {
-				return false;
-			}
-		}
-		if (car && !reserveCar(customerId, location)) {
-			return false;
-		}
-		if (room && !reserveRoom(customerId, location)) {
-			return false;
-		}
-		return true;
+	public boolean bundle(int customerId, Vector<String> flightNumbers, String location, boolean car, boolean room)
+			throws RemoteException {
+		return false;
 	}
 
 	public String getName() throws RemoteException {
