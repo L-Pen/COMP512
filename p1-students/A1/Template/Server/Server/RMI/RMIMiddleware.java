@@ -28,10 +28,10 @@ public class RMIMiddleware implements IResourceManager {
     private static IResourceManager roomsResourceManager;
     private static IResourceManager customersResourceManager;
 
-    private static Socket flightsSocket;
-    private static Socket carsSocket;
-    private static Socket roomsSocket;
-    private static Socket customersSocket;
+    public static Socket flightsSocket;
+    public static Socket carsSocket;
+    public static Socket roomsSocket;
+    public static Socket customersSocket;
 
     private static int registryPortNumber = 1030;
 
@@ -55,15 +55,14 @@ public class RMIMiddleware implements IResourceManager {
         if (runType.equals("rmi")) {
             runRMI(flightsServer, carsServer, roomsServer, customersServer, server);
         } else if (runType.equals("tcp")) {
-            runTCP(flightsServer, carsServer, roomsServer, customersServer, server);
+            runTCP(flightsServer, carsServer, roomsServer, customersServer);
         } else {
             System.err.println("Unknown run type");
         }
 
     }
 
-    private static void runTCP(String flightsServer, String carsServer, String roomsServer, String customersServer,
-            RMIMiddleware server)
+    private static void runTCP(String flightsServer, String carsServer, String roomsServer, String customersServer)
             throws IOException {
         ServerSocket serverSocket = new ServerSocket(9030);
         System.out.println("Server ready...");
@@ -74,7 +73,7 @@ public class RMIMiddleware implements IResourceManager {
         customersSocket = connectTcp(customersServer);
         while (true) {
             Socket socket = serverSocket.accept();
-            new serverSocketThread(socket, server).start();
+            new serverSocketThread(socket).start();
         }
     }
 
@@ -160,7 +159,7 @@ public class RMIMiddleware implements IResourceManager {
         if (success) {
             RMIMiddleware.customersResourceManager.addRooms(location, numRooms, price);
         }
-        return RMIMiddleware.roomsResourceManager.addCars(location, numRooms, price);
+        return success;
     }
 
     @Override
