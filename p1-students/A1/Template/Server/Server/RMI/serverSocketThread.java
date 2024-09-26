@@ -45,9 +45,11 @@ public class serverSocketThread extends Thread {
         // send to RM socket
         outToServer.println(command);
         // receive from RM socket
-        String res = inFromServer.readLine();
-        System.out.println("result: " + res);
-        return res;
+        while (true) {
+            String res = inFromServer.readLine();
+            System.out.println("result: " + res);
+            return res;
+        }
     }
 
     private String routeMessage(String commandName, String message) throws IOException {
