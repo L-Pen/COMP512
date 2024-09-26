@@ -45,10 +45,13 @@ public class serverSocketThread extends Thread {
         // send to RM socket
         outToServer.println(command);
         // receive from RM socket
+        String res = null;
         while (true) {
-            String res = inFromServer.readLine();
-            System.out.println("result: " + res);
-            return res;
+            res = inFromServer.readLine();
+            if (res != null) {
+                System.out.println("result: " + res);
+                return res;
+            }
         }
     }
 
