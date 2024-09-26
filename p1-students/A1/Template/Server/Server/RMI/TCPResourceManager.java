@@ -3,8 +3,9 @@
 // CSE 593
 // -------------------------------
 
-package Server.Common;
+package Server.RMI;
 
+import Server.Common.ResourceManager;
 import Server.Interface.*;
 
 import java.util.*;
@@ -27,12 +28,12 @@ public class TCPResourceManager extends ResourceManager {
 	}
 
 	public static void main(String[] args) throws IOException {
-		ServerSocket serverSocket = new ServerSocket(9090); // establish a server socket to receive messages over the
+		ServerSocket serverSocket = new ServerSocket(9030); // establish a server socket to receive messages over the
 															// network from clients
 
-		TCPResourceManager tcpResourceManager = new TCPResourceManager("tcpResourceManager");
+		TCPResourceManager tcpResourceManager = new TCPResourceManager(args[0]);
 
-		System.out.println("Server ready...");
+		System.out.println("Server ready..." + tcpResourceManager.m_name);
 
 		while (true) // runs forever
 		{
@@ -43,70 +44,58 @@ public class TCPResourceManager extends ResourceManager {
 
 				PrintWriter outToClient = new PrintWriter(socket.getOutputStream(), true);
 				String returnMessage = "";
-				
+
 				while ((message = inFromClient.readLine()) != null) {
 					String[] params = message.split(",");
 
-					if(params[0].equals("quit")) {
+					if (params[0].equals("quit")) {
 						break;
-					}
-					else if(params[0].equals("AddFlight")){ 
-						returnMessage = String.valueOf(tcpResourceManager.addFlight(Integer.parseInt(params[1]), Integer.parseInt(params[2]), Integer.parseInt(params[3])));
-					
-					}
-					else if(params[0].equals("AddCars")){
-						returnMessage = String.valueOf(tcpResourceManager.addCars(params[1], Integer.parseInt(params[2]), Integer.parseInt(params[3])));
-					}
-					else if(params[0].equals("AddRooms")){
-						returnMessage = String.valueOf(tcpResourceManager.addRooms(params[1], Integer.parseInt(params[2]), Integer.parseInt(params[3])));
-					}
-					else if(params[0].equals("AddCustomer")){
+					} else if (params[0].equals("AddFlight")) {
+						returnMessage = String.valueOf(tcpResourceManager.addFlight(Integer.parseInt(params[1]),
+								Integer.parseInt(params[2]), Integer.parseInt(params[3])));
+
+					} else if (params[0].equals("AddCars")) {
+						returnMessage = String.valueOf(tcpResourceManager.addCars(params[1],
+								Integer.parseInt(params[2]), Integer.parseInt(params[3])));
+					} else if (params[0].equals("AddRooms")) {
+						returnMessage = String.valueOf(tcpResourceManager.addRooms(params[1],
+								Integer.parseInt(params[2]), Integer.parseInt(params[3])));
+					} else if (params[0].equals("AddCustomer")) {
 						returnMessage = String.valueOf(tcpResourceManager.newCustomer());
-					}
-					else if(params[0].equals("AddCustomerID")){
+					} else if (params[0].equals("AddCustomerID")) {
 						returnMessage = String.valueOf(tcpResourceManager.newCustomer(Integer.parseInt(params[1])));
-					}
-					else if(params[0].equals("DeleteFlight")){
+					} else if (params[0].equals("DeleteFlight")) {
 						returnMessage = String.valueOf(tcpResourceManager.deleteFlight(Integer.parseInt(params[1])));
-					}
-					else if(params[0].equals("DeleteCars")){
+					} else if (params[0].equals("DeleteCars")) {
 						returnMessage = String.valueOf(tcpResourceManager.deleteCars(params[1]));
-					}
-					else if(params[0].equals("DeleteRooms")){
+					} else if (params[0].equals("DeleteRooms")) {
 						returnMessage = String.valueOf(tcpResourceManager.deleteRooms(params[1]));
-					}
-					else if(params[0].equals("DeleteCustomer")){
+					} else if (params[0].equals("DeleteCustomer")) {
 						returnMessage = String.valueOf(tcpResourceManager.deleteCustomer(Integer.parseInt(params[1])));
-					}
-					else if(params[0].equals("QueryFlight")){
+					} else if (params[0].equals("QueryFlight")) {
 						returnMessage = String.valueOf(tcpResourceManager.queryFlight(Integer.parseInt(params[1])));
-					}
-					else if(params[0].equals("QueryCars")){
+					} else if (params[0].equals("QueryCars")) {
 						returnMessage = String.valueOf(tcpResourceManager.queryCars(params[1]));
-					}
-					else if(params[0].equals("QueryRooms")){
+					} else if (params[0].equals("QueryRooms")) {
 						returnMessage = String.valueOf(tcpResourceManager.queryRooms(params[1]));
-					}
-					else if(params[0].equals("QueryCustomer")){
+					} else if (params[0].equals("QueryCustomer")) {
 						returnMessage = tcpResourceManager.queryCustomerInfo(Integer.parseInt(params[1]));
-					}
-					else if(params[0].equals("QueryFlightPrice")){
-						returnMessage = String.valueOf(tcpResourceManager.queryFlightPrice(Integer.parseInt(params[1])));
-					}
-					else if(params[0].equals("QueryCarsPrice")){
+					} else if (params[0].equals("QueryFlightPrice")) {
+						returnMessage = String
+								.valueOf(tcpResourceManager.queryFlightPrice(Integer.parseInt(params[1])));
+					} else if (params[0].equals("QueryCarsPrice")) {
 						returnMessage = String.valueOf(tcpResourceManager.queryCarsPrice(params[1]));
-					}
-					else if(params[0].equals("QueryRoomsPrice")){
+					} else if (params[0].equals("QueryRoomsPrice")) {
 						returnMessage = String.valueOf(tcpResourceManager.queryRoomsPrice(params[1]));
-					}
-					else if(params[0].equals("ReserveFlight")){
-						returnMessage = String.valueOf(tcpResourceManager.reserveFlight(Integer.parseInt(params[1]), Integer.parseInt(params[2])));
-					}
-					else if(params[0].equals("ReserveCar")){
-						returnMessage = String.valueOf(tcpResourceManager.reserveCar(Integer.parseInt(params[1]), params[2]));
-					}
-					else if(params[0].equals("ReserveRoom")){
-						returnMessage = String.valueOf(tcpResourceManager.reserveRoom(Integer.parseInt(params[1]), params[2]));
+					} else if (params[0].equals("ReserveFlight")) {
+						returnMessage = String.valueOf(tcpResourceManager.reserveFlight(Integer.parseInt(params[1]),
+								Integer.parseInt(params[2])));
+					} else if (params[0].equals("ReserveCar")) {
+						returnMessage = String
+								.valueOf(tcpResourceManager.reserveCar(Integer.parseInt(params[1]), params[2]));
+					} else if (params[0].equals("ReserveRoom")) {
+						returnMessage = String
+								.valueOf(tcpResourceManager.reserveRoom(Integer.parseInt(params[1]), params[2]));
 					}
 				}
 
