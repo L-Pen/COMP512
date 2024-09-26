@@ -45,7 +45,7 @@ public class RMIClient extends Client {
 			}
 		}
 		if (args[2].equals("tcp")) {
-			Socket socket = new Socket(s_serverHost, 1030); // establish a socket with a server using the given port#
+			Socket socket = new Socket(s_serverHost, 9030); // establish a socket with a server using the given port#
 
 			PrintWriter outToServer = new PrintWriter(socket.getOutputStream(), true); // open an output stream to the
 																						// server...
