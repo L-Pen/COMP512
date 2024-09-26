@@ -59,10 +59,10 @@ public class RMIClient extends Client {
 			BufferedReader bufferedReader = new java.io.BufferedReader(new InputStreamReader(System.in)); // to read
 																											// user's
 																											// input
-
 			while (true) // works forever
 			{
-				String readerInput = bufferedReader.readLine(); // read user's input
+				System.out.print((char) 27 + "[32;1m\n>] " + (char) 27 + "[0m");
+				String readerInput = bufferedReader.readLine().trim(); // read user's input
 				if (readerInput.equals("quit"))
 					break;
 
