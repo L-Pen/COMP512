@@ -3,7 +3,7 @@
 // CSE 593
 // -------------------------------
 
-package Server.RMI;
+package Server.Common;
 
 import Server.Common.Car;
 import Server.Common.Customer;
