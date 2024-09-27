@@ -32,7 +32,9 @@ public class serverSocketThread extends Thread {
 
                 outToClient.println(result);
             }
+            clientSocket.close();
         } catch (IOException e) {
+            System.err.println(e);
         }
     }
 

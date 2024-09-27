@@ -47,6 +47,7 @@ public class TCPResourceManager extends ResourceManager {
 
 				while ((message = inFromClient.readLine()) != null) {
 					String[] params = message.split(",");
+					System.out.println(message);
 
 					if (params[0].equals("quit")) {
 						break;
