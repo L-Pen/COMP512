@@ -135,8 +135,7 @@ public class TCPResourceManager extends ResourceManager {
 
 						returnMessage = String.valueOf(tcpResourceManager.bundle(customerID, flightNumbers, location, wantsCar, wantsRoom));
 						break;
-					
-
+					}
 				}
 
 				outToClient.println(returnMessage);
