@@ -46,6 +46,9 @@ public class TCPResourceManager extends ResourceManager {
 				String returnMessage = "";
 
 				while ((message = inFromClient.readLine()) != null) {
+
+					System.out.println("In TCP Resource Manager while loop");
+
 					String[] params = message.split(",");
 					System.out.println(message);
 
@@ -120,6 +123,7 @@ public class TCPResourceManager extends ResourceManager {
 
 				outToClient.println(returnMessage);
 			} catch (IOException e) {
+				System.out.println("Exception caught when trying to listen on port " + 9030 + " in TCP Resource Manager");
 			}
 		}
 
