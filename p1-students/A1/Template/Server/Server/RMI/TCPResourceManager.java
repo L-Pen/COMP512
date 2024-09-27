@@ -123,13 +123,13 @@ public class TCPResourceManager extends ResourceManager {
 
 						int customerID = Integer.parseInt(params[1]);
 						Vector<String> flightNumbers = new Vector<String>();
-						String location = params[params.length - 4];;
-						boolean wantsCar = params[params.length - 3].equals("1") ? true : false;
-						boolean wantsRoom = params[params.length - 2].equals("1") ? true : false;
+						String location = params[params.length - 3];
+						boolean wantsCar = params[params.length - 2].equals("1") ? true : false;
+						boolean wantsRoom = params[params.length - 1].equals("1") ? true : false;
 
 
 						// find alpha numberic element
-						for (int i = 2; i < params.length - 4; i++) {
+						for (int i = 2; i < params.length - 5; i++) {
 							flightNumbers.add(params[i]);
 						}
 
