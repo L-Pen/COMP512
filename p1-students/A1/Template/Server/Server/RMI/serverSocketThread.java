@@ -67,19 +67,19 @@ public class serverSocketThread extends Thread {
         switch (commandName) {
             case "AddFlight":
                 res = sendMessageToSocket(flightsSocket, message);
-                if (checkSuccess(res)) {
+                if (isTrue(res)) {
                     sendMessageToSocket(customersSocket, message);
                 }
                 break;
             case "AddCars":
                 res = sendMessageToSocket(carsSocket, message);
-                if (checkSuccess(res)) {
+                if (isTrue(res)) {
                     sendMessageToSocket(customersSocket, message);
                 }
                 break;
             case "AddRooms":
                 res = sendMessageToSocket(roomsSocket, message);
-                if (checkSuccess(res)) {
+                if (isTrue(res)) {
                     sendMessageToSocket(customersSocket, message);
                 }
                 break;
@@ -92,7 +92,7 @@ public class serverSocketThread extends Thread {
                 break;
             case "AddCustomerID":
                 res = sendMessageToSocket(customersSocket, message);
-                if (checkSuccess(res)) {
+                if (isTrue(res)) {
                     sendMessageToSocket(flightsSocket, message);
                     sendMessageToSocket(carsSocket, message);
                     sendMessageToSocket(roomsSocket, message);
@@ -100,25 +100,25 @@ public class serverSocketThread extends Thread {
                 break;
             case "DeleteFlight":
                 res = sendMessageToSocket(flightsSocket, message);
-                if (checkSuccess(res)) {
+                if (isTrue(res)) {
                     sendMessageToSocket(customersSocket, message);
                 }
                 break;
             case "DeleteCars":
                 res = sendMessageToSocket(carsSocket, message);
-                if (checkSuccess(res)) {
+                if (isTrue(res)) {
                     sendMessageToSocket(customersSocket, message);
                 }
                 break;
             case "DeleteRooms":
                 res = sendMessageToSocket(roomsSocket, message);
-                if (checkSuccess(res)) {
+                if (isTrue(res)) {
                     sendMessageToSocket(customersSocket, message);
                 }
                 break;
             case "DeleteCustomer":
                 res = sendMessageToSocket(customersSocket, message);
-                if (checkSuccess(res)) {
+                if (isTrue(res)) {
                     sendMessageToSocket(flightsSocket, message);
                     sendMessageToSocket(carsSocket, message);
                     sendMessageToSocket(roomsSocket, message);
@@ -147,23 +147,53 @@ public class serverSocketThread extends Thread {
                 break;
             case "ReserveFlight":
                 res = sendMessageToSocket(flightsSocket, message);
-                if (checkSuccess(res)) {
+                if (isTrue(res)) {
                     sendMessageToSocket(customersSocket, message);
                 }
                 break;
             case "ReserveCar":
                 res = sendMessageToSocket(carsSocket, message);
-                if (checkSuccess(res)) {
+                if (isTrue(res)) {
                     sendMessageToSocket(customersSocket, message);
                 }
                 break;
             case "ReserveRoom":
                 res = sendMessageToSocket(roomsSocket, message);
-                if (checkSuccess(res)) {
+                if (isTrue(res)) {
                     sendMessageToSocket(customersSocket, message);
                 }
                 break;
             case "Bundle":
+                flightsSocket.close();
+                String[] params = message.split(",");
+                boolean preSuccess = true;
+                String customerId = params[1];
+                for (int i = 0; i < params.length - 6; ++i) {
+                    flightsSocket = connectTcp(RMIMiddleware.flightsServer);
+                    String flightNumber = params[2 + i];
+                    String payloadBF = "ReserveFlight," + customerId + "," + flightNumber;
+                    res = sendMessageToSocket(flightsSocket, payloadBF);
+                    preSuccess = isTrue(res) && preSuccess;
+                    flightsSocket.close();
+                }
+                String location = params[params.length - 4];
+                boolean wantCar = isTrue(params[params.length - 3]);
+                boolean wantRoom = isTrue(params[params.length - 2]);
+                if (wantCar && preSuccess) {
+                    String payloadBC = "ReserveCar," + customerId + "," + location;
+                    res = sendMessageToSocket(carsSocket, payloadBC);
+                    preSuccess = isTrue(res) && preSuccess;
+                }
+                if (wantRoom && preSuccess) {
+                    String payloadBR = "ReserveRoom," + customerId + "," + location;
+                    res = sendMessageToSocket(roomsSocket, payloadBR);
+                    preSuccess = isTrue(res) && preSuccess;
+                }
+
+                if (preSuccess) {
+                    res = sendMessageToSocket(customersSocket, message);
+                } else
+                    res = "false";
                 break;
             default:
                 System.out.println(commandName);
@@ -176,7 +206,7 @@ public class serverSocketThread extends Thread {
         return res;
     }
 
-    private static boolean checkSuccess(String success) {
+    private static boolean isTrue(String success) {
         return success.equals("true");
     }
 
