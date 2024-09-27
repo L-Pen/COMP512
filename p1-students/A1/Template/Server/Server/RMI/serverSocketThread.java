@@ -179,9 +179,6 @@ public class serverSocketThread extends Thread {
                 String location = params[params.length - 3];
                 boolean wantCar = isTrue(params[params.length - 2]);
                 boolean wantRoom = isTrue(params[params.length - 1]);
-                System.out.println(location);
-                System.out.println(wantCar);
-                System.out.println(wantRoom);
                 if (wantCar && preSuccess) {
                     String payloadBC = "ReserveCar," + customerId + "," + location;
                     res = sendMessageToSocket(carsSocket, payloadBC);

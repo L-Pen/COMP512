@@ -9,7 +9,6 @@ import Server.Interface.*;
 
 import java.util.*;
 import java.rmi.RemoteException;
-import java.io.*;
 
 public class ResourceManager implements IResourceManager {
 	protected String m_name = "";
@@ -327,32 +326,28 @@ public class ResourceManager implements IResourceManager {
 	}
 
 	// Reserve bundle
-	public boolean bundle(int customerId, Vector<String> flightNumbers, String location, boolean car, boolean room) throws RemoteException {
-		
+	public boolean bundle(int customerId, Vector<String> flightNumbers, String location, boolean car, boolean room)
+			throws RemoteException {
+
 		RMHashMap uncorruptedHashMap = (RMHashMap) m_data.clone();
 
-		
-		for(String flightNumber : flightNumbers) {
+		for (String flightNumber : flightNumbers) {
 			if (!reserveFlight(customerId, Integer.parseInt(flightNumber))) {
 				return false;
-			}
-			else{
+			} else {
 				m_data = uncorruptedHashMap;
 			}
 		}
 
-
 		if (car && !reserveCar(customerId, location)) {
 			return false;
-		}
-		else{
+		} else {
 			m_data = uncorruptedHashMap;
 		}
 
 		if (room && !reserveRoom(customerId, location)) {
 			return false;
-		}
-		else{
+		} else {
 			m_data = uncorruptedHashMap;
 		}
 

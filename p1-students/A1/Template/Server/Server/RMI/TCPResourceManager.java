@@ -6,17 +6,12 @@
 package Server.RMI;
 
 import Server.Common.ResourceManager;
-import Server.Interface.*;
 
 import java.util.*;
-import java.rmi.RemoteException;
-import java.io.*;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.UnknownHostException;
-import java.util.Date;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -120,7 +115,6 @@ public class TCPResourceManager extends ResourceManager {
 						break;
 					} else if (params[0].equals("Bundle")) {
 
-
 						int customerID = Integer.parseInt(params[1]);
 						Vector<String> flightNumbers = new Vector<String>();
 						String location = params[params.length - 3];
@@ -132,14 +126,16 @@ public class TCPResourceManager extends ResourceManager {
 							flightNumbers.add(params[i]);
 						}
 
-						returnMessage = String.valueOf(tcpResourceManager.bundle(customerID, flightNumbers, location, wantsCar, wantsRoom));
+						returnMessage = String.valueOf(
+								tcpResourceManager.bundle(customerID, flightNumbers, location, wantsCar, wantsRoom));
 						break;
 					}
 				}
 
 				outToClient.println(returnMessage);
 			} catch (IOException e) {
-				System.out.println("Exception caught when trying to listen on port " + 9030 + " in TCP Resource Manager");
+				System.out
+						.println("Exception caught when trying to listen on port " + 9030 + " in TCP Resource Manager");
 			}
 		}
 

@@ -5,20 +5,10 @@
 
 package Server.Common;
 
-import Server.Common.Car;
-import Server.Common.Customer;
-import Server.Common.Flight;
-import Server.Common.RMHashMap;
-import Server.Common.RMItem;
-import Server.Common.ReservableItem;
-import Server.Common.ReservedItem;
-import Server.Common.Room;
-import Server.Common.Trace;
 import Server.Interface.*;
 
 import java.util.*;
 import java.rmi.RemoteException;
-import java.io.*;
 
 public class FlightsResourceManager implements IResourceManager {
 	protected String m_name = "";
