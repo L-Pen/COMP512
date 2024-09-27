@@ -168,7 +168,7 @@ public class serverSocketThread extends Thread {
                 String[] params = message.split(",");
                 boolean preSuccess = true;
                 String customerId = params[1];
-                for (int i = 0; i < params.length - 6; ++i) {
+                for (int i = 0; i < params.length - 5; ++i) {
                     flightsSocket = connectTcp(RMIMiddleware.flightsServer);
                     String flightNumber = params[2 + i];
                     String payloadBF = "ReserveFlight," + customerId + "," + flightNumber;
@@ -176,9 +176,12 @@ public class serverSocketThread extends Thread {
                     preSuccess = isTrue(res) && preSuccess;
                     flightsSocket.close();
                 }
-                String location = params[params.length - 4];
-                boolean wantCar = isTrue(params[params.length - 3]);
-                boolean wantRoom = isTrue(params[params.length - 2]);
+                String location = params[params.length - 3];
+                boolean wantCar = isTrue(params[params.length - 2]);
+                boolean wantRoom = isTrue(params[params.length - 1]);
+                System.out.println(location);
+                System.out.println(wantCar);
+                System.out.println(wantRoom);
                 if (wantCar && preSuccess) {
                     String payloadBC = "ReserveCar," + customerId + "," + location;
                     res = sendMessageToSocket(carsSocket, payloadBC);
