@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.net.UnknownHostException;
 
 public class serverSocketThread extends Thread {
     Socket clientSocket;
@@ -58,116 +59,129 @@ public class serverSocketThread extends Thread {
     }
 
     private String routeMessage(String commandName, String message) throws IOException {
+        Socket flightsSocket = connectTcp(RMIMiddleware.flightsServer);
+        Socket carsSocket = connectTcp(RMIMiddleware.carsServer);
+        Socket roomsSocket = connectTcp(RMIMiddleware.roomsServer);
+        Socket customersSocket = connectTcp(RMIMiddleware.customersServer);
         String res = "error";
         switch (commandName) {
             case "AddFlight":
-                res = sendMessageToSocket(RMIMiddleware.flightsSocket, message);
+                res = sendMessageToSocket(flightsSocket, message);
                 if (checkSuccess(res)) {
-                    sendMessageToSocket(RMIMiddleware.customersSocket, message);
+                    sendMessageToSocket(customersSocket, message);
                 }
                 break;
             case "AddCars":
-                res = sendMessageToSocket(RMIMiddleware.carsSocket, message);
+                res = sendMessageToSocket(carsSocket, message);
                 if (checkSuccess(res)) {
-                    sendMessageToSocket(RMIMiddleware.customersSocket, message);
+                    sendMessageToSocket(customersSocket, message);
                 }
                 break;
             case "AddRooms":
-                res = sendMessageToSocket(RMIMiddleware.roomsSocket, message);
+                res = sendMessageToSocket(roomsSocket, message);
                 if (checkSuccess(res)) {
-                    sendMessageToSocket(RMIMiddleware.customersSocket, message);
+                    sendMessageToSocket(customersSocket, message);
                 }
                 break;
             case "AddCustomer":
-                res = sendMessageToSocket(RMIMiddleware.customersSocket, message);
+                res = sendMessageToSocket(customersSocket, message);
                 String payload = "AddCustomer," + res;
-                sendMessageToSocket(RMIMiddleware.flightsSocket, payload);
-                sendMessageToSocket(RMIMiddleware.carsSocket, payload);
-                sendMessageToSocket(RMIMiddleware.roomsSocket, payload);
+                sendMessageToSocket(flightsSocket, payload);
+                sendMessageToSocket(carsSocket, payload);
+                sendMessageToSocket(roomsSocket, payload);
                 break;
             case "AddCustomerID":
-                res = sendMessageToSocket(RMIMiddleware.customersSocket, message);
+                res = sendMessageToSocket(customersSocket, message);
                 if (checkSuccess(res)) {
-                    sendMessageToSocket(RMIMiddleware.flightsSocket, message);
-                    sendMessageToSocket(RMIMiddleware.carsSocket, message);
-                    sendMessageToSocket(RMIMiddleware.roomsSocket, message);
+                    sendMessageToSocket(flightsSocket, message);
+                    sendMessageToSocket(carsSocket, message);
+                    sendMessageToSocket(roomsSocket, message);
                 }
                 break;
             case "DeleteFlight":
-                res = sendMessageToSocket(RMIMiddleware.flightsSocket, message);
+                res = sendMessageToSocket(flightsSocket, message);
                 if (checkSuccess(res)) {
-                    sendMessageToSocket(RMIMiddleware.customersSocket, message);
+                    sendMessageToSocket(customersSocket, message);
                 }
                 break;
             case "DeleteCars":
-                res = sendMessageToSocket(RMIMiddleware.carsSocket, message);
+                res = sendMessageToSocket(carsSocket, message);
                 if (checkSuccess(res)) {
-                    sendMessageToSocket(RMIMiddleware.customersSocket, message);
+                    sendMessageToSocket(customersSocket, message);
                 }
                 break;
             case "DeleteRooms":
-                res = sendMessageToSocket(RMIMiddleware.roomsSocket, message);
+                res = sendMessageToSocket(roomsSocket, message);
                 if (checkSuccess(res)) {
-                    sendMessageToSocket(RMIMiddleware.customersSocket, message);
+                    sendMessageToSocket(customersSocket, message);
                 }
                 break;
             case "DeleteCustomer":
-                res = sendMessageToSocket(RMIMiddleware.customersSocket, message);
+                res = sendMessageToSocket(customersSocket, message);
                 if (checkSuccess(res)) {
-                    sendMessageToSocket(RMIMiddleware.flightsSocket, message);
-                    sendMessageToSocket(RMIMiddleware.carsSocket, message);
-                    sendMessageToSocket(RMIMiddleware.roomsSocket, message);
+                    sendMessageToSocket(flightsSocket, message);
+                    sendMessageToSocket(carsSocket, message);
+                    sendMessageToSocket(roomsSocket, message);
                 }
                 break;
             case "QueryFlight":
-                res = sendMessageToSocket(RMIMiddleware.flightsSocket, message);
+                res = sendMessageToSocket(flightsSocket, message);
                 break;
             case "QueryCars":
-                res = sendMessageToSocket(RMIMiddleware.carsSocket, message);
+                res = sendMessageToSocket(carsSocket, message);
                 break;
             case "QueryRooms":
-                res = sendMessageToSocket(RMIMiddleware.roomsSocket, message);
+                res = sendMessageToSocket(roomsSocket, message);
                 break;
             case "QueryCustomer":
-                res = sendMessageToSocket(RMIMiddleware.customersSocket, message);
+                res = sendMessageToSocket(customersSocket, message);
                 break;
             case "QueryFlightPrice":
-                res = sendMessageToSocket(RMIMiddleware.flightsSocket, message);
+                res = sendMessageToSocket(flightsSocket, message);
                 break;
             case "QueryCarsPrice":
-                res = sendMessageToSocket(RMIMiddleware.carsSocket, message);
+                res = sendMessageToSocket(carsSocket, message);
                 break;
             case "QueryRoomsPrice":
-                res = sendMessageToSocket(RMIMiddleware.roomsSocket, message);
+                res = sendMessageToSocket(roomsSocket, message);
                 break;
             case "ReserveFlight":
-                res = sendMessageToSocket(RMIMiddleware.flightsSocket, message);
+                res = sendMessageToSocket(flightsSocket, message);
                 if (checkSuccess(res)) {
-                    sendMessageToSocket(RMIMiddleware.customersSocket, message);
+                    sendMessageToSocket(customersSocket, message);
                 }
                 break;
             case "ReserveCar":
-                res = sendMessageToSocket(RMIMiddleware.carsSocket, message);
+                res = sendMessageToSocket(carsSocket, message);
                 if (checkSuccess(res)) {
-                    sendMessageToSocket(RMIMiddleware.customersSocket, message);
+                    sendMessageToSocket(customersSocket, message);
                 }
                 break;
             case "ReserveRoom":
-                res = sendMessageToSocket(RMIMiddleware.roomsSocket, message);
+                res = sendMessageToSocket(roomsSocket, message);
                 if (checkSuccess(res)) {
-                    sendMessageToSocket(RMIMiddleware.customersSocket, message);
+                    sendMessageToSocket(customersSocket, message);
                 }
                 break;
             case "Bundle":
                 break;
             default:
+                System.out.println(commandName);
                 return "error";
         }
+        flightsSocket.close();
+        carsSocket.close();
+        roomsSocket.close();
+        customersSocket.close();
         return res;
     }
 
     private static boolean checkSuccess(String success) {
         return success.equals("true");
+    }
+
+    private static Socket connectTcp(String hostname) throws UnknownHostException, IOException {
+        return new Socket(hostname, 9030); // establish a socket with a server using the given port#
     }
 
 }

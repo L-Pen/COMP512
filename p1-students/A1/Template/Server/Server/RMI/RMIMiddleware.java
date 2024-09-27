@@ -28,10 +28,10 @@ public class RMIMiddleware implements IResourceManager {
     private static IResourceManager roomsResourceManager;
     private static IResourceManager customersResourceManager;
 
-    public static Socket flightsSocket;
-    public static Socket carsSocket;
-    public static Socket roomsSocket;
-    public static Socket customersSocket;
+    public static String flightsServer;
+    public static String carsServer;
+    public static String roomsServer;
+    public static String customersServer;
 
     private static int registryPortNumber = 1030;
 
@@ -46,10 +46,10 @@ public class RMIMiddleware implements IResourceManager {
         // Create a new Server object
         RMIMiddleware server = new RMIMiddleware();
 
-        String flightsServer = args[0];
-        String carsServer = args[1];
-        String roomsServer = args[2];
-        String customersServer = args[3];
+        flightsServer = args[0];
+        carsServer = args[1];
+        roomsServer = args[2];
+        customersServer = args[3];
         runType = args[4];
 
         if (runType.equals("rmi")) {
@@ -67,18 +67,10 @@ public class RMIMiddleware implements IResourceManager {
         ServerSocket serverSocket = new ServerSocket(9030);
         System.out.println("Server ready...");
         // connect to resource managers...
-        flightsSocket = connectTcp(flightsServer);
-        carsSocket = connectTcp(carsServer);
-        roomsSocket = connectTcp(roomsServer);
-        customersSocket = connectTcp(customersServer);
         while (true) {
             Socket socket = serverSocket.accept();
             new serverSocketThread(socket).start();
         }
-    }
-
-    private static Socket connectTcp(String hostname) throws UnknownHostException, IOException {
-        return new Socket(hostname, 9030); // establish a socket with a server using the given port#
     }
 
     private static void runRMI(String flightsServer, String carsServer, String roomsServer, String customersServer,
