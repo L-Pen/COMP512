@@ -118,7 +118,25 @@ public class TCPResourceManager extends ResourceManager {
 						returnMessage = String
 								.valueOf(tcpResourceManager.reserveRoom(Integer.parseInt(params[1]), params[2]));
 						break;
-					}
+					} else if (params[0].equals("Bundle")) {
+
+
+						int customerID = Integer.parseInt(params[1]);
+						Vector<String> flightNumbers = new Vector<String>();
+						String location = params[params.length - 4];;
+						boolean wantsCar = params[params.length - 3].equals("1") ? true : false;
+						boolean wantsRoom = params[params.length - 2].equals("1") ? true : false;
+
+
+						// find alpha numberic element
+						for (int i = 2; i < params.length - 4; i++) {
+							flightNumbers.add(params[i]);
+						}
+
+						returnMessage = String.valueOf(tcpResourceManager.bundle(customerID, flightNumbers, location, wantsCar, wantsRoom));
+						break;
+					
+
 				}
 
 				outToClient.println(returnMessage);
