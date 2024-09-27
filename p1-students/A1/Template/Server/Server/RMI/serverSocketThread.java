@@ -85,7 +85,7 @@ public class serverSocketThread extends Thread {
                 break;
             case "AddCustomer":
                 res = sendMessageToSocket(customersSocket, message);
-                String payload = "AddCustomer," + res;
+                String payload = "AddCustomerID," + res;
                 sendMessageToSocket(flightsSocket, payload);
                 sendMessageToSocket(carsSocket, payload);
                 sendMessageToSocket(roomsSocket, payload);
