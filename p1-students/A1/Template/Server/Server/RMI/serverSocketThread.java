@@ -32,7 +32,6 @@ public class serverSocketThread extends Thread {
 
                 outToClient.println(result);
             }
-            clientSocket.close();
         } catch (IOException e) {
         }
     }
@@ -52,6 +51,7 @@ public class serverSocketThread extends Thread {
                 System.out.println("result: " + res);
                 return res;
             }
+            System.out.println("waiting for answer...");
         }
     }
 
