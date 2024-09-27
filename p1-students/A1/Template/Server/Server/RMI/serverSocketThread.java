@@ -210,7 +210,7 @@ public class serverSocketThread extends Thread {
     }
 
     private static boolean isTrue(String success) {
-        return success.equals("true");
+        return success.equals("true") || success.equals("1");
     }
 
     private static Socket connectTcp(String hostname) throws UnknownHostException, IOException {
