@@ -64,7 +64,14 @@ public class RMIClient extends Client {
 				System.out.print((char) 27 + "[32;1m\n>] " + (char) 27 + "[0m");
 				String readerInput = bufferedReader.readLine().trim(); // read user's input
 				Vector<String> arguments = parse(readerInput);
-				Command cmd = Command.fromString((String) arguments.elementAt(0));
+				Command cmd = null;
+				try{
+					cmd = Command.fromString((String) arguments.elementAt(0));
+				} catch (IllegalArgumentException e) {
+					System.out.println("Invalid command");
+					continue;
+				}
+				
 				if (cmd.equals(Command.Quit))
 					break;
 
