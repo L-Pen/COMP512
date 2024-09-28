@@ -83,9 +83,40 @@ public class RMIClient extends Client {
 					commandString += (String) arguments.elementAt(i) + ",";
 				}
 				outToServer.println(commandString); // send the user's input via the output stream to the server
+				
 				String res = inFromServer.readLine(); // receive the server's result via the input stream from the
 														// server
-				System.out.println("result: " + res); // print the server result to the user
+
+				if(cmd.equals(Command.AddCustomer)){
+					System.out.println("Add customer ID: " + res); //what about the bad cases?
+				}
+				else if (cmd.equals(Command.AddCustomerID)){
+					System.out.println("Add customer ID: " + res);
+				}
+				else if (cmd.equals(Command.QueryFlight)){
+					System.out.println("Number of seats available: " + res);
+				}
+				else if (cmd.equals(Command.QueryCars)){
+					System.out.println("Number of cars at this location: " + res);
+				}
+				else if (cmd.equals(Command.QueryRooms)){
+					System.out.println("Number of rooms at this location: " + res);
+				}
+				else if (cmd.equals(Command.QueryCustomer)){ //check for this
+					System.out.println("Customer info: " + res);
+				}
+				else if (cmd.equals(Command.QueryFlightPrice)){
+					System.out.println("Price of a seat: " + res);
+				}
+				else if (cmd.equals(Command.QueryCarsPrice)){
+					System.out.println("Price of cars at this location: " + res);
+				}
+				else if (cmd.equals(Command.QueryRoomsPrice)){
+					System.out.println("Price of rooms at this location: " + res);
+				}
+				else{
+					System.out.println(res.equals("true") ? "Operation successful" : "Operation failed");
+				}
 			}
 
 			socket.close();
