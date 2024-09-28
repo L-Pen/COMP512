@@ -254,6 +254,21 @@ public class ResourceManager implements IResourceManager {
 		}
 	}
 
+	public String queryCustomerInfoTCP(int customerID) throws RemoteException {
+		Trace.info("RM::queryCustomerInfo(" + customerID + ") called");
+		Customer customer = (Customer) readData(Customer.getKey(customerID));
+		if (customer == null) {
+			Trace.warn("RM::queryCustomerInfo(" + customerID + ") failed--customer doesn't exist");
+			// NOTE: don't change this--WC counts on this value indicating a customer does
+			// not exist...
+			return "";
+		} else {
+			Trace.info("RM::queryCustomerInfo(" + customerID + ")");
+			System.out.println(customer.getBill());
+			return customer.getBillTCP();
+		}
+	}
+
 	public int newCustomer() throws RemoteException {
 		Trace.info("RM::newCustomer() called");
 		// Generate a globally unique ID for the new customer; if it generates
