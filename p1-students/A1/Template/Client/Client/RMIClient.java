@@ -90,9 +90,6 @@ public class RMIClient extends Client {
 				if(cmd.equals(Command.AddCustomer)){
 					System.out.println("Add customer ID: " + res); //what about the bad cases?
 				}
-				else if (cmd.equals(Command.AddCustomerID)){
-					System.out.println("Add customer ID: " + res);
-				}
 				else if (cmd.equals(Command.QueryFlight)){
 					System.out.println("Number of seats available: " + res);
 				}
