@@ -1,18 +1,32 @@
 package Client;
 
+import java.util.*;
+import java.io.*;
+import java.rmi.RemoteException;
+
 public class testRMI {
 
-    static RMIClient client;
-
     public static void main(String[] args) {
-        client = new RMIClient();
-        String host = "";
+        // run tests
+    }
+
+    private RMIClient setUpClient(String host) {
+        RMIClient client = new RMIClient();
         int port = 1030;
         String name = "Middleware";
         client.connectServer(host, port, name);
+        return client;
     }
 
-    public void testAddFlight() {
+    private Vector<String> createVector(String... elements) {
+        Vector<String> vector = new Vector<>();
+        Arrays.stream(elements).forEach(vector::add);
+        return vector;
+    }
+
+    public void testAddFlight() throws NumberFormatException, RemoteException {
+        RMIClient client = setUpClient("");
+        client.execute(Command.AddFlight, createVector("1", "1", "1"));
     }
 
     public void testAddCars() {

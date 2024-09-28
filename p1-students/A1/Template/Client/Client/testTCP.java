@@ -1,15 +1,25 @@
 package Client;
 
 import Client.RMIClient;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.util.*;
+import java.io.*;
 
 public class testTCP {
 
-    public void setUp() {
-        RMIClient client = new RMIClient();
+    public void setUp() throws UnknownHostException, IOException {
+        String s_serverHost = "tr-open-03";
+        Socket socket = new Socket(s_serverHost, 9030);
+        PrintWriter outToServer = new PrintWriter(socket.getOutputStream(), true);
+        BufferedReader inFromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+        BufferedReader bufferedReader = new java.io.BufferedReader(new InputStreamReader(System.in));
+
     }
 
     public void tearDown() {
-        // cleanup logic after each test
+
     }
 
     public void testAddFlight() {
