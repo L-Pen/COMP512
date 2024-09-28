@@ -31,7 +31,7 @@ public class serverSocketThread extends Thread {
                 // on res, use outToClient to send res back to client
                 result = routeMessage(commandName, message);
 
-                outToClient.println(result);
+                // outToClient.println(result);
             }
             clientSocket.close();
         } catch (IOException e) {

@@ -59,7 +59,7 @@ public class RMIMiddleware implements IResourceManager {
     private static void runTCP(String flightsServer, String carsServer, String roomsServer, String customersServer)
             throws IOException {
         ServerSocket serverSocket = new ServerSocket(9030);
-        System.out.println("Server ready...");
+        System.out.println("Middleware Server ready...");
         // connect to resource managers...
         while (true) {
             Socket socket = serverSocket.accept();
