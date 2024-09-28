@@ -50,15 +50,6 @@ public class Customer extends RMItem {
 		return s;
 	}
 
-	public String getBillTCP() {
-		String s = "Bill for customer " + m_ID + "\t";
-		for (String key : m_reservations.keySet()) {
-			ReservedItem item = (ReservedItem) m_reservations.get(key);
-			s += +item.getCount() + " " + item.getReservableItemKey() + " $" + item.getPrice() + "\t";
-		}
-		return s;
-	}
-
 	public String toString() {
 		String ret = "--- BEGIN CUSTOMER key='";
 		ret += getKey() + "', id='" + getID() + "', reservations=>\n" + m_reservations.toString() + "\n";

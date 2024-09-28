@@ -89,8 +89,7 @@ public class TCPResourceManager extends ResourceManager {
 						returnMessage = String.valueOf(tcpResourceManager.queryRooms(params[1]));
 						break;
 					} else if (params[0].equals("QueryCustomer")) {
-						returnMessage = tcpResourceManager.queryCustomerInfoTCP(Integer.parseInt(params[1]));
-						System.out.println("HERE ! QueryCustomer: " + returnMessage);
+						returnMessage = tcpResourceManager.queryCustomerInfo(Integer.parseInt(params[1]));
 						break;
 					} else if (params[0].equals("QueryFlightPrice")) {
 						returnMessage = String
