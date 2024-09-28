@@ -1,11 +1,15 @@
 package Client;
 
-import Client.RMIClient;
-
 public class testRMI {
 
-    public static void main(String[] args) {
+    static RMIClient client;
 
+    public static void main(String[] args) {
+        client = new RMIClient();
+        String host = "";
+        int port = 1030;
+        String name = "Middleware";
+        client.connectServer(host, port, name);
     }
 
     public void testAddFlight() {
