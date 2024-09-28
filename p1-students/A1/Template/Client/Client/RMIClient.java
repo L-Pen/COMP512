@@ -45,73 +45,54 @@ public class RMIClient extends Client {
 			}
 		}
 		if (args[2].equals("tcp")) {
-			Socket socket = new Socket(s_serverHost, 9030); // establish a socket with a server using the given port#
+			Socket socket = new Socket(s_serverHost, 9030);
+			PrintWriter outToServer = new PrintWriter(socket.getOutputStream(), true);
+			BufferedReader inFromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-			PrintWriter outToServer = new PrintWriter(socket.getOutputStream(), true); // open an output stream to the
-																						// server...
-			BufferedReader inFromServer = new BufferedReader(new InputStreamReader(socket.getInputStream())); // open an
-																												// input
-																												// stream
-																												// from
-																												// the
-																												// server...
-
-			BufferedReader bufferedReader = new java.io.BufferedReader(new InputStreamReader(System.in)); // to read
-																											// user's
-																											// input
+			BufferedReader bufferedReader = new java.io.BufferedReader(new InputStreamReader(System.in));
 			while (true) // works forever
 			{
 				System.out.print((char) 27 + "[32;1m\n>] " + (char) 27 + "[0m");
 				String readerInput = bufferedReader.readLine().trim(); // read user's input
 				Vector<String> arguments = parse(readerInput);
 				Command cmd = null;
-				try{
+				try {
 					cmd = Command.fromString((String) arguments.elementAt(0));
 					printInputs(cmd, arguments);
 				} catch (IllegalArgumentException e) {
 					System.out.println("Invalid command");
 					continue;
 				}
-				
+
 				if (cmd.equals(Command.Quit))
 					break;
-
-				
 
 				String commandString = cmd.name() + ",";
 				for (int i = 1; i < arguments.size(); i++) {
 					commandString += (String) arguments.elementAt(i) + ",";
 				}
 				outToServer.println(commandString); // send the user's input via the output stream to the server
-				
+
 				String res = inFromServer.readLine(); // receive the server's result via the input stream from the
 														// server
 
-				if(cmd.equals(Command.AddCustomer)){
-					System.out.println("Add customer ID: " + res); //what about the bad cases?
-				}
-				else if (cmd.equals(Command.QueryFlight)){
+				if (cmd.equals(Command.AddCustomer)) {
+					System.out.println("Add customer ID: " + res); // what about the bad cases?
+				} else if (cmd.equals(Command.QueryFlight)) {
 					System.out.println("Number of seats available: " + res);
-				}
-				else if (cmd.equals(Command.QueryCars)){
+				} else if (cmd.equals(Command.QueryCars)) {
 					System.out.println("Number of cars at this location: " + res);
-				}
-				else if (cmd.equals(Command.QueryRooms)){
+				} else if (cmd.equals(Command.QueryRooms)) {
 					System.out.println("Number of rooms at this location: " + res);
-				}
-				else if (cmd.equals(Command.QueryCustomer)){ //check for this
+				} else if (cmd.equals(Command.QueryCustomer)) { // check for this
 					System.out.println("Customer info: " + res);
-				}
-				else if (cmd.equals(Command.QueryFlightPrice)){
+				} else if (cmd.equals(Command.QueryFlightPrice)) {
 					System.out.println("Price of a seat: " + res);
-				}
-				else if (cmd.equals(Command.QueryCarsPrice)){
+				} else if (cmd.equals(Command.QueryCarsPrice)) {
 					System.out.println("Price of cars at this location: " + res);
-				}
-				else if (cmd.equals(Command.QueryRoomsPrice)){
+				} else if (cmd.equals(Command.QueryRoomsPrice)) {
 					System.out.println("Price of rooms at this location: " + res);
-				}
-				else{
+				} else {
 					System.out.println(res.equals("true") ? "Operation successful" : "Operation failed");
 				}
 			}
@@ -155,7 +136,7 @@ public class RMIClient extends Client {
 		}
 	}
 
-	public static void printInputs(Command cmd,Vector<String> arguments ) {
+	public static void printInputs(Command cmd, Vector<String> arguments) {
 		switch (cmd) {
 			case Help: {
 				if (arguments.size() == 1) {
@@ -336,4 +317,3 @@ public class RMIClient extends Client {
 		}
 	}
 }
-
