@@ -272,9 +272,6 @@ public class RMIClient extends Client {
 				System.out.println("Reserving a car at a location");
 				System.out.println("-Customer ID: " + arguments.elementAt(1));
 				System.out.println("-Car Location: " + arguments.elementAt(2));
-
-				int customerID = toInt(arguments.elementAt(1));
-				String location = arguments.elementAt(2);
 				break;
 			}
 			case ReserveRoom: {
@@ -283,9 +280,6 @@ public class RMIClient extends Client {
 				System.out.println("Reserving a room at a location");
 				System.out.println("-Customer ID: " + arguments.elementAt(1));
 				System.out.println("-Room Location: " + arguments.elementAt(2));
-
-				int customerID = toInt(arguments.elementAt(1));
-				String location = arguments.elementAt(2);
 				break;
 			}
 			case Bundle: {
