@@ -102,7 +102,7 @@ public class RMIClient extends Client {
 		}
 	}
 
-	private static String sendTcpRequest(int port, String commandString) throws IOException {
+	public static String sendTcpRequest(int port, String commandString) throws IOException {
 		Socket socket = new Socket(s_serverHost, port);
 		PrintWriter outToServer = new PrintWriter(socket.getOutputStream(), true);
 		BufferedReader inFromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
