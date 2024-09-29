@@ -26,7 +26,7 @@ public class RMIClient extends Client {
 		if (args.length > 1) {
 			s_serverName = args[1];
 		}
-		if (args.length > 3) {
+		if (args.length > 4) {
 			System.err.println((char) 27 + "[31;1mClient exception: " + (char) 27
 					+ "[0mUsage: java client.RMIClient [server_hostname [server_rmiobject]]");
 			System.exit(1);
@@ -45,61 +45,76 @@ public class RMIClient extends Client {
 			}
 		}
 		if (args[2].equals("tcp")) {
-			Socket socket = new Socket(s_serverHost, 9030);
-			PrintWriter outToServer = new PrintWriter(socket.getOutputStream(), true);
-			BufferedReader inFromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			int port = 9030;
+			if (args.length > 3)
+				port = Integer.parseInt(args[3]);
+			try {
+				while (true) // works forever
+				{
 
-			BufferedReader bufferedReader = new java.io.BufferedReader(new InputStreamReader(System.in));
-			while (true) // works forever
-			{
-				System.out.print((char) 27 + "[32;1m\n>] " + (char) 27 + "[0m");
-				String readerInput = bufferedReader.readLine().trim(); // read user's input
-				Vector<String> arguments = parse(readerInput);
-				Command cmd = null;
-				try {
-					cmd = Command.fromString((String) arguments.elementAt(0));
-					printInputs(cmd, arguments);
-				} catch (IllegalArgumentException e) {
-					System.out.println("Invalid command");
-					continue;
+					BufferedReader bufferedReader = new java.io.BufferedReader(new InputStreamReader(System.in));
+					System.out.print((char) 27 + "[32;1m\n>] " + (char) 27 + "[0m");
+					String readerInput = bufferedReader.readLine().trim(); // read user's input
+					Vector<String> arguments = parse(readerInput);
+					Command cmd = null;
+					try {
+						cmd = Command.fromString((String) arguments.elementAt(0));
+						printInputs(cmd, arguments);
+					} catch (IllegalArgumentException e) {
+						System.out.println("Invalid command");
+						continue;
+					}
+
+					if (cmd.equals(Command.Quit))
+						break;
+
+					String commandString = cmd.name() + ",";
+					for (int i = 1; i < arguments.size(); i++) {
+						commandString += (String) arguments.elementAt(i) + ",";
+					}
+
+					String res = sendTcpRequest(port, commandString);
+
+					if (cmd.equals(Command.AddCustomer)) {
+						System.out.println("Add customer ID: " + res); // what about the bad cases?
+					} else if (cmd.equals(Command.QueryFlight)) {
+						System.out.println("Number of seats available: " + res);
+					} else if (cmd.equals(Command.QueryCars)) {
+						System.out.println("Number of cars at this location: " + res);
+					} else if (cmd.equals(Command.QueryRooms)) {
+						System.out.println("Number of rooms at this location: " + res);
+					} else if (cmd.equals(Command.QueryCustomer)) { // check for this
+						System.out.println("Customer info: " + res);
+					} else if (cmd.equals(Command.QueryFlightPrice)) {
+						System.out.println("Price of a seat: " + res);
+					} else if (cmd.equals(Command.QueryCarsPrice)) {
+						System.out.println("Price of cars at this location: " + res);
+					} else if (cmd.equals(Command.QueryRoomsPrice)) {
+						System.out.println("Price of rooms at this location: " + res);
+					} else {
+						System.out.println(res.equals("true") ? "Operation successful" : "Operation failed");
+					}
+
 				}
-
-				if (cmd.equals(Command.Quit))
-					break;
-
-				String commandString = cmd.name() + ",";
-				for (int i = 1; i < arguments.size(); i++) {
-					commandString += (String) arguments.elementAt(i) + ",";
-				}
-				outToServer.println(commandString); // send the user's input via the output stream to the server
-
-				String res = inFromServer.readLine(); // receive the server's result via the input stream from the
-														// server
-
-				if (cmd.equals(Command.AddCustomer)) {
-					System.out.println("Add customer ID: " + res); // what about the bad cases?
-				} else if (cmd.equals(Command.QueryFlight)) {
-					System.out.println("Number of seats available: " + res);
-				} else if (cmd.equals(Command.QueryCars)) {
-					System.out.println("Number of cars at this location: " + res);
-				} else if (cmd.equals(Command.QueryRooms)) {
-					System.out.println("Number of rooms at this location: " + res);
-				} else if (cmd.equals(Command.QueryCustomer)) { // check for this
-					System.out.println("Customer info: " + res);
-				} else if (cmd.equals(Command.QueryFlightPrice)) {
-					System.out.println("Price of a seat: " + res);
-				} else if (cmd.equals(Command.QueryCarsPrice)) {
-					System.out.println("Price of cars at this location: " + res);
-				} else if (cmd.equals(Command.QueryRoomsPrice)) {
-					System.out.println("Price of rooms at this location: " + res);
-				} else {
-					System.out.println(res.equals("true") ? "Operation successful" : "Operation failed");
-				}
+			} catch (Exception e) {
+				System.err.println("An error occured... Disconnecting");
 			}
-
-			socket.close();
 		}
+	}
 
+	private static String sendTcpRequest(int port, String commandString) throws IOException {
+		Socket socket = new Socket(s_serverHost, port);
+		PrintWriter outToServer = new PrintWriter(socket.getOutputStream(), true);
+		BufferedReader inFromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+		outToServer.println(commandString); // send the user's input via the output stream to the server
+
+		String messageInProgress = null;
+		String res = "";
+		while ((messageInProgress = inFromServer.readLine()) != null) {
+			res += messageInProgress + "\n";
+		}
+		socket.close();
+		return res.trim();
 	}
 
 	public RMIClient() {

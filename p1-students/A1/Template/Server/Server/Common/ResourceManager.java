@@ -150,7 +150,7 @@ public class ResourceManager implements IResourceManager {
 			item.setReserved(item.getReserved() - 1);
 			writeData(item.getKey(), item);
 
-			Trace.info("RM::reserveItem(" + customerID + ", " + key + ", " + location + ") succeeded");
+			Trace.info("RM::unreserveItem(" + customerID + ", " + key + ", " + location + ") succeeded");
 			return true;
 		}
 	}
@@ -379,26 +379,16 @@ public class ResourceManager implements IResourceManager {
 	public boolean bundle(int customerId, Vector<String> flightNumbers, String location, boolean car, boolean room)
 			throws RemoteException {
 
-		RMHashMap uncorruptedHashMap = (RMHashMap) m_data.clone();
-
 		for (String flightNumber : flightNumbers) {
-			if (!reserveFlight(customerId, Integer.parseInt(flightNumber))) {
-				return false;
-			} else {
-				m_data = uncorruptedHashMap;
-			}
+			reserveFlight(customerId, Integer.parseInt(flightNumber));
 		}
 
-		if (car && !reserveCar(customerId, location)) {
-			return false;
-		} else {
-			m_data = uncorruptedHashMap;
+		if (car) {
+			reserveCar(customerId, location);
 		}
 
-		if (room && !reserveRoom(customerId, location)) {
-			return false;
-		} else {
-			m_data = uncorruptedHashMap;
+		if (room) {
+			reserveRoom(customerId, location);
 		}
 
 		return true;

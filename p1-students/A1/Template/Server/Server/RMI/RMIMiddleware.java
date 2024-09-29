@@ -64,6 +64,7 @@ public class RMIMiddleware implements IResourceManager {
         System.out.println("Middleware Server ready...");
         // connect to resource managers...
         while (true) {
+            // waits here
             Socket socket = serverSocket.accept();
             new serverSocketThread(socket).start();
         }
@@ -276,32 +277,41 @@ public class RMIMiddleware implements IResourceManager {
 
         boolean preSuccess = true;
 
+        Vector<String> flightsToUnreserve = new Vector<String>();
+        boolean unreserveCar = false;
+        boolean unreserveRoom = false;
+
         for (String flightNumber : flightNumbers) {
-            preSuccess = preSuccess
-                    && RMIMiddleware.flightsResourceManager.reserveFlight(customerID, Integer.parseInt(flightNumber));
+            boolean success = RMIMiddleware.flightsResourceManager.reserveFlight(customerID,
+                    Integer.parseInt(flightNumber));
+            if (success)
+                flightsToUnreserve.add(flightNumber);
+            preSuccess = preSuccess && success;
         }
-        System.out.println("PreSuccess: " + preSuccess);
-        System.out.println("Reserving car: " + car);
-        if (car && preSuccess) {
+        if (car) {
             System.out.println("Reserving car");
-            preSuccess = preSuccess && RMIMiddleware.carsResourceManager.reserveCar(customerID, location);
+            boolean success = RMIMiddleware.carsResourceManager.reserveCar(customerID, location);
+            unreserveCar = success;
+            preSuccess = preSuccess && success;
         }
-        System.out.println("Reserving room: " + room);
-        System.out.println("PreSuccess: " + preSuccess);
-        if (room && preSuccess) {
+        if (room) {
             System.out.println("Reserving room");
-            preSuccess = preSuccess && RMIMiddleware.roomsResourceManager.reserveRoom(customerID, location);
+            boolean success = RMIMiddleware.roomsResourceManager.reserveRoom(customerID, location);
+            unreserveRoom = success;
+            preSuccess = preSuccess && success;
         }
 
         if (preSuccess) {
             return RMIMiddleware.customersResourceManager.bundle(customerID, flightNumbers, location, car, room);
         } else {
             System.out.println("Failed... rolling back");
-            for (String flightNumber : flightNumbers) {
+            for (String flightNumber : flightsToUnreserve) {
                 RMIMiddleware.flightsResourceManager.unreserveFlight(customerID, Integer.parseInt(flightNumber));
             }
-            RMIMiddleware.carsResourceManager.unreserveCar(customerID, location);
-            RMIMiddleware.roomsResourceManager.unreserveRoom(customerID, location);
+            if (unreserveCar)
+                RMIMiddleware.carsResourceManager.unreserveCar(customerID, location);
+            if (unreserveRoom)
+                RMIMiddleware.roomsResourceManager.unreserveRoom(customerID, location);
         }
 
         return false;
