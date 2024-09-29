@@ -33,7 +33,7 @@ public class RMIMiddleware implements IResourceManager {
 
     public static void main(String args[]) throws Exception {
 
-        if (args.length != 5)
+        if (args.length < 5)
             throw new Exception(
                     "We need a flights, cars, rooms and customer server names. Whatever u put is not equal to 4");
 
@@ -46,19 +46,21 @@ public class RMIMiddleware implements IResourceManager {
         customersServer = args[3];
         runType = args[4];
 
+        int port = 9034;
+
         if (runType.equals("rmi")) {
             runRMI(flightsServer, carsServer, roomsServer, customersServer, server);
         } else if (runType.equals("tcp")) {
-            runTCP(flightsServer, carsServer, roomsServer, customersServer);
+            runTCP(port);
         } else {
             System.err.println("Unknown run type");
         }
 
     }
 
-    private static void runTCP(String flightsServer, String carsServer, String roomsServer, String customersServer)
+    private static void runTCP(int port)
             throws IOException {
-        ServerSocket serverSocket = new ServerSocket(9030);
+        ServerSocket serverSocket = new ServerSocket(port);
         System.out.println("Middleware Server ready...");
         // connect to resource managers...
         while (true) {

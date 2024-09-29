@@ -16,27 +16,32 @@ public class serverSocketThread extends Thread {
     }
 
     public void run() {
-        try {
-            BufferedReader inFromClient = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            PrintWriter outToClient = new PrintWriter(clientSocket.getOutputStream(), true);
-            String message = null;
-            while ((message = inFromClient.readLine()) != null) {
-                System.out.println("message:" + message);
-                String result = "";
-                String[] params = message.split(",");
-                String commandName = params[0];
-                // check which function client is trying to call eg AddFlights
-                // forward message to FlightResourceManager thru TCP
-                // wait for res from resource manager...
-                // on res, use outToClient to send res back to client
-                result = routeMessage(commandName, message);
+        while (true) {
+            try {
 
-                outToClient.println(result);
+                BufferedReader inFromClient = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                PrintWriter outToClient = new PrintWriter(clientSocket.getOutputStream(), true);
+                String message = null;
+                while ((message = inFromClient.readLine()) != null) {
+                    System.out.println("message:" + message);
+                    String result = "";
+                    String[] params = message.split(",");
+                    String commandName = params[0];
+                    // check which function client is trying to call eg AddFlights
+                    // forward message to FlightResourceManager thru TCP
+                    // wait for res from resource manager...
+                    // on res, use outToClient to send res back to client
+                    result = routeMessage(commandName, message);
+
+                    outToClient.println(result);
+                    clientSocket.close();
+
+                }
+            } catch (IOException e) {
+                System.err.println(e);
             }
-            clientSocket.close();
-        } catch (IOException e) {
-            System.err.println(e);
         }
+
     }
 
     private String sendMessageToSocket(Socket socket, String command) throws IOException {
@@ -51,7 +56,7 @@ public class serverSocketThread extends Thread {
         while (true) {
             res = inFromServer.readLine();
             if (res != null) {
-                System.out.println("result: " + res);
+                System.err.println("res" + res);
                 return res;
             }
             System.out.println("waiting for answer...");
@@ -59,11 +64,12 @@ public class serverSocketThread extends Thread {
     }
 
     private String routeMessage(String commandName, String message) throws IOException {
-        Socket flightsSocket = connectTcp(RMIMiddleware.flightsServer);
-        Socket carsSocket = connectTcp(RMIMiddleware.carsServer);
-        Socket roomsSocket = connectTcp(RMIMiddleware.roomsServer);
-        Socket customersSocket = connectTcp(RMIMiddleware.customersServer);
+        Socket flightsSocket = connectTcp(RMIMiddleware.flightsServer, 9030);
+        Socket carsSocket = connectTcp(RMIMiddleware.carsServer, 9031);
+        Socket roomsSocket = connectTcp(RMIMiddleware.roomsServer, 9032);
+        Socket customersSocket = connectTcp(RMIMiddleware.customersServer, 9033);
         String res = "error";
+        System.err.println("hi");
         switch (commandName) {
             case "AddFlight":
                 res = sendMessageToSocket(flightsSocket, message);
@@ -169,7 +175,7 @@ public class serverSocketThread extends Thread {
                 boolean preSuccess = true;
                 String customerId = params[1];
                 for (int i = 0; i < params.length - 5; ++i) {
-                    flightsSocket = connectTcp(RMIMiddleware.flightsServer);
+                    flightsSocket = connectTcp(RMIMiddleware.flightsServer, 9030);
                     String flightNumber = params[2 + i];
                     String payloadBF = "ReserveFlight," + customerId + "," + flightNumber;
                     res = sendMessageToSocket(flightsSocket, payloadBF);
@@ -210,8 +216,8 @@ public class serverSocketThread extends Thread {
         return success.equals("true") || success.equals("1");
     }
 
-    private static Socket connectTcp(String hostname) throws UnknownHostException, IOException {
-        return new Socket(hostname, 9030); // establish a socket with a server using the given port#
+    private static Socket connectTcp(String hostname, int port) throws UnknownHostException, IOException {
+        return new Socket(hostname, port); // establish a socket with a server using the given port#
     }
 
 }

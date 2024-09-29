@@ -18,12 +18,17 @@ public class TCPResourceManager extends ResourceManager {
 	}
 
 	public static void main(String[] args) throws IOException {
-		ServerSocket serverSocket = new ServerSocket(9030); // establish a server socket to receive messages over the
+
+		int port = 9030;
+		if (args.length == 2)
+			port = Integer.parseInt(args[1]);
+
+		ServerSocket serverSocket = new ServerSocket(port); // establish a server socket to receive messages over the
 															// network from clients
 
 		TCPResourceManager tcpResourceManager = new TCPResourceManager(args[0]);
 
-		System.out.println("Server ready..." + tcpResourceManager.m_name);
+		System.out.println("Server " + tcpResourceManager.m_name + " ready on port " + String.valueOf(port));
 
 		while (true) // runs forever
 		{
@@ -34,6 +39,8 @@ public class TCPResourceManager extends ResourceManager {
 
 				PrintWriter outToClient = new PrintWriter(socket.getOutputStream(), true);
 				String returnMessage = "";
+
+				System.out.println("hiii");
 
 				while ((message = inFromClient.readLine()) != null) {
 
