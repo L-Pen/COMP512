@@ -18,12 +18,14 @@ public class testTCP {
         BufferedReader inFromServer2 = new BufferedReader(new InputStreamReader(client2.getInputStream()));
 
         outToServer.println("AddFlight,101,200,150");
-        Thread.sleep(1000);
+
+        client1.close();
+        
         outToServer2.println("queryFlight,101");
 
         String message = null;
         while ((message = inFromServer2.readLine()) != null) {
-            System.out.println("message:" + message);
+            System.out.println("REturn message:" + message);
         }
         // if(test1) {
         //     System.out.println("Test 1 passed");
@@ -31,7 +33,6 @@ public class testTCP {
         //     System.out.println("Test 1 failed");
         // }
 
-        client1.close();
         client2.close();
 
     }
