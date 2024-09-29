@@ -120,6 +120,41 @@ public class ResourceManager implements IResourceManager {
 		}
 	}
 
+	protected boolean unreserveItem(int customerID, String key, String location) {
+		Trace.info("RM::unreserveItem(customer=" + customerID + ", " + key + ", " + location + ") called");
+		// Read customer object if it exists (and read lock it)
+		Customer customer = (Customer) readData(Customer.getKey(customerID));
+		if (customer == null) {
+			Trace.warn("RM::unreserveItem(" + customerID + ", " + key + ", " + location
+					+ ")  failed--customer doesn't exist");
+			return false;
+		}
+
+		ReservableItem item = (ReservableItem) readData(key);
+		if (customer.getReservedItem(key) == null) {
+			Trace.warn(
+					"RM::unreserveItem(" + customerID + ", " + key + ", " + location
+							+ ") failed--item was not reserved");
+			return false;
+		}
+		if (item == null) {
+			Trace.warn(
+					"RM::unreserveItem(" + customerID + ", " + key + ", " + location + ") failed--item doesn't exist");
+			return false;
+		} else {
+			customer.unreserve(key);
+			writeData(customer.getKey(), customer);
+
+			// Decrease the number of available items in the storage
+			item.setCount(item.getCount() + 1);
+			item.setReserved(item.getReserved() - 1);
+			writeData(item.getKey(), item);
+
+			Trace.info("RM::reserveItem(" + customerID + ", " + key + ", " + location + ") succeeded");
+			return true;
+		}
+	}
+
 	// Create a new flight, or add seats to existing flight
 	// NOTE: if flightPrice <= 0 and the flight already exists, it maintains its
 	// current price
@@ -323,6 +358,21 @@ public class ResourceManager implements IResourceManager {
 	// Adds room reservation to this customer
 	public boolean reserveRoom(int customerID, String location) throws RemoteException {
 		return reserveItem(customerID, Room.getKey(location), location);
+	}
+
+	// Remove flight reservation to this customer
+	public boolean unreserveFlight(int customerID, int flightNum) throws RemoteException {
+		return unreserveItem(customerID, Flight.getKey(flightNum), String.valueOf(flightNum));
+	}
+
+	// Remove car reservation to this customer
+	public boolean unreserveCar(int customerID, String location) throws RemoteException {
+		return unreserveItem(customerID, Car.getKey(location), location);
+	}
+
+	// Remove room reservation to this customer
+	public boolean unreserveRoom(int customerID, String location) throws RemoteException {
+		return unreserveItem(customerID, Room.getKey(location), location);
 	}
 
 	// Reserve bundle

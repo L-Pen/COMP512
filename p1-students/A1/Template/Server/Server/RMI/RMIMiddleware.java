@@ -277,13 +277,6 @@ public class RMIMiddleware implements IResourceManager {
         for (String flightNumber : flightNumbers) {
             preSuccess = preSuccess
                     && RMIMiddleware.flightsResourceManager.reserveFlight(customerID, Integer.parseInt(flightNumber));
-
-            // TO DO: check with prof to see if we need to unreserve flights if one of them
-            // fails
-            // if (!preSuccess) {
-            // break;
-            // }
-
         }
         System.out.println("PreSuccess: " + preSuccess);
         System.out.println("Reserving car: " + car);
@@ -300,6 +293,13 @@ public class RMIMiddleware implements IResourceManager {
 
         if (preSuccess) {
             return RMIMiddleware.customersResourceManager.bundle(customerID, flightNumbers, location, car, room);
+        } else {
+            System.out.println("Failed... rolling back");
+            for (String flightNumber : flightNumbers) {
+                RMIMiddleware.flightsResourceManager.unreserveFlight(customerID, Integer.parseInt(flightNumber));
+            }
+            RMIMiddleware.carsResourceManager.unreserveCar(customerID, location);
+            RMIMiddleware.roomsResourceManager.unreserveRoom(customerID, location);
         }
 
         return false;
@@ -308,6 +308,21 @@ public class RMIMiddleware implements IResourceManager {
     @Override
     public String getName() throws RemoteException {
         throw new UnsupportedOperationException("Unimplemented method 'getName'");
+    }
+
+    @Override
+    public boolean unreserveFlight(int customerID, int flightNumber) throws RemoteException {
+        throw new UnsupportedOperationException("Unimplemented method 'unreserveFlight'");
+    }
+
+    @Override
+    public boolean unreserveCar(int customerID, String location) throws RemoteException {
+        throw new UnsupportedOperationException("Unimplemented method 'unreserveCar'");
+    }
+
+    @Override
+    public boolean unreserveRoom(int customerID, String location) throws RemoteException {
+        throw new UnsupportedOperationException("Unimplemented method 'unreserveRoom'");
     }
 
 }
