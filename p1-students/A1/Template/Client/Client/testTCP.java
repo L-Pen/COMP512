@@ -1,6 +1,5 @@
 package Client;
 
-import Client.RMIClient;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.*;
