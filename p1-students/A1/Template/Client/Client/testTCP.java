@@ -20,7 +20,12 @@ public class testTCP {
         outToServer.println("AddFlight,101,200,150");
         outToServer2.println("queryFlight,101");
 
-        assert inFromServer2.readLine().equals("150");
+        boolean test1 = inFromServer2.readLine().equals("150");
+        if(test1) {
+            System.out.println("Test 1 passed");
+        } else {
+            System.out.println("Test 1 failed");
+        }
 
         client1.close();
         client2.close();
