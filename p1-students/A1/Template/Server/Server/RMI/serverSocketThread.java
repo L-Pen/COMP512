@@ -121,6 +121,7 @@ public class serverSocketThread extends Thread {
                 break;
             case "QueryFlight":
                 res = sendTcpRequest(RMIMiddleware.flightsServer, message);
+                System.out.println("QueryFlight HERE!!!!!!: " + res);
                 break;
             case "QueryCars":
                 res = sendTcpRequest(RMIMiddleware.carsServer, message);
