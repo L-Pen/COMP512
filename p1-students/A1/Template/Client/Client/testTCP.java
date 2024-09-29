@@ -9,14 +9,21 @@ public class testTCP {
 
     public static void testAddFlight() throws UnknownHostException, IOException {
 
-        Socket socket = new Socket("tr-open-03", 9030);
-        PrintWriter outToServer = new PrintWriter(socket.getOutputStream(), true);
-        BufferedReader inFromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        Socket client1 = new Socket("tr-open-03", 9030);
+        PrintWriter outToServer = new PrintWriter(client1.getOutputStream(), true);
+        BufferedReader inFromServer = new BufferedReader(new InputStreamReader(client1.getInputStream()));
 
-        outToServer.println("AddFlight,1,1,1");
-        String res = inFromServer.readLine();
-        System.out.println("RESULT OF TEST: " + res);
-        socket.close();
+        Socket client2 = new Socket("tr-open-03", 9030);
+        PrintWriter outToServer2 = new PrintWriter(client2.getOutputStream(), true);
+        BufferedReader inFromServer2 = new BufferedReader(new InputStreamReader(client2.getInputStream()));
+
+        outToServer.println("AddFlight,101,200,150");
+        outToServer2.println("queryFlight,101");
+
+        assert inFromServer2.readLine().equals("150");
+
+        client1.close();
+        client2.close();
 
     }
 
