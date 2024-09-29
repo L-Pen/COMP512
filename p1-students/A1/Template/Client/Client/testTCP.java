@@ -20,14 +20,9 @@ public class testTCP {
         outToServer.println("AddFlight,101,200,150");
         outToServer2.println("queryFlight,101");
 
-        String res = null;
-        while (true) {
-            res = inFromServer2.readLine();
-            if (res != null) {
-                System.out.println("result: " + res);
-                break;
-            }
-            System.out.println("waiting for answer...");
+        String message = null;
+        while ((message = inFromServer2.readLine()) != null) {
+            System.out.println("message:" + message);
         }
         // if(test1) {
         //     System.out.println("Test 1 passed");
