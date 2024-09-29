@@ -8,85 +8,21 @@ import java.io.*;
 
 public class testTCP {
 
-    public void setUp() throws UnknownHostException, IOException {
-        String s_serverHost = "tr-open-03";
-        Socket socket = new Socket(s_serverHost, 9030);
+    public static void testAddFlight() throws UnknownHostException, IOException {
+
+        Socket socket = new Socket("localhost", 9030);
         PrintWriter outToServer = new PrintWriter(socket.getOutputStream(), true);
         BufferedReader inFromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-        BufferedReader bufferedReader = new java.io.BufferedReader(new InputStreamReader(System.in));
+        outToServer.println("AddFlight,1,1,1");
+        String res = inFromServer.readLine();
+        System.out.println("RESULT OF TEST: " + res);
+        socket.close();
 
     }
 
-    public void tearDown() {
-
+    public static void main(String[] args) throws UnknownHostException, IOException {
+        testAddFlight();
     }
 
-    public void testAddFlight() {
-    }
-
-    public void testAddCars() {
-    }
-
-    public void testAddRooms() {
-    }
-
-    public void testAddCustomer() {
-
-    }
-
-    public void testAddCustomerID() {
-    }
-
-    public void testDeleteFlight() {
-    }
-
-    public void testDeleteCars() {
-    }
-
-    public void testDeleteRooms() {
-    }
-
-    public void testDeleteCustomer() {
-    }
-
-    public void testQueryFlight() {
-
-    }
-
-    public void testQueryCars() {
-
-    }
-
-    public void testQueryRooms() {
-
-    }
-
-    public void testQueryCustomer() {
-
-    }
-
-    public void testQueryFlightPrice() {
-
-    }
-
-    public void testQueryCarsPrice() {
-
-    }
-
-    public void testQueryRoomsPrice() {
-
-    }
-
-    public void testReserveFlight() {
-    }
-
-    public void testReserveCar() {
-    }
-
-    public void testReserveRoom() {
-    }
-
-    public void testBundle() {
-    }
 }
