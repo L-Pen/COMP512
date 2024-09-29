@@ -10,7 +10,7 @@ public class testTCP {
 
     public static void testAddFlight() throws UnknownHostException, IOException, InterruptedException {
         String commandString = "AddFlight,123,456,789";
-        String response = RMIClient.sendTcpRequest(1030, commandString);
+        String response = RMIClient.sendTcpRequest(9034, commandString);
         System.out.println("Response from server: " + response);
     }
 
