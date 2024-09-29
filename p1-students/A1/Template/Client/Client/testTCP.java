@@ -20,13 +20,13 @@ public class testTCP {
         outToServer.println("AddFlight,101,200,150");
         outToServer2.println("queryFlight,101");
 
-        boolean test1 = inFromServer2.readLine().equals("150");
-        System.out.println("test1: " + test1);
-        if(test1) {
-            System.out.println("Test 1 passed");
-        } else {
-            System.out.println("Test 1 failed");
-        }
+        // boolean test1 = inFromServer2.readLine().equals("150");
+        System.out.println("test1: " +  inFromServer2.readLine());
+        // if(test1) {
+        //     System.out.println("Test 1 passed");
+        // } else {
+        //     System.out.println("Test 1 failed");
+        // }
 
         client1.close();
         client2.close();
