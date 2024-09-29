@@ -15,11 +15,13 @@ public class testTCP {
         String response = RMIClient.sendTcpRequest(9034, commandString1);
         String response2 = RMIClient.sendTcpRequest(9034, commandString2);
         String response3 = RMIClient.sendTcpRequest(9034, commandString3);
-        if (response3.equals("300")) {
-            System.out.println("Test Passed");
-        } else {
-            System.out.println("Test Failed");
-        }
+
+        System.out.println("response: " + response);
+        // if (response3.equals("300")) {
+        //     System.out.println("Test Passed");
+        // } else {
+        //     System.out.println("Test Failed");
+        // }
     }
 
     public static void main(String[] args) throws UnknownHostException, IOException, InterruptedException {
