@@ -7,7 +7,7 @@ import java.io.*;
 
 public class testTCP {
 
-    public static void testAddFlight() throws UnknownHostException, IOException {
+    public static void testAddFlight() throws UnknownHostException, IOException, InterruptedException {
 
         Socket client1 = new Socket("tr-open-03", 9030);
         PrintWriter outToServer = new PrintWriter(client1.getOutputStream(), true);
@@ -18,6 +18,7 @@ public class testTCP {
         BufferedReader inFromServer2 = new BufferedReader(new InputStreamReader(client2.getInputStream()));
 
         outToServer.println("AddFlight,101,200,150");
+        Thread.sleep(1000);
         outToServer2.println("queryFlight,101");
 
         String message = null;
@@ -35,7 +36,7 @@ public class testTCP {
 
     }
 
-    public static void main(String[] args) throws UnknownHostException, IOException {
+    public static void main(String[] args) throws UnknownHostException, IOException, InterruptedException {
         testAddFlight();
     }
 
