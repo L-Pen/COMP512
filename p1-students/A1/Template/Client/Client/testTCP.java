@@ -9,7 +9,7 @@ public class testTCP {
 
     public static void testAddFlight() throws UnknownHostException, IOException {
 
-        Socket socket = new Socket("localhost", 9030);
+        Socket socket = new Socket("tr-open-03", 9030);
         PrintWriter outToServer = new PrintWriter(socket.getOutputStream(), true);
         BufferedReader inFromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
