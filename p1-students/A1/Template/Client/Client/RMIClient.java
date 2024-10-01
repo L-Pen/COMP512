@@ -97,6 +97,7 @@ public class RMIClient extends Client {
 
 				}
 			} catch (Exception e) {
+				e.printStackTrace();
 				System.err.println("An error occured... Disconnecting");
 			}
 		}
