@@ -3,6 +3,6 @@
         "."
     ],
     "java.project.referencedLibraries": [
-        "comp512.jar"
+        "comp512p2.jar"
     ]
 }
