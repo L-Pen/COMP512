@@ -9,9 +9,9 @@ then
 	exit 1
 fi
 
-if [[ ! -f $BASEDIR/comp512p2.jar ]]
+if [[ ! -f $BASEDIR/comp512.jar ]]
 then
-	echo "Error cannot locate $BASEDIR/comp512p2.jar . Make sure it is present."
+	echo "Error cannot locate $BASEDIR/comp512.jar . Make sure it is present."
 	exit 1
 fi
 
@@ -21,8 +21,10 @@ then
 	exit 1
 fi
 
-export CLASSPATH=$BASEDIR/comp512p2.jar:$BASEDIR
+export CLASSPATH=$BASEDIR/comp512.jar:$BASEDIR
 cd $BASEDIR
+
+echo $(find -L comp512st -name '*.java')
 
 javac $(find -L comp512st -name '*.java')
 

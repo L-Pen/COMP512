@@ -1,0 +1,347 @@
+Oct 27, 2024 7:08:08.287636000 P.M. comp512st.tiapp.TreasureIslandApp main INFO: Started with arguments : [MacBook-Pro-2.local:8001, MacBook-Pro-2.local:8001,MacBook-Pro-2.local:8002, game-30-99, 2, 1]
+Oct 27, 2024 7:08:08.309310000 P.M. comp512.utils.FailCheck <init> INFO: Initializing failure check emulation setup....
+Oct 27, 2024 7:08:08.339938000 P.M. comp512.gcl.GCL <init> INFO: Host MacBook-Pro-2.local/127.0.0.1:8001
+Oct 27, 2024 7:08:08.341158000 P.M. comp512.gcl.GCL <init> INFO: Initializing outbox despatcher threads.
+Oct 27, 2024 7:08:08.343423000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Starting outbox despatch thread for process.
+Oct 27, 2024 7:08:08.343431000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8001: Starting outbox despatch thread for process.
+Oct 27, 2024 7:08:08.348531000 P.M. comp512.ti.TreasureIsland <init> INFO: Treasure Island initialized.
+Oct 27, 2024 7:08:12.347195000 P.M. comp512st.tiapp.TreasureIslandApp main FINE: cmd is : R
+Oct 27, 2024 7:08:12.354542000 P.M. comp512.gcl.GCL broadcastMsg FINE: Broadcast message request received. Translating to point-to-point messages : [Ljava.lang.Object;@306a30c7
+Oct 27, 2024 7:08:12.356251000 P.M. comp512.gcl.GCL sendMsg FINE: Request received to send message to MacBook-Pro-2.local:8001. [Ljava.lang.Object;@306a30c7
+Oct 27, 2024 7:08:12.360204000 P.M. comp512.gcl.GCL sendMsg FINE: Request received to send message to MacBook-Pro-2.local:8002. [Ljava.lang.Object;@306a30c7
+Oct 27, 2024 7:08:12.368563000 P.M. comp512.gcl.GCL$InboxListener run INFO: Network connection request from  /127.0.0.1
+Oct 27, 2024 7:08:12.399414000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run FINE: MacBook-Pro-2.local:8001: Sending message to. message: [senderProcess:MacBook-Pro-2.local:8001:val:[Ljava.lang.Object;@306a30c7]
+Oct 27, 2024 7:08:12.399478000 P.M. comp512.gcl.GCL$InboxListener run INFO: MacBook-Pro-2.local:8001: Input stream set up for this process to receive incoming messages. Inet: /127.0.0.1
+Oct 27, 2024 7:08:12.403284000 P.M. comp512.gcl.GCL$GCLInbox run INFO: MacBook-Pro-2.local:8001: Starting an inBox thread to receive messages from this process.
+Oct 27, 2024 7:08:12.407436000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher openConnection SEVERE: MacBook-Pro-2.local:8002: Encountered IOException while trying to establish.  Inet: MacBook-Pro-2.local/127.0.0.1 port: 8002 : java.net.ConnectException: Connection refused
+java.net.ConnectException: Connection refused
+	at java.base/sun.nio.ch.Net.connect0(Native Method)
+	at java.base/sun.nio.ch.Net.connect(Net.java:589)
+	at java.base/sun.nio.ch.Net.connect(Net.java:578)
+	at java.base/sun.nio.ch.NioSocketImpl.connect(NioSocketImpl.java:583)
+	at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:327)
+	at java.base/java.net.Socket.connect(Socket.java:751)
+	at java.base/java.net.Socket.connect(Socket.java:686)
+	at java.base/java.net.Socket.<init>(Socket.java:555)
+	at java.base/java.net.Socket.<init>(Socket.java:356)
+	at comp512.gcl.GCL$GCLOutBoxDespatcher.openConnection(GCL.java:71)
+	at comp512.gcl.GCL$GCLOutBoxDespatcher.run(GCL.java:112)
+
+Oct 27, 2024 7:08:12.425056000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 100 milliseconds.
+Oct 27, 2024 7:08:12.445019000 P.M. comp512.gcl.GCL$GCLInbox run FINE: MacBook-Pro-2.local:8001: Received a message from. message: [senderProcess:MacBook-Pro-2.local:8001:val:[Ljava.lang.Object;@6953d710]
+Oct 27, 2024 7:08:12.447093000 P.M. comp512.gcl.GCL readGCMessage INFO: Delivering message : [senderProcess:MacBook-Pro-2.local:8001:val:[Ljava.lang.Object;@6953d710]
+Oct 27, 2024 7:08:12.447719000 P.M. comp512st.tiapp.TreasureIslandApp run FINE: Received :[1, R]
+Oct 27, 2024 7:08:12.450938000 P.M. comp512.ti.TreasureIsland move INFO: Move request: player number 1 direction R
+Oct 27, 2024 7:08:12.532537000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 200 milliseconds.
+Oct 27, 2024 7:08:12.741703000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 400 milliseconds.
+Oct 27, 2024 7:08:13.152573000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 800 milliseconds.
+Oct 27, 2024 7:08:13.960627000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:08:14.971837000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:08:15.981779000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:08:16.994372000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:08:18.005184000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:08:19.027888000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:08:20.043841000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:08:21.052288000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:08:22.059599000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:08:23.063766000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:08:24.072492000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:08:25.085218000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:08:26.091602000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:08:27.098767000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:08:28.107899000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:08:29.115575000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:08:30.125891000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:08:31.133916000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:08:32.151375000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:08:33.162441000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:08:34.170814000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:08:35.184487000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:08:36.193431000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:08:37.198800000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:08:38.202957000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:08:39.211767000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:08:40.220795000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:08:41.232768000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:08:42.244695000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:08:43.252650000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:08:44.263692000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:08:45.272401000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:08:46.283508000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:08:47.294697000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:08:48.306264000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:08:49.320465000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:08:50.326575000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:08:51.331066000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:08:52.338763000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:08:53.353665000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:08:54.365530000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:08:55.371844000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:08:56.379532000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:08:57.386482000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:08:58.393535000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:08:59.399392000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:00.408530000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:01.417922000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:02.426369000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:03.452685000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:04.463796000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:05.471948000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:06.479868000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:07.488433000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:08.495306000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:09.503835000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:10.514189000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:11.523992000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:12.535750000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:13.545850000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:14.554774000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:15.563946000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:16.574187000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:17.583966000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:18.600665000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:19.610691000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:20.623120000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:21.631684000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:22.639080000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:23.647436000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:24.656353000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:25.664158000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:26.672618000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:27.679429000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:28.693940000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:29.710435000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:30.716343000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:31.725484000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:32.735456000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:33.750367000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:34.761501000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:35.769624000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:36.778284000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:37.782741000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:38.793817000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:39.802609000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:40.810646000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:41.818765000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:42.831560000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:43.839641000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:44.847460000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:45.855501000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:46.864166000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:47.869024000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:48.878559000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:49.887784000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:50.896003000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:51.903549000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:52.916766000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:53.929906000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:54.938005000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:55.949489000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:56.962274000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:57.973031000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:58.981744000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:09:59.987496000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:00.992961000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:01.999396000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:03.006931000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:04.016154000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:05.024275000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:06.032251000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:07.041265000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:08.052036000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:09.060063000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:10.068174000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:11.075746000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:12.079948000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:13.086297000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:14.094706000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:15.102381000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:16.109304000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:17.118616000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:18.127032000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:19.130757000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:20.138895000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:21.147532000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:22.152914000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:23.161409000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:24.167944000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:25.176067000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:26.184107000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:27.191333000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:28.199483000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:29.209052000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:30.219363000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:31.227031000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:32.234497000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:33.242866000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:34.251172000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:35.256664000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:36.260668000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:37.269857000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:38.277730000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:39.284985000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:40.291910000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:41.295991000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:42.302706000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:43.310021000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:44.315863000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:45.320945000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:46.330041000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:47.338178000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:48.345348000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:49.352259000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:50.361130000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:51.368951000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:52.376099000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:53.383978000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:54.391695000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:55.394434000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:56.404001000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:57.412919000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:58.422551000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:10:59.430768000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:00.447191000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:01.456410000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:02.467546000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:03.478537000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:04.491932000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:05.500117000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:06.506598000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:07.514442000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:08.526595000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:09.535180000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:10.542437000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:11.545635000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:12.557889000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:13.568122000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:14.574504000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:15.585430000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:16.597674000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:17.603892000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:18.610419000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:19.618731000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:20.626062000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:21.629790000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:22.637922000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:23.646284000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:24.654196000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:25.661090000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:26.664509000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:27.672819000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:28.684711000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:29.694915000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:30.707063000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:31.715197000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:32.723740000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:33.735834000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:34.747121000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:35.757339000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:36.766818000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:37.774181000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:38.777442000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:39.786078000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:40.799475000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:41.807462000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:42.815355000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:43.822760000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:44.832663000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:45.843828000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:46.855135000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:47.864172000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:48.871180000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:49.881831000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:50.900283000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:51.909815000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:52.922209000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:53.932927000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:54.943052000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:55.951966000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:56.963895000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:57.981751000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:11:58.995992000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:00.003137000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:01.009115000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:02.016506000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:03.024410000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:04.033720000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:05.042758000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:06.053226000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:07.063569000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:08.074222000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:09.092789000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:10.106304000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:11.118786000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:12.127139000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:13.135477000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:14.142121000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:15.150944000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:16.163779000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:17.172683000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:18.180992000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:19.190043000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:20.195932000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:21.204798000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:22.213244000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:23.220133000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:24.228843000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:25.240709000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:26.250202000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:27.268886000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:28.280045000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:29.291871000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:30.300835000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:31.308742000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:32.315120000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:33.330077000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:34.338207000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:35.346350000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:36.354206000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:37.363194000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:38.370371000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:39.378662000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:40.383100000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:41.390928000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:42.398550000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:43.406152000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:44.412330000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:45.417567000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:46.423556000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:47.428706000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:48.435699000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:49.444227000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:50.453288000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:51.462800000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:52.472363000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:53.484640000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:54.492631000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:55.499514000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:56.507455000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:57.515329000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:58.520773000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:12:59.528443000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:13:00.535264000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:13:01.543231000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:13:01.729019000 P.M. comp512st.tiapp.TreasureIslandApp main FINE: cmd is : E
+Oct 27, 2024 7:13:01.731209000 P.M. comp512st.tiapp.TreasureIslandApp main INFO: Shutting down Paxos
+Oct 27, 2024 7:13:02.551492000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Will try connecting to  after 1000 milliseconds.
+Oct 27, 2024 7:13:02.738400000 P.M. comp512.gcl.GCL shutdownGCL INFO: GCL Shutdown request received.
+Oct 27, 2024 7:13:02.744405000 P.M. comp512.gcl.GCL$InboxListener shutdown INFO: Received request to shutdown GCL Inbox listener thread.
+Oct 27, 2024 7:13:02.748912000 P.M. comp512.gcl.GCL$InboxListener run INFO: GCL Inbox listener is now shutdown. We will not be accepting new incoming connections anymore.
+Oct 27, 2024 7:13:02.751241000 P.M. comp512.gcl.GCL shutdownGCL INFO: Inbox listener thread is now shutdown.
+Oct 27, 2024 7:13:02.751466000 P.M. comp512.gcl.GCL shutdownGCL INFO: Initiating broadcast of CLOSE message to all my outbound connections.
+Oct 27, 2024 7:13:02.752313000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run FINE: MacBook-Pro-2.local:8001: Sending message to. message: [senderProcess:CLOSE:val:null]
+Oct 27, 2024 7:13:02.754348000 P.M. comp512.gcl.GCL$GCLInbox run FINE: MacBook-Pro-2.local:8001: Received a message from. message: [senderProcess:CLOSE:val:null]
+Oct 27, 2024 7:13:02.756345000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8001: Detected CLOSE marker in the outgoing message. I am shutting down after this.
+Oct 27, 2024 7:13:02.757080000 P.M. comp512.gcl.GCL$GCLInbox run INFO: MacBook-Pro-2.local:8001: Is closing connection. I will not get anymore messages from them.
+Oct 27, 2024 7:13:02.759021000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher shutdown INFO: MacBook-Pro-2.local:8002: Request initiated to shutdown the message despatcher thread for this process. The thread is currently alive.
+Oct 27, 2024 7:13:02.765398000 P.M. comp512.gcl.GCL$GCLInbox run INFO: MacBook-Pro-2.local:8001: Closed incoming connection from this process. The inBox thread is shutdown.
+Oct 27, 2024 7:13:02.765433000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8001: Message despatch thread to the process is now shutdown. No more messages will be sent to that process.
+Oct 27, 2024 7:13:02.966273000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher shutdown INFO: MacBook-Pro-2.local:8001: Request initiated to shutdown the message despatcher thread for this process. The thread is currently not alive.
+Oct 27, 2024 7:13:02.968849000 P.M. comp512.gcl.GCL$GCLOutBoxDespatcher run INFO: MacBook-Pro-2.local:8002: Message despatch thread to the process is now shutdown. No more messages will be sent to that process.
+Oct 27, 2024 7:13:02.969882000 P.M. comp512.gcl.GCL shutdownGCL INFO: MacBook-Pro-2.local:8002: GCL outbox despatcher thread for this process is now shutdown.
+Oct 27, 2024 7:13:02.972277000 P.M. comp512.gcl.GCL shutdownGCL INFO: MacBook-Pro-2.local:8001: GCL outbox despatcher thread for this process is now shutdown.
+Oct 27, 2024 7:13:02.973416000 P.M. comp512.gcl.GCL$GCLInbox shutdown INFO: MacBook-Pro-2.local:8001: Requesting shutdown for GCL message inbox thread from this process. This thread is currently not alive.
+Oct 27, 2024 7:13:02.974878000 P.M. comp512.gcl.GCL$GCLInbox shutdown INFO: MacBook-Pro-2.local:8001: This thread has already terminated.
+Oct 27, 2024 7:13:02.975634000 P.M. comp512.gcl.GCL shutdownGCL INFO: MacBook-Pro-2.local:8001: GCL inbox thread for this proess is now shutdown.
+Oct 27, 2024 7:13:02.975969000 P.M. comp512.gcl.GCL readGCMessage INFO: GCL is being shutdown. No more messages will be delivered. Reader will be interrupted.
+Oct 27, 2024 7:13:02.986914000 P.M. comp512st.tiapp.TreasureIslandApp main INFO: Process terminated.
