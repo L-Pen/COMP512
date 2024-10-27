@@ -24,7 +24,5 @@ fi
 export CLASSPATH=$BASEDIR/comp512.jar:$BASEDIR
 cd $BASEDIR
 
-echo $(find -L comp512st -name '*.java')
-
 javac $(find -L comp512st -name '*.java')
 
