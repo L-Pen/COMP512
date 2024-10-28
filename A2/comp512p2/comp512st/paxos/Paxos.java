@@ -66,7 +66,7 @@ public class Paxos {
 
 		// start new paxos instance
 		while (!deque.isEmpty()) {
-			roundNumber++;
+			roundNumber += 2;
 			propose();
 
 			// wait for majority to accept
