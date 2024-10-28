@@ -11,9 +11,12 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.logging.*;
 import java.net.UnknownHostException;
+import java.lang.Thread;
 
 // ANY OTHER classes, etc., that you add must be private to this package and not visible to the application layer.
 
@@ -26,6 +29,7 @@ public class Paxos {
 	int roundNumber = 0;
 	int majority = 0;
 	Deque<PlayerMoveData> deque = new ArrayDeque<>();
+	Queue<PlayerMoveData> deliveryQueue = new LinkedList<>();
 
 	public Paxos(String myProcess, String[] allGroupProcesses, Logger logger, FailCheck failCheck)
 			throws IOException, UnknownHostException {
@@ -37,6 +41,10 @@ public class Paxos {
 		// Initialize the GCL communication system as well as anything else you need to.
 		this.gcl = new GCL(myProcess, allGroupProcesses, null, logger);
 		this.majority = calculateMajority(allGroupProcesses.length);
+
+		PaxosListener pl = new PaxosListener(deque, gcl);
+		Thread plThread = new Thread(pl);
+		plThread.start();
 	}
 
 	private int calculateMajority(int numProcesses) {
@@ -57,14 +65,16 @@ public class Paxos {
 		deque.addLast(playerMoveData);
 
 		// start new paxos instance
-		roundNumber++;
-		propose();
+		while (!deque.isEmpty()) {
+			roundNumber++;
+			propose();
 
-		// wait for majority to accept
-		accept();
+			// wait for majority to accept
+			accept();
 
-		// broadcast confirm
-		confirm();
+			// broadcast confirm
+			confirm();
+		}
 	}
 
 	private void propose() throws InterruptedException {
@@ -111,6 +121,7 @@ public class Paxos {
 	private void confirm() throws InterruptedException {
 		Confirm confirm = new Confirm(roundNumber);
 		gcl.broadcastMsg(confirm);
+		return;
 	}
 
 	// This is what the application layer is calling to figure out what is the next
@@ -119,8 +130,10 @@ public class Paxos {
 	// the same order.
 	public Object acceptTOMsg() throws InterruptedException {
 		// This is just a place holder.
-		// while(queue empty)
-		return "";
+		while (deliveryQueue.isEmpty()) {
+		}
+		PlayerMoveData pmd = deliveryQueue.remove();
+		return new Object[] { pmd.player, pmd.move };
 	}
 
 	// Add any of your own shutdown code into this method.
@@ -129,9 +142,35 @@ public class Paxos {
 	}
 }
 
+class PaxosListener implements Runnable {
+
+	Deque<PlayerMoveData> deque;
+	GCL gcl;
+
+	public PaxosListener(Deque<PlayerMoveData> deque, GCL gcl) {
+		this.deque = deque;
+		this.gcl = gcl;
+	}
+
+	public void run() {
+		while (true) {
+			try {
+				GCMessage gcmsg = gcl.readGCMessage();
+
+				System.out.println(gcmsg);
+
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+}
+
 class Promise implements Serializable {
 	int receivedRoundNumber;
 	int acceptedRoundNumber; // -1 for none
+	String type = "PROMISE";
 	PlayerMoveData acceptedValue;
 
 	public Promise() {
