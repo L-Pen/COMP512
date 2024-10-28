@@ -24,7 +24,7 @@ public class Paxos {
 		// Rember to call the failCheck.checkFailure(..) with appropriate arguments
 		// throughout your Paxos code to force fail points if necessary.
 		this.failCheck = failCheck;
-		System.out.println(allGroupProcesses.length);
+		System.out.println("NUM PROCESSES: " + allGroupProcesses.length);
 
 		// Initialize the GCL communication system as well as anything else you need to.
 		this.gcl = new GCL(myProcess, allGroupProcesses, null, logger);
