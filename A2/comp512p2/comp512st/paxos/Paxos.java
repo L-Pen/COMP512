@@ -158,6 +158,7 @@ class PaxosListener implements Runnable {
 				GCMessage gcmsg = gcl.readGCMessage();
 
 				PaxosPhase val = (PaxosPhase) gcmsg.val;
+				System.out.println(val.type);
 
 				switch (val.type) {
 					case "PROPOSAL": {
