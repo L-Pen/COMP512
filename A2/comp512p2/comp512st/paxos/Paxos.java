@@ -61,7 +61,7 @@ public class Paxos {
 		// a majority (and immediately upon majority) of processes have accepted the
 		// value.
 		Object[] vals = (Object[]) val;
-		PlayerMoveData playerMoveData = new PlayerMoveData((int) vals[0], (String) vals[1]);
+		PlayerMoveData playerMoveData = new PlayerMoveData((int) vals[0], (char) vals[1]);
 		deque.addLast(playerMoveData);
 
 		// start new paxos instance
@@ -188,9 +188,9 @@ class Proposal implements Serializable {
 
 class PlayerMoveData {
 	int player;
-	String move;
+	char move;
 
-	public PlayerMoveData(int player, String move) {
+	public PlayerMoveData(int player, char move) {
 		this.player = player;
 		this.move = move;
 	}
