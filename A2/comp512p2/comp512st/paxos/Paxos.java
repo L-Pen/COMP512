@@ -174,7 +174,7 @@ class PaxosListener implements Runnable {
 
 }
 
-class Promise {
+class Promise implements Serializable {
 	int receivedRoundNumber;
 	int acceptedRoundNumber; // -1 for none
 	PlayerMoveData acceptedValue;
@@ -184,7 +184,7 @@ class Promise {
 	}
 }
 
-class Proposal {
+class Proposal implements Serializable {
 	int roundNumber;
 
 	public Proposal(int roundNumber) {
@@ -202,7 +202,7 @@ class PlayerMoveData {
 	}
 }
 
-class Accept {
+class Accept implements Serializable {
 	int roundNumber;
 	PlayerMoveData pmd;
 
@@ -212,7 +212,7 @@ class Accept {
 	}
 }
 
-class AcceptAck {
+class AcceptAck implements Serializable {
 	int roundNumber;
 
 	public AcceptAck(int roundNumber) {
@@ -220,7 +220,7 @@ class AcceptAck {
 	}
 }
 
-class Confirm {
+class Confirm implements Serializable {
 	int roundNumber;
 
 	public Confirm(int roundNumber) {
