@@ -158,24 +158,13 @@ class PaxosListener implements Runnable {
 				GCMessage gcmsg = gcl.readGCMessage();
 
 				System.out.println(gcmsg.val.getClass());
-				// switch (val.type) {
-				// case "PROPOSAL": {
 
-				// Proposal p = (Proposal) val;
-				// System.out.println("rn " + p.roundNumber);
-				// break;
-				// }
-				// case "ACCEPT": {
-
-				// break;
-				// }
-				// case "CONFIRM": {
-
-				// break;
-				// }
-				// default:
-				// break;
-				// }
+				Object val = gcmsg.val;
+				if (val instanceof Proposal) {
+					Proposal p = (Proposal) val;
+					int rountNumber = p.roundNumber;
+					System.out.println(rountNumber);
+				}
 
 			} catch (InterruptedException e) {
 				e.printStackTrace();
@@ -183,10 +172,6 @@ class PaxosListener implements Runnable {
 		}
 	}
 
-}
-
-abstract class PaxosPhase implements Serializable {
-	String type;
 }
 
 class Promise {
@@ -199,13 +184,11 @@ class Promise {
 	}
 }
 
-class Proposal extends PaxosPhase {
+class Proposal {
 	int roundNumber;
-	String type;
 
 	public Proposal(int roundNumber) {
 		this.roundNumber = roundNumber;
-		this.type = "PROPOSAL";
 	}
 }
 
@@ -219,15 +202,13 @@ class PlayerMoveData {
 	}
 }
 
-class Accept extends PaxosPhase {
+class Accept {
 	int roundNumber;
 	PlayerMoveData pmd;
-	String type;
 
 	public Accept(int roundNumber, PlayerMoveData pmd) {
 		this.roundNumber = roundNumber;
 		this.pmd = pmd;
-		this.type = "ACCEPT";
 	}
 }
 
@@ -239,12 +220,10 @@ class AcceptAck {
 	}
 }
 
-class Confirm extends PaxosPhase {
+class Confirm {
 	int roundNumber;
-	String type;
 
 	public Confirm(int roundNumber) {
 		this.roundNumber = roundNumber;
-		this.type = "CONFIRM";
 	}
 }
