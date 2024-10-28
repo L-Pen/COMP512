@@ -61,22 +61,20 @@ public class Paxos {
 		// a majority (and immediately upon majority) of processes have accepted the
 		// value.
 		Object[] vals = (Object[]) val;
-		System.out.println(vals[0]);
-		// PlayerMoveData playerMoveData = new PlayerMoveData((int) val1.get(0),
-		// (String) val1.get(1));
-		// deque.addLast(playerMoveData);
+		PlayerMoveData playerMoveData = new PlayerMoveData((int) vals[0], (String) vals[1]);
+		deque.addLast(playerMoveData);
 
 		// start new paxos instance
-		// while (!deque.isEmpty()) {
-		// roundNumber++;
-		// propose();
+		while (!deque.isEmpty()) {
+			roundNumber++;
+			propose();
 
-		// // wait for majority to accept
-		// accept();
+			// wait for majority to accept
+			accept();
 
-		// // broadcast confirm
-		// confirm();
-		// }
+			// broadcast confirm
+			confirm();
+		}
 	}
 
 	private void propose() throws InterruptedException {
