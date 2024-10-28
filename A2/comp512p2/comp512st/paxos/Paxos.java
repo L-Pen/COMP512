@@ -60,24 +60,23 @@ public class Paxos {
 		// Here you will have to ensure that the CALL BLOCKS, and is returned ONLY when
 		// a majority (and immediately upon majority) of processes have accepted the
 		// value.
-		System.out.println(val);
-		List<Object> val1 = Arrays.asList(val);
-		System.out.println(val1.toString());
-		System.out.println(val1.get(0).toString());
-		PlayerMoveData playerMoveData = new PlayerMoveData((int) val1.get(0), (String) val1.get(1));
-		deque.addLast(playerMoveData);
+		System.out.println(val.getClass());
+		return;
+		// PlayerMoveData playerMoveData = new PlayerMoveData((int) val1.get(0),
+		// (String) val1.get(1));
+		// deque.addLast(playerMoveData);
 
 		// start new paxos instance
-		while (!deque.isEmpty()) {
-			roundNumber++;
-			propose();
+		// while (!deque.isEmpty()) {
+		// roundNumber++;
+		// propose();
 
-			// wait for majority to accept
-			accept();
+		// // wait for majority to accept
+		// accept();
 
-			// broadcast confirm
-			confirm();
-		}
+		// // broadcast confirm
+		// confirm();
+		// }
 	}
 
 	private void propose() throws InterruptedException {
