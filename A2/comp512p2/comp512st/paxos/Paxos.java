@@ -9,7 +9,6 @@ import comp512.utils.*;
 import java.io.*;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
@@ -30,21 +29,28 @@ public class Paxos {
 	int majority = 0;
 	Deque<PlayerMoveData> deque = new ArrayDeque<>();
 	Queue<PlayerMoveData> deliveryQueue = new LinkedList<>();
+	boolean isLeader = false;
+	String processId;
 
 	public Paxos(String myProcess, String[] allGroupProcesses, Logger logger, FailCheck failCheck)
 			throws IOException, UnknownHostException {
 		// Rember to call the failCheck.checkFailure(..) with appropriate arguments
 		// throughout your Paxos code to force fail points if necessary.
 		this.failCheck = failCheck;
-		System.out.println("NUM PROCESSES: " + allGroupProcesses.length);
+		this.processId = myProcess;
+		System.out.println("NUM PROCESSES: " + allGroupProcesses.length + " PROCESS ID: " + processId);
 
 		// Initialize the GCL communication system as well as anything else you need to.
 		this.gcl = new GCL(myProcess, allGroupProcesses, null, logger);
 		this.majority = calculateMajority(allGroupProcesses.length);
 
-		PaxosListener pl = new PaxosListener(deque, gcl);
+		PaxosListener pl = new PaxosListener(this);
 		Thread plThread = new Thread(pl);
 		plThread.start();
+
+		PaxosBroadcaster pb = new PaxosBroadcaster(this);
+		Thread pbThread = new Thread(pb);
+		pbThread.start();
 	}
 
 	private int calculateMajority(int numProcesses) {
@@ -54,74 +60,9 @@ public class Paxos {
 	// This is what the application layer is going to call to send a message/value,
 	// such as the player and the move
 	public void broadcastTOMsg(Object val) throws InterruptedException {
-		// This is just a place holder.
-		// Extend this to build whatever Paxos logic you need to make sure the messaging
-		// system is total order.
-		// Here you will have to ensure that the CALL BLOCKS, and is returned ONLY when
-		// a majority (and immediately upon majority) of processes have accepted the
-		// value.
 		Object[] vals = (Object[]) val;
 		PlayerMoveData playerMoveData = new PlayerMoveData((int) vals[0], (char) vals[1]);
 		deque.addLast(playerMoveData);
-
-		// start new paxos instance
-		while (!deque.isEmpty()) {
-			roundNumber++;
-			propose();
-
-			// wait for majority to accept
-			accept();
-
-			// broadcast confirm
-			confirm();
-		}
-	}
-
-	private void propose() throws InterruptedException {
-		// propose to be leader, ie round value
-		Proposal proposal = new Proposal(roundNumber);
-
-		gcl.broadcastMsg(proposal);
-		int count = 0;
-		List<Promise> promisesWithAcceptedRound = new ArrayList<>();
-		while (count < this.majority) {
-			GCMessage gcmsg = gcl.readGCMessage();
-			Promise promise = (Promise) gcmsg.val;
-			if (promise.receivedRoundNumber != roundNumber)
-				continue;
-			if (promise.acceptedRoundNumber != -1) {
-				promisesWithAcceptedRound.add(promise);
-			}
-			count++;
-		}
-		promisesWithAcceptedRound.sort((p1, p2) -> Integer.compare(p1.acceptedRoundNumber, p2.acceptedRoundNumber));
-
-		for (int i = promisesWithAcceptedRound.size() - 1; i >= 0; i--) {
-			deque.addFirst(promisesWithAcceptedRound.get(i).acceptedValue);
-		}
-		return;
-	}
-
-	private void accept() throws InterruptedException {
-		PlayerMoveData pmd = deque.removeFirst();
-
-		Accept accept = new Accept(roundNumber, pmd);
-		gcl.broadcastMsg(accept);
-		int count = 0;
-		while (count < this.majority) {
-			GCMessage gcmsg = gcl.readGCMessage();
-			AcceptAck acceptAck = (AcceptAck) gcmsg.val;
-			if (acceptAck.roundNumber != roundNumber)
-				continue;
-			count++;
-		}
-		return;
-	}
-
-	private void confirm() throws InterruptedException {
-		Confirm confirm = new Confirm(roundNumber);
-		gcl.broadcastMsg(confirm);
-		return;
 	}
 
 	// This is what the application layer is calling to figure out what is the next
@@ -144,26 +85,26 @@ public class Paxos {
 
 class PaxosListener implements Runnable {
 
-	Deque<PlayerMoveData> deque;
-	GCL gcl;
+	Paxos paxos;
 
-	public PaxosListener(Deque<PlayerMoveData> deque, GCL gcl) {
-		this.deque = deque;
-		this.gcl = gcl;
+	public PaxosListener(Paxos paxos) {
+		this.paxos = paxos;
 	}
 
 	public void run() {
 		while (true) {
 			try {
-				GCMessage gcmsg = gcl.readGCMessage();
-
-				System.out.println(gcmsg.val.getClass());
+				GCMessage gcmsg = paxos.gcl.readGCMessage();
 
 				Object val = gcmsg.val;
 				if (val instanceof Proposal) {
 					Proposal p = (Proposal) val;
 					int rountNumber = p.roundNumber;
 					System.out.println(rountNumber);
+					// if()
+				}
+				if (val instanceof LeaderElection) {
+					LeaderElection le = (LeaderElection) val;
 				}
 
 			} catch (InterruptedException e) {
@@ -171,7 +112,112 @@ class PaxosListener implements Runnable {
 			}
 		}
 	}
+}
 
+class LeaderElection implements Serializable {
+	String processId;
+
+	public LeaderElection(String processId) {
+		this.processId = processId;
+	}
+}
+
+class PaxosBroadcaster implements Runnable {
+	Paxos paxos;
+	boolean startedLeaderElection = false;
+
+	public PaxosBroadcaster(Paxos paxos) {
+		this.paxos = paxos;
+	}
+
+	public void run() {
+		while (true) {
+			// start new paxos instance
+			if (paxos.deque.isEmpty())
+				continue;
+
+			// start leader election
+			if (!startedLeaderElection) {
+				LeaderElection le = new LeaderElection(paxos.processId);
+				paxos.gcl.broadcastMsg(le);
+				startedLeaderElection = true;
+			}
+
+			if (!paxos.isLeader)
+				continue;
+
+			startedLeaderElection = false;
+			paxos.roundNumber++;
+			try {
+				propose();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+
+			// wait for majority to accept
+			try {
+				accept();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+
+			// broadcast confirm
+			try {
+				confirm();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+
+			paxos.isLeader = false;
+		}
+	}
+
+	private void propose() throws InterruptedException {
+		// propose to be leader, ie round value
+		Proposal proposal = new Proposal(paxos.roundNumber);
+
+		paxos.gcl.broadcastMsg(proposal);
+		int count = 0;
+		List<Promise> promisesWithAcceptedRound = new ArrayList<>();
+		while (count < paxos.majority) {
+			GCMessage gcmsg = paxos.gcl.readGCMessage();
+			Promise promise = (Promise) gcmsg.val;
+			if (promise.receivedRoundNumber != paxos.roundNumber)
+				continue;
+			if (promise.acceptedRoundNumber != -1) {
+				promisesWithAcceptedRound.add(promise);
+			}
+			count++;
+		}
+		promisesWithAcceptedRound.sort((p1, p2) -> Integer.compare(p1.acceptedRoundNumber, p2.acceptedRoundNumber));
+
+		for (int i = promisesWithAcceptedRound.size() - 1; i >= 0; i--) {
+			paxos.deque.addFirst(promisesWithAcceptedRound.get(i).acceptedValue);
+		}
+		return;
+	}
+
+	private void accept() throws InterruptedException {
+		PlayerMoveData pmd = paxos.deque.removeFirst();
+
+		Accept accept = new Accept(paxos.roundNumber, pmd);
+		paxos.gcl.broadcastMsg(accept);
+		int count = 0;
+		while (count < paxos.majority) {
+			GCMessage gcmsg = paxos.gcl.readGCMessage();
+			AcceptAck acceptAck = (AcceptAck) gcmsg.val;
+			if (acceptAck.roundNumber != paxos.roundNumber)
+				continue;
+			count++;
+		}
+		return;
+	}
+
+	private void confirm() throws InterruptedException {
+		Confirm confirm = new Confirm(paxos.roundNumber);
+		paxos.gcl.broadcastMsg(confirm);
+		return;
+	}
 }
 
 class Promise implements Serializable {
