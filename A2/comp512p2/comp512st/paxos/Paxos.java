@@ -202,10 +202,11 @@ class Promise {
 
 class Proposal extends PaxosPhase {
 	int roundNumber;
-	String type = "PROPOSAL";
+	String type;
 
 	public Proposal(int roundNumber) {
 		this.roundNumber = roundNumber;
+		this.type = "PROPOSAL";
 	}
 }
 
@@ -222,11 +223,12 @@ class PlayerMoveData {
 class Accept extends PaxosPhase {
 	int roundNumber;
 	PlayerMoveData pmd;
-	String type = "ACCEPT";
+	String type;
 
 	public Accept(int roundNumber, PlayerMoveData pmd) {
 		this.roundNumber = roundNumber;
 		this.pmd = pmd;
+		this.type = "ACCEPT";
 	}
 }
 
@@ -240,9 +242,10 @@ class AcceptAck {
 
 class Confirm extends PaxosPhase {
 	int roundNumber;
-	String type = "CONFIRM";
+	String type;
 
 	public Confirm(int roundNumber) {
 		this.roundNumber = roundNumber;
+		this.type = "CONFIRM";
 	}
 }
