@@ -61,7 +61,7 @@ public class Paxos {
 		// a majority (and immediately upon majority) of processes have accepted the
 		// value.
 		Object[] vals = (Object[]) val;
-		System.out.println(vals.toString());
+		System.out.println(vals[0]);
 		// PlayerMoveData playerMoveData = new PlayerMoveData((int) val1.get(0),
 		// (String) val1.get(1));
 		// deque.addLast(playerMoveData);
