@@ -66,7 +66,7 @@ public class Paxos {
 
 		// start new paxos instance
 		while (!deque.isEmpty()) {
-			roundNumber += 2;
+			roundNumber++;
 			propose();
 
 			// wait for majority to accept
@@ -208,11 +208,6 @@ class Proposal extends PaxosPhase {
 
 	public Proposal(int roundNumber) {
 		this.roundNumber = roundNumber;
-	}
-
-	@Override
-	public String toString() {
-		return String.valueOf(roundNumber);
 	}
 }
 
