@@ -186,7 +186,7 @@ class PaxosListener implements Runnable {
 
 }
 
-class PaxosPhase implements Serializable {
+abstract class PaxosPhase {
 	String type;
 }
 
