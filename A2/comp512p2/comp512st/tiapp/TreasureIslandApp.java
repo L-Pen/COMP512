@@ -1,6 +1,5 @@
 package comp512st.tiapp;
 
-import comp512.gcl.*;
 import comp512.ti.*;
 import comp512.utils.*;
 
@@ -38,7 +37,7 @@ public class TreasureIslandApp implements Runnable {
 				Object[] info = (Object[]) paxos.acceptTOMsg();
 				logger.fine("Received :" + Arrays.toString(info));
 				move((Integer) info[0], (Character) info[1]);
-				// displayIsland();
+				displayIsland();
 			} catch (InterruptedException ie) {
 				if (keepExploring)
 					logger.log(Level.SEVERE, "Encountered InterruptedException while waiting for messages.", ie);

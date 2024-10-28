@@ -7,6 +7,11 @@ import comp512.utils.*;
 
 // Any other imports that you may need.
 import java.io.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Deque;
+import java.util.List;
 import java.util.logging.*;
 import java.net.UnknownHostException;
 
@@ -18,6 +23,9 @@ import java.net.UnknownHostException;
 public class Paxos {
 	GCL gcl;
 	FailCheck failCheck;
+	int roundNumber = 0;
+	int majority = 0;
+	Deque<PlayerMoveData> deque = new ArrayDeque<>();
 
 	public Paxos(String myProcess, String[] allGroupProcesses, Logger logger, FailCheck failCheck)
 			throws IOException, UnknownHostException {
@@ -28,19 +36,81 @@ public class Paxos {
 
 		// Initialize the GCL communication system as well as anything else you need to.
 		this.gcl = new GCL(myProcess, allGroupProcesses, null, logger);
+		this.majority = calculateMajority(allGroupProcesses.length);
+	}
 
+	private int calculateMajority(int numProcesses) {
+		return (numProcesses / 2) + 1;
 	}
 
 	// This is what the application layer is going to call to send a message/value,
 	// such as the player and the move
-	public void broadcastTOMsg(Object val) {
+	public void broadcastTOMsg(Object val) throws InterruptedException {
 		// This is just a place holder.
 		// Extend this to build whatever Paxos logic you need to make sure the messaging
 		// system is total order.
 		// Here you will have to ensure that the CALL BLOCKS, and is returned ONLY when
 		// a majority (and immediately upon majority) of processes have accepted the
 		// value.
-		gcl.broadcastMsg(val);
+		List<Object> val1 = Arrays.asList(val);
+		PlayerMoveData playerMoveData = new PlayerMoveData((int) val1.get(0), (String) val1.get(1));
+		deque.addLast(playerMoveData);
+
+		// start new paxos instance
+		roundNumber++;
+		propose();
+
+		// wait for majority to accept
+		accept();
+
+		// broadcast confirm
+		confirm();
+	}
+
+	private void propose() throws InterruptedException {
+		// propose to be leader, ie round value
+		Proposal proposal = new Proposal(roundNumber);
+
+		gcl.broadcastMsg(proposal);
+		int count = 0;
+		List<Promise> promisesWithAcceptedRound = new ArrayList<>();
+		while (count < this.majority) {
+			GCMessage gcmsg = gcl.readGCMessage();
+			Promise promise = (Promise) gcmsg.val;
+			if (promise.receivedRoundNumber != roundNumber)
+				continue;
+			if (promise.acceptedRoundNumber != -1) {
+				promisesWithAcceptedRound.add(promise);
+			}
+			count++;
+		}
+		promisesWithAcceptedRound.sort((p1, p2) -> Integer.compare(p1.acceptedRoundNumber, p2.acceptedRoundNumber));
+
+		for (int i = promisesWithAcceptedRound.size() - 1; i >= 0; i--) {
+			deque.addFirst(promisesWithAcceptedRound.get(i).acceptedValue);
+		}
+		return;
+	}
+
+	private void accept() throws InterruptedException {
+		PlayerMoveData pmd = deque.removeFirst();
+
+		Accept accept = new Accept(roundNumber, pmd);
+		gcl.broadcastMsg(accept);
+		int count = 0;
+		while (count < this.majority) {
+			GCMessage gcmsg = gcl.readGCMessage();
+			AcceptAck acceptAck = (AcceptAck) gcmsg.val;
+			if (acceptAck.roundNumber != roundNumber)
+				continue;
+			count++;
+		}
+		return;
+	}
+
+	private void confirm() throws InterruptedException {
+		Confirm confirm = new Confirm(roundNumber);
+		gcl.broadcastMsg(confirm);
 	}
 
 	// This is what the application layer is calling to figure out what is the next
@@ -49,12 +119,66 @@ public class Paxos {
 	// the same order.
 	public Object acceptTOMsg() throws InterruptedException {
 		// This is just a place holder.
-		GCMessage gcmsg = gcl.readGCMessage();
-		return gcmsg.val;
+		// while(queue empty)
+		return "";
 	}
 
 	// Add any of your own shutdown code into this method.
 	public void shutdownPaxos() {
 		gcl.shutdownGCL();
+	}
+}
+
+class Promise implements Serializable {
+	int receivedRoundNumber;
+	int acceptedRoundNumber; // -1 for none
+	PlayerMoveData acceptedValue;
+
+	public Promise() {
+
+	}
+}
+
+class Proposal implements Serializable {
+	int roundNumber;
+
+	public Proposal(int roundNumber) {
+		this.roundNumber = roundNumber;
+	}
+}
+
+class PlayerMoveData {
+	int player;
+	String move;
+
+	public PlayerMoveData(int player, String move) {
+		this.player = player;
+		this.move = move;
+	}
+}
+
+class Accept {
+	int roundNumber;
+	PlayerMoveData pmd;
+
+	public Accept(int roundNumber, PlayerMoveData pmd) {
+		this.roundNumber = roundNumber;
+		this.pmd = pmd;
+	}
+}
+
+class AcceptAck {
+	int roundNumber;
+
+	public AcceptAck(int roundNumber) {
+		this.roundNumber = roundNumber;
+	}
+}
+
+class Confirm {
+	int roundNumber;
+
+	public Confirm(int roundNumber) {
+		this.roundNumber = roundNumber;
 	}
 }
