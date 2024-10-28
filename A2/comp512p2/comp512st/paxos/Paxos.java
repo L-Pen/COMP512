@@ -60,9 +60,10 @@ public class Paxos {
 		// Here you will have to ensure that the CALL BLOCKS, and is returned ONLY when
 		// a majority (and immediately upon majority) of processes have accepted the
 		// value.
+		System.out.println(val);
 		List<Object> val1 = Arrays.asList(val);
-		System.out.println(val1.get(0) + " " + val1.get(0).getClass());
-		System.out.println(val1.get(1) + " " + val1.get(1).getClass());
+		System.out.println(val1.toString());
+		System.out.println(val1.get(0).toString());
 		PlayerMoveData playerMoveData = new PlayerMoveData((int) val1.get(0), (String) val1.get(1));
 		deque.addLast(playerMoveData);
 
