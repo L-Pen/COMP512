@@ -153,12 +153,16 @@ class PaxosListener implements Runnable {
 				}
 
 				if (val instanceof Proposal) { // not done
-					System.out.println("In Proposal in paxos listener");
+					System.out.println(paxos.processId + " In Proposal in paxos listener");
 					Proposal p = (Proposal) val;
 					Promise promise = new Promise(p.roundNumber, paxos.acceptedRoundNumber, paxos.acceptedValue);
 
 					if (p.roundNumber >= paxos.roundNumber) {
+						System.out.println("Inside >= round number in proposal in paxos listener");
 						paxos.roundNumber = p.roundNumber;
+						System.out.println("Paxos Round number in propsal in paxos listener :"  + paxos.roundNumber);
+						System.out.println("Sending promise to: " + gcmsg.senderProcess);
+
 						paxos.gcl.sendMsg(promise, gcmsg.senderProcess);
 					}
 					else{
