@@ -179,7 +179,15 @@ class PaxosListener implements Runnable {
 				}
 
 				else if (val instanceof Accept) {
-
+					System.out.println("In Accept in paxos listener");
+					Accept acceptMessage = (Accept) val;
+					paxos.acceptedValue = acceptMessage.pmd;
+					paxos.acceptedRoundNumber = acceptMessage.roundNumber;
+					System.out.println("Accepted Round Number: " + paxos.acceptedRoundNumber);
+					System.out.println("Accepted Value: " + paxos.acceptedValue.toString());
+					AcceptAck acceptAck = new AcceptAck(acceptMessage.roundNumber);
+					paxos.gcl.sendMsg(acceptAck, gcmsg.senderProcess);
+					System.out.println("Exiting Accept in paxos listener");
 				}
 
 				else if (val instanceof Confirm) {
@@ -298,19 +306,24 @@ class PaxosBroadcaster implements Runnable {
 
 	private void accept() throws InterruptedException {
 		System.out.println("Inside Accept message");
-		PlayerMoveData pmd = paxos.deque.removeFirst();
+		PlayerMoveData pmd = paxos.deque.peekFirst();
 		System.out.println(pmd.toString());
 
 		Accept accept = new Accept(paxos.roundNumber, pmd);
 		paxos.gcl.broadcastMsg(accept);
 		int count = 0;
+		paxos.pausePaxosListener = true;
 		while (count < paxos.majority) {
 			GCMessage gcmsg = paxos.gcl.readGCMessage();
 			AcceptAck acceptAck = (AcceptAck) gcmsg.val;
 			if (acceptAck.roundNumber != paxos.roundNumber)
 				continue;
 			count++;
+			System.out.println("ROMEN LOG 3: " + count);
 		}
+		paxos.pausePaxosListener = false;
+		paxos.deque.removeFirst();
+		System.out.println("FINISHED ACCEPT");
 		return;
 	}
 
