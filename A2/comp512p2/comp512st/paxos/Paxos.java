@@ -37,6 +37,7 @@ public class Paxos {
 	volatile boolean paxosInstanceRunning = false;
 	volatile int acceptedRoundNumber;
 	volatile PlayerMoveData acceptedValue;
+	volatile boolean pausePaxosListener;
 
 	public Paxos(String myProcess, String[] allGroupProcesses, Logger logger, FailCheck failCheck)
 			throws IOException, UnknownHostException {
@@ -50,6 +51,7 @@ public class Paxos {
 		this.paxosInstanceRunning = false;
 		this.acceptedRoundNumber = -1;
 		this.acceptedValue = null;
+		this.pausePaxosListener = false;
 
 		System.out.println("NUM PROCESSES: " + allGroupProcesses.length + " HI PROCESS ID: " + processId);
 
@@ -110,6 +112,11 @@ class PaxosListener implements Runnable {
 
 	public void run() {
 		while (true) {
+
+			if (paxos.pausePaxosListener) {
+				continue;
+			}
+
 			try {
 				GCMessage gcmsg = paxos.gcl.readGCMessage();
 
@@ -129,7 +136,7 @@ class PaxosListener implements Runnable {
 					paxos.gcl.sendMsg(leaderElectionMessage, gcmsg.senderProcess);
 					System.out.println("Exiting leader election in paxos listener");
 				}
-				if (val instanceof LeaderElectionAck) {
+				else if (val instanceof LeaderElectionAck) {
 					System.out.println("In leader election ack in paxos listener");
 					receivedLeAcks.add((LeaderElectionAck) val);
 
@@ -152,7 +159,7 @@ class PaxosListener implements Runnable {
 					}
 				}
 
-				if (val instanceof Proposal) { // not done
+				else if (val instanceof Proposal) { // not done
 					System.out.println(paxos.processId + " In Proposal in paxos listener");
 					Proposal p = (Proposal) val;
 					Promise promise = new Promise(p.roundNumber, paxos.acceptedRoundNumber, paxos.acceptedValue);
@@ -163,8 +170,7 @@ class PaxosListener implements Runnable {
 						System.out.println("Paxos Round number in propsal in paxos listener :"  + paxos.roundNumber);
 						System.out.println("Sending promise to: " + gcmsg.senderProcess);
 
-						paxos.gcl.broadcastMsg(promise);
-					}
+						paxos.gcl.sendMsg(promise, gcmsg.senderProcess);					}
 					else{
 						System.out.println("Refused your proposal loser");
 					}
@@ -172,16 +178,15 @@ class PaxosListener implements Runnable {
 					System.out.println("FINISHED PROPOSAL: " + p.roundNumber);
 				}
 
-				if (val instanceof Accept) {
+				else if (val instanceof Accept) {
 
 				}
 
-				if (val instanceof Confirm) {
+				else if (val instanceof Confirm) {
 					Confirm confirm = (Confirm) val;
 					paxos.paxosInstanceRunning = false;
 				}
-
-				System.out.println("ROMEN LOG 2: " + val.getClass());
+				
 
 			} catch (InterruptedException e) {
 				e.printStackTrace();
