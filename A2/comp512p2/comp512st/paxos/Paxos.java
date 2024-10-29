@@ -263,6 +263,7 @@ class PaxosBroadcaster implements Runnable {
 		int count = 0;
 		List<Promise> promisesWithAcceptedRound = new ArrayList<>();
 		while (count < paxos.majority) {
+			System.out.println("Inside propose while loop");
 			GCMessage gcmsg = paxos.gcl.readGCMessage();
 			Promise promise = (Promise) gcmsg.val;
 			System.out.println("Received promise from: " + gcmsg.senderProcess);
