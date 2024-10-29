@@ -40,7 +40,7 @@ public class Paxos {
 		this.failCheck = failCheck;
 		this.processId = Integer.parseInt(myProcess.split(":")[1]);
 		this.processName = myProcess;
-		System.out.println("NUM PROCESSES: " + allGroupProcesses.length + " PROCESS ID: " + processId);
+		System.out.println("NUM PROCESSES: " + allGroupProcesses.length + " HI PROCESS ID: " + processId);
 
 		// Initialize the GCL communication system as well as anything else you need to.
 		this.gcl = new GCL(myProcess, allGroupProcesses, null, logger);
