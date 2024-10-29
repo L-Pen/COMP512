@@ -316,7 +316,7 @@ class PaxosBroadcaster implements Runnable {
 	private void accept() throws InterruptedException {
 		System.out.println("Inside Accept message");
 		PlayerMoveData pmd = paxos.deque.peekFirst();
-		System.out.println(pmd.toString());
+		System.out.println("PRINTING PMD IN ACCEPT: " + pmd.toString());
 
 		Accept accept = new Accept(paxos.roundNumber, pmd);
 		paxos.gcl.broadcastMsg(accept);
@@ -365,7 +365,7 @@ class Proposal implements Serializable {
 	}
 }
 
-class PlayerMoveData {
+class PlayerMoveData implements Serializable{
 	int player;
 	char move;
 
