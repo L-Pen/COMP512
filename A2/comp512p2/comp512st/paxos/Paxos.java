@@ -28,7 +28,7 @@ public class Paxos {
 	volatile int roundNumber = 0;
 	int majority = 0;
 	volatile Deque<PlayerMoveData> deque = new ArrayDeque<>();
-	Queue<PlayerMoveData> deliveryQueue = new LinkedList<>();
+	volatile Queue<PlayerMoveData> deliveryQueue = new LinkedList<>();
 	volatile boolean isLeader = false;
 	int processId;
 	String processName;
