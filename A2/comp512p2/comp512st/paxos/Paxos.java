@@ -71,9 +71,11 @@ public class Paxos {
 	// This is what the application layer is going to call to send a message/value,
 	// such as the player and the move
 	public void broadcastTOMsg(Object val) throws InterruptedException {
+		System.out.println("Entered broadcastTOMsg");
 		Object[] vals = (Object[]) val;
 		PlayerMoveData playerMoveData = new PlayerMoveData((int) vals[0], (char) vals[1]);
 		deque.addLast(playerMoveData);
+		System.out.println("Added to deque in broadcastTOMsg");
 	}
 
 	// This is what the application layer is calling to figure out what is the next
@@ -111,18 +113,23 @@ class PaxosListener implements Runnable {
 				Object val = gcmsg.val;
 
 				if (val instanceof LeaderElection) {
+					System.out.println("In leader election in paxos listener");
 					LeaderElection le = (LeaderElection) val;
 					paxos.paxosInstanceRunning = false;
 					// if im not the leader or my idis less than propoper or my id is bigger but i have nothing to send
 					boolean elect = (paxos.processId < le.processId) || (paxos.processId > le.processId && paxos.deque.isEmpty());
+					System.out.println("Elect result: " + elect);
 					paxos.paxosInstanceRunning = elect;
 					LeaderElectionAck leaderElectionMessage = new LeaderElectionAck(elect);
 					paxos.gcl.sendMsg(leaderElectionMessage, gcmsg.senderProcess);
+					System.out.println("Exiting leader election in paxos listener");
 				}
 				if (val instanceof LeaderElectionAck) {
+					System.out.println("In leader election ack in paxos listener");
 					receivedLeAcks.add((LeaderElectionAck) val);
 
 					if (receivedLeAcks.size() == paxos.numberProcesses) {
+						System.out.println("Received all leader election acks");
 						boolean electLeader = true;
 						for (LeaderElectionAck lea : receivedLeAcks) {
 							if (!lea.electLeader) { //if not elected the leader break
@@ -142,6 +149,7 @@ class PaxosListener implements Runnable {
 				}
 
 				if (val instanceof Proposal) { //not done
+					System.out.println("In Proposal in paxos listener");
 					Proposal p = (Proposal) val;
 					int roundNumber = p.roundNumber;
 					System.out.println(roundNumber);
@@ -188,7 +196,9 @@ class PaxosBroadcaster implements Runnable {
 
 			// start leader election
 			if (!paxos.startedLeaderElection && !paxos.paxosInstanceRunning) {
+				System.out.println("Beginning Leader Election in Paxos Broadcaster");
 				LeaderElection le = new LeaderElection(paxos.processId, paxos.processName);
+				System.out.println(le);
 				paxos.gcl.broadcastMsg(le);
 				paxos.startedLeaderElection = true;
 			}
@@ -196,10 +206,11 @@ class PaxosBroadcaster implements Runnable {
 			if (!paxos.isLeader)
 				continue;
 			
-
+			System.out.println("In the middle of Paxos Broadcaster");
 			paxos.startedLeaderElection = false;
 			paxos.roundNumber++;
 			try {
+				System.out.println("Proposing");
 				propose();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
