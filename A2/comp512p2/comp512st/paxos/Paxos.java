@@ -89,9 +89,11 @@ public class Paxos {
 	// the same order.
 	public Object acceptTOMsg() throws InterruptedException {
 		// This is just a place holder.
+		System.out.println("Entered acceptTOMsg");
 		while (deliveryQueue.isEmpty()) {
 		}
 		PlayerMoveData pmd = deliveryQueue.remove();
+		System.out.println("TO STRING IN ACCEPT TO MESSAGE: " + pmd.toString());
 		return new Object[] { pmd.player, pmd.move };
 	}
 
@@ -191,8 +193,13 @@ class PaxosListener implements Runnable {
 				}
 
 				else if (val instanceof Confirm) {
+					System.out.println("In Confirm in paxos listener");
 					Confirm confirm = (Confirm) val;
+					if (confirm.roundNumber == paxos.acceptedRoundNumber) {
+						paxos.deliveryQueue.add(paxos.acceptedValue);
+					}
 					paxos.paxosInstanceRunning = false;
+
 				}
 				
 				System.out.println("Romen Log 2: " + val.getClass());
@@ -328,8 +335,10 @@ class PaxosBroadcaster implements Runnable {
 	}
 
 	private void confirm() throws InterruptedException {
+		System.out.println("Inside Confirm message");
 		Confirm confirm = new Confirm(paxos.roundNumber);
 		paxos.gcl.broadcastMsg(confirm);
+		System.out.println("FINISHED CONFIRM");
 		return;
 	}
 }
