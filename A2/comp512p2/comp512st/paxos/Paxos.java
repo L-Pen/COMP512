@@ -163,7 +163,7 @@ class PaxosListener implements Runnable {
 						System.out.println("Paxos Round number in propsal in paxos listener :"  + paxos.roundNumber);
 						System.out.println("Sending promise to: " + gcmsg.senderProcess);
 
-						paxos.gcl.sendMsg(promise, gcmsg.senderProcess);
+						paxos.gcl.broadcastMsg(promise);
 					}
 					else{
 						System.out.println("Refused your proposal loser");
@@ -180,6 +180,8 @@ class PaxosListener implements Runnable {
 					Confirm confirm = (Confirm) val;
 					paxos.paxosInstanceRunning = false;
 				}
+
+				System.out.println("ROMEN LOG 2: " + val.getClass());
 
 			} catch (InterruptedException e) {
 				e.printStackTrace();
@@ -265,6 +267,7 @@ class PaxosBroadcaster implements Runnable {
 		while (count < paxos.majority) {
 			System.out.println("Inside propose while loop");
 			GCMessage gcmsg = paxos.gcl.readGCMessage();
+
 			Promise promise = (Promise) gcmsg.val;
 			System.out.println("Received promise from: " + gcmsg.senderProcess);
 			if (promise.receivedRoundNumber != paxos.roundNumber)
