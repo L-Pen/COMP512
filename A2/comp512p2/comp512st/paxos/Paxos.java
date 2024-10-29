@@ -187,7 +187,7 @@ class PaxosListener implements Runnable {
 					paxos.paxosInstanceRunning = false;
 				}
 				
-
+				System.out.println("Romen Log 2: " + val.getClass());
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -269,6 +269,7 @@ class PaxosBroadcaster implements Runnable {
 		System.out.println("Broadcasted proposal");
 		int count = 0;
 		List<Promise> promisesWithAcceptedRound = new ArrayList<>();
+		paxos.pausePaxosListener = true; // we be hackin
 		while (count < paxos.majority) {
 			System.out.println("Inside propose while loop");
 			GCMessage gcmsg = paxos.gcl.readGCMessage();
@@ -283,6 +284,7 @@ class PaxosBroadcaster implements Runnable {
 			count++;
 			System.out.println("ROMEN LOG: " + count);
 		}
+		paxos.pausePaxosListener = false;
 		System.out.println("OUT OF PROPOSE WHILE LOOP");
 		promisesWithAcceptedRound.sort((p1, p2) -> Integer.compare(p1.acceptedRoundNumber, p2.acceptedRoundNumber));
 
