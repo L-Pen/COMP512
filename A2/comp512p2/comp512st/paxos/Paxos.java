@@ -165,7 +165,7 @@ class PaxosListener implements Runnable {
 						System.out.println("Refused your proposal loser");
 					}
 
-					System.out.println(p.roundNumber);
+					System.out.println("FINISHED PROPOSAL: " + p.roundNumber);
 				}
 
 				if (val instanceof Accept) {
