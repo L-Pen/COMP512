@@ -190,7 +190,7 @@ class PaxosBroadcaster implements Runnable {
 
 	public void run() {
 		while (true) {
-			System.out.println("Deque size in THREAD: " + paxos.deque.size());
+			// System.out.println("Deque size in THREAD: " + paxos.deque.size());
 
 			// start new paxos instance
 			if (paxos.deque.isEmpty())
