@@ -30,14 +30,16 @@ public class Paxos {
 	Deque<PlayerMoveData> deque = new ArrayDeque<>();
 	Queue<PlayerMoveData> deliveryQueue = new LinkedList<>();
 	boolean isLeader = false;
-	String processId;
+	int processId;
+	String processName;
 
 	public Paxos(String myProcess, String[] allGroupProcesses, Logger logger, FailCheck failCheck)
 			throws IOException, UnknownHostException {
 		// Rember to call the failCheck.checkFailure(..) with appropriate arguments
 		// throughout your Paxos code to force fail points if necessary.
 		this.failCheck = failCheck;
-		this.processId = myProcess;
+		this.processId = Integer.parseInt(myProcess.split(":")[1]);
+		this.processName = myProcess;
 		System.out.println("NUM PROCESSES: " + allGroupProcesses.length + " PROCESS ID: " + processId);
 
 		// Initialize the GCL communication system as well as anything else you need to.
@@ -105,6 +107,9 @@ class PaxosListener implements Runnable {
 				}
 				if (val instanceof LeaderElection) {
 					LeaderElection le = (LeaderElection) val;
+					if (paxos.processId > le.processId && !paxos.deque.isEmpty()) {
+
+					}
 				}
 
 			} catch (InterruptedException e) {
@@ -115,10 +120,12 @@ class PaxosListener implements Runnable {
 }
 
 class LeaderElection implements Serializable {
-	String processId;
+	int processId;
+	String processName;
 
-	public LeaderElection(String processId) {
+	public LeaderElection(int processId, String processName) {
 		this.processId = processId;
+		this.processName = processName;
 	}
 }
 
@@ -138,7 +145,7 @@ class PaxosBroadcaster implements Runnable {
 
 			// start leader election
 			if (!startedLeaderElection) {
-				LeaderElection le = new LeaderElection(paxos.processId);
+				LeaderElection le = new LeaderElection(paxos.processId, paxos.processName);
 				paxos.gcl.broadcastMsg(le);
 				startedLeaderElection = true;
 			}
