@@ -16,7 +16,6 @@ import java.util.Queue;
 import java.util.logging.*;
 import java.net.UnknownHostException;
 import java.lang.Thread;
-import java.lang.reflect.Array;
 
 // ANY OTHER classes, etc., that you add must be private to this package and not visible to the application layer.
 
@@ -26,16 +25,16 @@ import java.lang.reflect.Array;
 public class Paxos {
 	GCL gcl;
 	FailCheck failCheck;
-	int roundNumber = 0;
+	volatile int roundNumber = 0;
 	int majority = 0;
-	Deque<PlayerMoveData> deque = new ArrayDeque<>();
+	volatile Deque<PlayerMoveData> deque = new ArrayDeque<>();
 	Queue<PlayerMoveData> deliveryQueue = new LinkedList<>();
-	boolean isLeader = false;
+	volatile boolean isLeader = false;
 	int processId;
 	String processName;
 	Integer numberProcesses;
-	boolean startedLeaderElection = false;
-	boolean paxosInstanceRunning = false;
+	volatile boolean startedLeaderElection = false;
+	volatile boolean paxosInstanceRunning = false;
 
 	public Paxos(String myProcess, String[] allGroupProcesses, Logger logger, FailCheck failCheck)
 			throws IOException, UnknownHostException {
