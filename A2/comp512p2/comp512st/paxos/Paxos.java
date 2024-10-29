@@ -117,7 +117,7 @@ class PaxosListener implements Runnable {
 					paxos.paxosInstanceRunning = false;
 					// if im not the leader or my idis less than propoper or my id is bigger but i
 					// have nothing to send
-					boolean elect = (paxos.processId < le.processId)
+					boolean elect = (paxos.processId == le.processId) || (paxos.processId < le.processId)
 							|| (paxos.processId > le.processId && paxos.deque.isEmpty());
 					System.out.println("Elect result: " + elect);
 					paxos.paxosInstanceRunning = elect;
