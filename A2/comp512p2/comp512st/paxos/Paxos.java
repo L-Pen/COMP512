@@ -157,7 +157,7 @@ class PaxosListener implements Runnable {
 					Proposal p = (Proposal) val;
 					Promise promise = new Promise(p.roundNumber, paxos.acceptedRoundNumber, paxos.acceptedValue);
 
-					if (p.roundNumber > paxos.roundNumber) {
+					if (p.roundNumber >= paxos.roundNumber) {
 						paxos.roundNumber = p.roundNumber;
 						paxos.gcl.sendMsg(promise, gcmsg.senderProcess);
 					}
@@ -261,7 +261,7 @@ class PaxosBroadcaster implements Runnable {
 		while (count < paxos.majority) {
 			GCMessage gcmsg = paxos.gcl.readGCMessage();
 			Promise promise = (Promise) gcmsg.val;
-			System.out.println("Received promise");
+			System.out.println("Received promise from: " + gcmsg.senderProcess);
 			if (promise.receivedRoundNumber != paxos.roundNumber)
 				continue;
 			if (promise.acceptedRoundNumber != -1) {
