@@ -16,6 +16,7 @@ import java.util.Queue;
 import java.util.logging.*;
 import java.net.UnknownHostException;
 import java.lang.Thread;
+import java.lang.reflect.Array;
 
 // ANY OTHER classes, etc., that you add must be private to this package and not visible to the application layer.
 
@@ -32,6 +33,10 @@ public class Paxos {
 	boolean isLeader = false;
 	int processId;
 	String processName;
+	Integer numberProcesses;
+	boolean startedLeaderElection = false;
+	boolean paxosInstanceRunning = false;
+
 
 	public Paxos(String myProcess, String[] allGroupProcesses, Logger logger, FailCheck failCheck)
 			throws IOException, UnknownHostException {
@@ -40,6 +45,10 @@ public class Paxos {
 		this.failCheck = failCheck;
 		this.processId = Integer.parseInt(myProcess.split(":")[1]);
 		this.processName = myProcess;
+		this.numberProcesses = allGroupProcesses.length;
+		this.startedLeaderElection = false;
+		this.paxosInstanceRunning = false;
+
 		System.out.println("NUM PROCESSES: " + allGroupProcesses.length + " HI PROCESS ID: " + processId);
 
 		// Initialize the GCL communication system as well as anything else you need to.
@@ -88,6 +97,7 @@ public class Paxos {
 class PaxosListener implements Runnable {
 
 	Paxos paxos;
+	ArrayList<LeaderElectionAck> receivedLeAcks = new ArrayList<>();
 
 	public PaxosListener(Paxos paxos) {
 		this.paxos = paxos;
@@ -97,20 +107,53 @@ class PaxosListener implements Runnable {
 		while (true) {
 			try {
 				GCMessage gcmsg = paxos.gcl.readGCMessage();
-				// hello liamo
 
 				Object val = gcmsg.val;
-				if (val instanceof Proposal) {
-					Proposal p = (Proposal) val;
-					int rountNumber = p.roundNumber;
-					System.out.println(rountNumber);
-					// if()
-				}
+
 				if (val instanceof LeaderElection) {
 					LeaderElection le = (LeaderElection) val;
-					if (paxos.processId > le.processId && !paxos.deque.isEmpty()) {
+					paxos.paxosInstanceRunning = false;
+					// if im not the leader or my idis less than propoper or my id is bigger but i have nothing to send
+					boolean elect = (paxos.processId < le.processId) || (paxos.processId > le.processId && paxos.deque.isEmpty());
+					paxos.paxosInstanceRunning = elect;
+					LeaderElectionAck leaderElectionMessage = new LeaderElectionAck(elect);
+					paxos.gcl.sendMsg(leaderElectionMessage, gcmsg.senderProcess);
+				}
+				if (val instanceof LeaderElectionAck) {
+					receivedLeAcks.add((LeaderElectionAck) val);
 
+					if (receivedLeAcks.size() == paxos.numberProcesses) {
+						boolean electLeader = true;
+						for (LeaderElectionAck lea : receivedLeAcks) {
+							if (!lea.electLeader) { //if not elected the leader break
+								electLeader = false;
+								break;
+							}
+						}
+						if (electLeader) {
+							paxos.isLeader = true;
+						}
+						else{
+							paxos.startedLeaderElection = false;
+						}
+						receivedLeAcks.clear();
+						System.out.println("Process ID: " + paxos.processId + " Leader: " + paxos.isLeader);
 					}
+				}
+
+				if (val instanceof Proposal) { //not done
+					Proposal p = (Proposal) val;
+					int roundNumber = p.roundNumber;
+					System.out.println(roundNumber);
+				}
+
+				if (val instanceof Accept){
+					
+				}
+
+				if (val instanceof Confirm) {
+					Confirm confirm = (Confirm) val;
+					paxos.paxosInstanceRunning = false;
 				}
 
 			} catch (InterruptedException e) {
@@ -132,7 +175,6 @@ class LeaderElection implements Serializable {
 
 class PaxosBroadcaster implements Runnable {
 	Paxos paxos;
-	boolean startedLeaderElection = false;
 
 	public PaxosBroadcaster(Paxos paxos) {
 		this.paxos = paxos;
@@ -145,16 +187,17 @@ class PaxosBroadcaster implements Runnable {
 				continue;
 
 			// start leader election
-			if (!startedLeaderElection) {
+			if (!paxos.startedLeaderElection && !paxos.paxosInstanceRunning) {
 				LeaderElection le = new LeaderElection(paxos.processId, paxos.processName);
 				paxos.gcl.broadcastMsg(le);
-				startedLeaderElection = true;
+				paxos.startedLeaderElection = true;
 			}
 
 			if (!paxos.isLeader)
 				continue;
+			
 
-			startedLeaderElection = false;
+			paxos.startedLeaderElection = false;
 			paxos.roundNumber++;
 			try {
 				propose();
@@ -279,5 +322,13 @@ class Confirm implements Serializable {
 
 	public Confirm(int roundNumber) {
 		this.roundNumber = roundNumber;
+	}
+}
+
+class LeaderElectionAck implements Serializable {
+	boolean electLeader;
+
+	public LeaderElectionAck(boolean electLeader) {
+		this.electLeader = electLeader;
 	}
 }
