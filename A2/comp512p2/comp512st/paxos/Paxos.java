@@ -37,7 +37,6 @@ public class Paxos {
 	boolean startedLeaderElection = false;
 	boolean paxosInstanceRunning = false;
 
-
 	public Paxos(String myProcess, String[] allGroupProcesses, Logger logger, FailCheck failCheck)
 			throws IOException, UnknownHostException {
 		// Rember to call the failCheck.checkFailure(..) with appropriate arguments
@@ -116,8 +115,10 @@ class PaxosListener implements Runnable {
 					System.out.println("In leader election in paxos listener");
 					LeaderElection le = (LeaderElection) val;
 					paxos.paxosInstanceRunning = false;
-					// if im not the leader or my idis less than propoper or my id is bigger but i have nothing to send
-					boolean elect = (paxos.processId < le.processId) || (paxos.processId > le.processId && paxos.deque.isEmpty());
+					// if im not the leader or my idis less than propoper or my id is bigger but i
+					// have nothing to send
+					boolean elect = (paxos.processId < le.processId)
+							|| (paxos.processId > le.processId && paxos.deque.isEmpty());
 					System.out.println("Elect result: " + elect);
 					paxos.paxosInstanceRunning = elect;
 					LeaderElectionAck leaderElectionMessage = new LeaderElectionAck(elect);
@@ -132,15 +133,14 @@ class PaxosListener implements Runnable {
 						System.out.println("Received all leader election acks");
 						boolean electLeader = true;
 						for (LeaderElectionAck lea : receivedLeAcks) {
-							if (!lea.electLeader) { //if not elected the leader break
+							if (!lea.electLeader) { // if not elected the leader break
 								electLeader = false;
 								break;
 							}
 						}
 						if (electLeader) {
 							paxos.isLeader = true;
-						}
-						else{
+						} else {
 							paxos.startedLeaderElection = false;
 						}
 						receivedLeAcks.clear();
@@ -148,15 +148,15 @@ class PaxosListener implements Runnable {
 					}
 				}
 
-				if (val instanceof Proposal) { //not done
+				if (val instanceof Proposal) { // not done
 					System.out.println("In Proposal in paxos listener");
 					Proposal p = (Proposal) val;
 					int roundNumber = p.roundNumber;
 					System.out.println(roundNumber);
 				}
 
-				if (val instanceof Accept){
-					
+				if (val instanceof Accept) {
+
 				}
 
 				if (val instanceof Confirm) {
@@ -205,7 +205,7 @@ class PaxosBroadcaster implements Runnable {
 
 			if (!paxos.isLeader)
 				continue;
-			
+
 			System.out.println("In the middle of Paxos Broadcaster");
 			paxos.startedLeaderElection = false;
 			paxos.roundNumber++;
@@ -307,6 +307,11 @@ class PlayerMoveData {
 	public PlayerMoveData(int player, char move) {
 		this.player = player;
 		this.move = move;
+	}
+
+	@Override
+	public String toString() {
+		return "Player: " + player + " Move: " + move;
 	}
 }
 
