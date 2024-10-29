@@ -97,6 +97,7 @@ class PaxosListener implements Runnable {
 		while (true) {
 			try {
 				GCMessage gcmsg = paxos.gcl.readGCMessage();
+				// hello liamo
 
 				Object val = gcmsg.val;
 				if (val instanceof Proposal) {
