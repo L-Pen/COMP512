@@ -272,6 +272,7 @@ class PaxosBroadcaster implements Runnable {
 				promisesWithAcceptedRound.add(promise);
 			}
 			count++;
+			System.out.println("ROMEN LOG: " + count);
 		}
 		System.out.println("OUT OF PROPOSE WHILE LOOP");
 		promisesWithAcceptedRound.sort((p1, p2) -> Integer.compare(p1.acceptedRoundNumber, p2.acceptedRoundNumber));
