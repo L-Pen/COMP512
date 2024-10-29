@@ -35,6 +35,8 @@ public class Paxos {
 	Integer numberProcesses;
 	volatile boolean startedLeaderElection = false;
 	volatile boolean paxosInstanceRunning = false;
+	volatile int acceptedRoundNumber;
+	volatile PlayerMoveData acceptedValue;
 
 	public Paxos(String myProcess, String[] allGroupProcesses, Logger logger, FailCheck failCheck)
 			throws IOException, UnknownHostException {
@@ -46,6 +48,8 @@ public class Paxos {
 		this.numberProcesses = allGroupProcesses.length;
 		this.startedLeaderElection = false;
 		this.paxosInstanceRunning = false;
+		this.acceptedRoundNumber = -1;
+		this.acceptedValue = null;
 
 		System.out.println("NUM PROCESSES: " + allGroupProcesses.length + " HI PROCESS ID: " + processId);
 
@@ -151,8 +155,17 @@ class PaxosListener implements Runnable {
 				if (val instanceof Proposal) { // not done
 					System.out.println("In Proposal in paxos listener");
 					Proposal p = (Proposal) val;
-					int roundNumber = p.roundNumber;
-					System.out.println(roundNumber);
+					Promise promise = new Promise(p.roundNumber, paxos.acceptedRoundNumber, paxos.acceptedValue);
+
+					if (p.roundNumber > paxos.roundNumber) {
+						paxos.roundNumber = p.roundNumber;
+						paxos.gcl.sendMsg(promise, gcmsg.senderProcess);
+					}
+					else{
+						System.out.println("Refused your proposal loser");
+					}
+
+					System.out.println(p.roundNumber);
 				}
 
 				if (val instanceof Accept) {
@@ -238,14 +251,17 @@ class PaxosBroadcaster implements Runnable {
 
 	private void propose() throws InterruptedException {
 		// propose to be leader, ie round value
+		System.out.println("Inside Propose message");
 		Proposal proposal = new Proposal(paxos.roundNumber);
 
 		paxos.gcl.broadcastMsg(proposal);
+		System.out.println("Broadcasted proposal");
 		int count = 0;
 		List<Promise> promisesWithAcceptedRound = new ArrayList<>();
 		while (count < paxos.majority) {
 			GCMessage gcmsg = paxos.gcl.readGCMessage();
 			Promise promise = (Promise) gcmsg.val;
+			System.out.println("Received promise");
 			if (promise.receivedRoundNumber != paxos.roundNumber)
 				continue;
 			if (promise.acceptedRoundNumber != -1) {
@@ -253,16 +269,21 @@ class PaxosBroadcaster implements Runnable {
 			}
 			count++;
 		}
+		System.out.println("OUT OF PROPOSE WHILE LOOP");
 		promisesWithAcceptedRound.sort((p1, p2) -> Integer.compare(p1.acceptedRoundNumber, p2.acceptedRoundNumber));
 
+		System.out.println("Promises with accepted round size in propose: " + promisesWithAcceptedRound.size());
 		for (int i = promisesWithAcceptedRound.size() - 1; i >= 0; i--) {
 			paxos.deque.addFirst(promisesWithAcceptedRound.get(i).acceptedValue);
 		}
+		System.out.println("Deque size in propose: " + paxos.deque.size());
 		return;
 	}
 
 	private void accept() throws InterruptedException {
+		System.out.println("Inside Accept message");
 		PlayerMoveData pmd = paxos.deque.removeFirst();
+		System.out.println(pmd.toString());
 
 		Accept accept = new Accept(paxos.roundNumber, pmd);
 		paxos.gcl.broadcastMsg(accept);
@@ -289,8 +310,10 @@ class Promise implements Serializable {
 	int acceptedRoundNumber; // -1 for none
 	PlayerMoveData acceptedValue;
 
-	public Promise() {
-
+	public Promise(int receivedRoundNumber, int acceptedRoundNumber, PlayerMoveData acceptedValue) {
+		this.receivedRoundNumber = receivedRoundNumber;
+		this.acceptedRoundNumber = acceptedRoundNumber;
+		this.acceptedValue = acceptedValue;
 	}
 }
 
