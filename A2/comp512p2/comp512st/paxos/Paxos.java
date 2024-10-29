@@ -198,6 +198,7 @@ class PaxosListener implements Runnable {
 					System.out.println("In Confirm in paxos listener");
 					Confirm confirm = (Confirm) val;
 					if (confirm.roundNumber == paxos.acceptedRoundNumber) {
+						System.out.println("Were you false?");
 						paxos.deliveryQueue.add(paxos.acceptedValue);
 					}
 					paxos.paxosInstanceRunning = false;
