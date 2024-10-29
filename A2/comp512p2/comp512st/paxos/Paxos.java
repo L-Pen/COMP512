@@ -74,6 +74,7 @@ public class Paxos {
 		Object[] vals = (Object[]) val;
 		PlayerMoveData playerMoveData = new PlayerMoveData((int) vals[0], (char) vals[1]);
 		deque.addLast(playerMoveData);
+		System.out.println("Deque size: " + deque.peek());
 		System.out.println("Added to deque in broadcastTOMsg");
 	}
 
