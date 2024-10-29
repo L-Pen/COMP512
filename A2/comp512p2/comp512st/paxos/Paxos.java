@@ -126,6 +126,8 @@ class PaxosListener implements Runnable {
 
 				if (val instanceof LeaderElection) {
 					System.out.println("In leader election in paxos listener");
+					paxos.acceptedRoundNumber = -1;
+					paxos.acceptedValue = null;
 					LeaderElection le = (LeaderElection) val;
 					paxos.paxosInstanceRunning = false;
 					// if im not the leader or my idis less than propoper or my id is bigger but i
