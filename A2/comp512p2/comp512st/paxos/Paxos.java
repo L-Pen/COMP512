@@ -37,7 +37,10 @@ public class Paxos {
 	volatile boolean paxosInstanceRunning = false;
 	volatile int acceptedRoundNumber;
 	volatile PlayerMoveData acceptedValue;
-	volatile boolean pausePaxosListener;
+	volatile int acceptAckCount;
+	volatile List<Promise> promisesWithAcceptedRound;
+	volatile int promiseCount;
+	volatile PaxosPhase phase;
 
 	public Paxos(String myProcess, String[] allGroupProcesses, Logger logger, FailCheck failCheck)
 			throws IOException, UnknownHostException {
@@ -51,7 +54,10 @@ public class Paxos {
 		this.paxosInstanceRunning = false;
 		this.acceptedRoundNumber = -1;
 		this.acceptedValue = null;
-		this.pausePaxosListener = false;
+		this.acceptAckCount = 0;
+		this.promisesWithAcceptedRound = new ArrayList<>();
+		this.promiseCount = 0;
+		this.phase = PaxosPhase.LEADER_ELECTION_ACK;
 
 		System.out.println("NUM PROCESSES: " + allGroupProcesses.length + " HI PROCESS ID: " + processId);
 
@@ -114,15 +120,12 @@ class PaxosListener implements Runnable {
 
 	public void run() {
 		while (true) {
-
-			if (paxos.pausePaxosListener) {
-				continue;
-			}
-
 			try {
 				GCMessage gcmsg = paxos.gcl.readGCMessage();
 
 				Object val = gcmsg.val;
+
+				System.out.println("Received payload: " + val.getClass().getName());
 
 				if (val instanceof LeaderElection) {
 					System.out.println("In leader election in paxos listener");
@@ -140,7 +143,7 @@ class PaxosListener implements Runnable {
 					paxos.gcl.sendMsg(leaderElectionMessage, gcmsg.senderProcess);
 					paxos.failCheck.checkFailure(FailCheck.FailureType.AFTERSENDVOTE);
 					System.out.println("Exiting leader election in paxos listener");
-				} else if (val instanceof LeaderElectionAck) {
+				} else if (val instanceof LeaderElectionAck && paxos.phase == PaxosPhase.LEADER_ELECTION_ACK) {
 					System.out.println("In leader election ack in paxos listener");
 					receivedLeAcks.add((LeaderElectionAck) val);
 
@@ -154,17 +157,19 @@ class PaxosListener implements Runnable {
 							}
 						}
 						if (electLeader) {
+							// dont set started leader election false here because we dont want to start
+							// another one
 							paxos.isLeader = true;
 							paxos.failCheck.checkFailure(FailCheck.FailureType.AFTERBECOMINGLEADER);
+							paxos.phase = PaxosPhase.PROMISE;
 						} else {
+							// if you get rejected, we want you to be able to run for leader again
 							paxos.startedLeaderElection = false;
 						}
 						receivedLeAcks.clear();
 						System.out.println("Process ID: " + paxos.processId + " Leader: " + paxos.isLeader);
 					}
-				}
-
-				else if (val instanceof Proposal) { // not done
+				} else if (val instanceof Proposal) {
 					System.out.println(paxos.processId + " In Proposal in paxos listener");
 					paxos.failCheck.checkFailure(FailCheck.FailureType.RECEIVEPROPOSE);
 					Proposal p = (Proposal) val;
@@ -182,9 +187,17 @@ class PaxosListener implements Runnable {
 					}
 
 					System.out.println("FINISHED PROPOSAL: " + p.roundNumber);
-				}
-
-				else if (val instanceof Accept) {
+				} else if (val instanceof Promise && paxos.phase == PaxosPhase.PROMISE) {
+					Promise promise = (Promise) gcmsg.val;
+					System.out.println("Received promise from: " + gcmsg.senderProcess);
+					if (promise.receivedRoundNumber != paxos.roundNumber)
+						continue;
+					if (promise.acceptedRoundNumber != -1) {
+						paxos.promisesWithAcceptedRound.add(promise);
+					}
+					paxos.promiseCount++;
+					System.out.println("Promise count: " + paxos.promiseCount);
+				} else if (val instanceof Accept) {
 					System.out.println("In Accept in paxos listener");
 					Accept acceptMessage = (Accept) val;
 					paxos.acceptedValue = acceptMessage.pmd;
@@ -194,9 +207,13 @@ class PaxosListener implements Runnable {
 					AcceptAck acceptAck = new AcceptAck(acceptMessage.roundNumber);
 					paxos.gcl.sendMsg(acceptAck, gcmsg.senderProcess);
 					System.out.println("Exiting Accept in paxos listener");
-				}
-
-				else if (val instanceof Confirm) {
+				} else if (val instanceof AcceptAck && paxos.phase == PaxosPhase.ACCEPT_ACK) {
+					AcceptAck acceptAck = (AcceptAck) gcmsg.val;
+					if (acceptAck.roundNumber != paxos.roundNumber)
+						continue;
+					paxos.acceptAckCount++;
+					System.out.println("Accept ack count: " + paxos.acceptAckCount);
+				} else if (val instanceof Confirm && paxos.phase == PaxosPhase.CONFIRM) {
 					System.out.println("In Confirm in paxos listener");
 					Confirm confirm = (Confirm) val;
 					if (confirm.roundNumber == paxos.acceptedRoundNumber) {
@@ -205,8 +222,6 @@ class PaxosListener implements Runnable {
 					}
 					paxos.paxosInstanceRunning = false;
 				}
-
-				System.out.println("Romen Log 2: " + val.getClass());
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -276,6 +291,7 @@ class PaxosBroadcaster implements Runnable {
 				e.printStackTrace();
 			}
 
+			paxos.phase = PaxosPhase.LEADER_ELECTION_ACK;
 			paxos.isLeader = false;
 		}
 	}
@@ -287,31 +303,17 @@ class PaxosBroadcaster implements Runnable {
 
 		paxos.gcl.broadcastMsg(proposal);
 		System.out.println("Broadcasted proposal");
-		int count = 0;
-		List<Promise> promisesWithAcceptedRound = new ArrayList<>();
-		paxos.pausePaxosListener = true; // we be hackin
-		while (count < paxos.majority) {
-			System.out.println("Inside propose while loop");
-			GCMessage gcmsg = paxos.gcl.readGCMessage();
-
-			Promise promise = (Promise) gcmsg.val;
-			System.out.println("Received promise from: " + gcmsg.senderProcess);
-			if (promise.receivedRoundNumber != paxos.roundNumber)
-				continue;
-			if (promise.acceptedRoundNumber != -1) {
-				promisesWithAcceptedRound.add(promise);
-			}
-			count++;
-			System.out.println("ROMEN LOG: " + count);
+		while (paxos.promiseCount < paxos.majority) {
 		}
-		paxos.pausePaxosListener = false;
-		System.out.println("OUT OF PROPOSE WHILE LOOP");
-		promisesWithAcceptedRound.sort((p1, p2) -> Integer.compare(p1.acceptedRoundNumber, p2.acceptedRoundNumber));
+		paxos.phase = PaxosPhase.ACCEPT_ACK;
+		paxos.promisesWithAcceptedRound
+				.sort((p1, p2) -> Integer.compare(p1.acceptedRoundNumber, p2.acceptedRoundNumber));
 
-		System.out.println("Promises with accepted round size in propose: " + promisesWithAcceptedRound.size());
-		for (int i = promisesWithAcceptedRound.size() - 1; i >= 0; i--) {
-			paxos.deque.addFirst(promisesWithAcceptedRound.get(i).acceptedValue);
+		System.out.println("Promises with accepted round size in propose: " + paxos.promisesWithAcceptedRound.size());
+		for (int i = paxos.promisesWithAcceptedRound.size() - 1; i >= 0; i--) {
+			paxos.deque.addFirst(paxos.promisesWithAcceptedRound.get(i).acceptedValue);
 		}
+		paxos.promisesWithAcceptedRound.clear();
 		System.out.println("Deque size in propose: " + paxos.deque.size());
 		return;
 	}
@@ -321,19 +323,12 @@ class PaxosBroadcaster implements Runnable {
 		PlayerMoveData pmd = paxos.deque.peekFirst();
 		System.out.println("PRINTING PMD IN ACCEPT: " + pmd.toString());
 
+		paxos.acceptAckCount = 0;
 		Accept accept = new Accept(paxos.roundNumber, pmd);
 		paxos.gcl.broadcastMsg(accept);
-		int count = 0;
-		paxos.pausePaxosListener = true;
-		while (count < paxos.majority) {
-			GCMessage gcmsg = paxos.gcl.readGCMessage();
-			AcceptAck acceptAck = (AcceptAck) gcmsg.val;
-			if (acceptAck.roundNumber != paxos.roundNumber)
-				continue;
-			count++;
-			System.out.println("ROMEN LOG 3: " + count);
+		while (paxos.acceptAckCount < paxos.majority) {
 		}
-		paxos.pausePaxosListener = false;
+		paxos.phase = PaxosPhase.CONFIRM;
 		paxos.failCheck.checkFailure(FailCheck.FailureType.AFTERVALUEACCEPT);
 		paxos.deque.removeFirst();
 		System.out.println("FINISHED ACCEPT");
@@ -416,4 +411,11 @@ class LeaderElectionAck implements Serializable {
 	public LeaderElectionAck(boolean electLeader) {
 		this.electLeader = electLeader;
 	}
+}
+
+enum PaxosPhase {
+	LEADER_ELECTION_ACK,
+	PROMISE,
+	ACCEPT_ACK,
+	CONFIRM
 }
