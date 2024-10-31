@@ -213,7 +213,7 @@ class PaxosListener implements Runnable {
 						continue;
 					paxos.acceptAckCount++;
 					System.out.println("Accept ack count: " + paxos.acceptAckCount);
-				} else if (val instanceof Confirm && paxos.phase == PaxosPhase.CONFIRM) {
+				} else if (val instanceof Confirm) {
 					System.out.println("In Confirm in paxos listener");
 					Confirm confirm = (Confirm) val;
 					if (confirm.roundNumber == paxos.acceptedRoundNumber) {
@@ -328,7 +328,6 @@ class PaxosBroadcaster implements Runnable {
 		paxos.gcl.broadcastMsg(accept);
 		while (paxos.acceptAckCount < paxos.majority) {
 		}
-		paxos.phase = PaxosPhase.CONFIRM;
 		paxos.failCheck.checkFailure(FailCheck.FailureType.AFTERVALUEACCEPT);
 		paxos.deque.removeFirst();
 		System.out.println("FINISHED ACCEPT");
@@ -417,5 +416,4 @@ enum PaxosPhase {
 	LEADER_ELECTION_ACK,
 	PROMISE,
 	ACCEPT_ACK,
-	CONFIRM
 }
