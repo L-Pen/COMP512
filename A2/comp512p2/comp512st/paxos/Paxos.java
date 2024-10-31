@@ -138,9 +138,9 @@ class PaxosListener implements Runnable {
 					paxos.paxosInstanceRunning = elect;
 					LeaderElectionAck leaderElectionMessage = new LeaderElectionAck(elect);
 					paxos.gcl.sendMsg(leaderElectionMessage, gcmsg.senderProcess);
+					paxos.failCheck.checkFailure(FailCheck.FailureType.AFTERSENDVOTE);
 					System.out.println("Exiting leader election in paxos listener");
-				}
-				else if (val instanceof LeaderElectionAck) {
+				} else if (val instanceof LeaderElectionAck) {
 					System.out.println("In leader election ack in paxos listener");
 					receivedLeAcks.add((LeaderElectionAck) val);
 
@@ -155,6 +155,7 @@ class PaxosListener implements Runnable {
 						}
 						if (electLeader) {
 							paxos.isLeader = true;
+							paxos.failCheck.checkFailure(FailCheck.FailureType.AFTERBECOMINGLEADER);
 						} else {
 							paxos.startedLeaderElection = false;
 						}
@@ -165,17 +166,18 @@ class PaxosListener implements Runnable {
 
 				else if (val instanceof Proposal) { // not done
 					System.out.println(paxos.processId + " In Proposal in paxos listener");
+					paxos.failCheck.checkFailure(FailCheck.FailureType.RECEIVEPROPOSE);
 					Proposal p = (Proposal) val;
 					Promise promise = new Promise(p.roundNumber, paxos.acceptedRoundNumber, paxos.acceptedValue);
 
 					if (p.roundNumber >= paxos.roundNumber) {
 						System.out.println("Inside >= round number in proposal in paxos listener");
 						paxos.roundNumber = p.roundNumber;
-						System.out.println("Paxos Round number in propsal in paxos listener :"  + paxos.roundNumber);
+						System.out.println("Paxos Round number in propsal in paxos listener :" + paxos.roundNumber);
 						System.out.println("Sending promise to: " + gcmsg.senderProcess);
 
-						paxos.gcl.sendMsg(promise, gcmsg.senderProcess);					}
-					else{
+						paxos.gcl.sendMsg(promise, gcmsg.senderProcess);
+					} else {
 						System.out.println("Refused your proposal loser");
 					}
 
@@ -202,9 +204,8 @@ class PaxosListener implements Runnable {
 						paxos.deliveryQueue.add(paxos.acceptedValue);
 					}
 					paxos.paxosInstanceRunning = false;
-
 				}
-				
+
 				System.out.println("Romen Log 2: " + val.getClass());
 			} catch (InterruptedException e) {
 				e.printStackTrace();
@@ -244,6 +245,7 @@ class PaxosBroadcaster implements Runnable {
 				LeaderElection le = new LeaderElection(paxos.processId, paxos.processName);
 				System.out.println(le);
 				paxos.gcl.broadcastMsg(le);
+				paxos.failCheck.checkFailure(FailCheck.FailureType.AFTERSENDPROPOSE);
 				paxos.startedLeaderElection = true;
 			}
 
@@ -332,6 +334,7 @@ class PaxosBroadcaster implements Runnable {
 			System.out.println("ROMEN LOG 3: " + count);
 		}
 		paxos.pausePaxosListener = false;
+		paxos.failCheck.checkFailure(FailCheck.FailureType.AFTERVALUEACCEPT);
 		paxos.deque.removeFirst();
 		System.out.println("FINISHED ACCEPT");
 		return;
@@ -366,7 +369,7 @@ class Proposal implements Serializable {
 	}
 }
 
-class PlayerMoveData implements Serializable{
+class PlayerMoveData implements Serializable {
 	int player;
 	char move;
 
