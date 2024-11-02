@@ -41,6 +41,7 @@ public class Paxos {
 	volatile List<Promise> promisesWithAcceptedRound;
 	volatile int promiseCount;
 	volatile PaxosPhase phase;
+	volatile boolean killThread;
 
 	public Paxos(String myProcess, String[] allGroupProcesses, Logger logger, FailCheck failCheck)
 			throws IOException, UnknownHostException {
@@ -58,6 +59,7 @@ public class Paxos {
 		this.promisesWithAcceptedRound = new ArrayList<>();
 		this.promiseCount = 0;
 		this.phase = PaxosPhase.LEADER_ELECTION_ACK;
+		this.killThread = false;
 
 		System.out.println("NUM PROCESSES: " + allGroupProcesses.length + " HI PROCESS ID: " + processId);
 
@@ -105,6 +107,7 @@ public class Paxos {
 
 	// Add any of your own shutdown code into this method.
 	public void shutdownPaxos() {
+		this.killThread = true;
 		gcl.shutdownGCL();
 	}
 }
@@ -119,7 +122,7 @@ class PaxosListener implements Runnable {
 	}
 
 	public void run() {
-		while (true) {
+		while (!paxos.killThread) {
 			try {
 				GCMessage gcmsg = paxos.gcl.readGCMessage();
 
@@ -223,9 +226,7 @@ class PaxosListener implements Runnable {
 					paxos.paxosInstanceRunning = false;
 				}
 			} catch (InterruptedException e) {
-				System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 				e.printStackTrace();
-				System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 			}
 		}
 	}
@@ -249,7 +250,7 @@ class PaxosBroadcaster implements Runnable {
 	}
 
 	public void run() {
-		while (true) {
+		while (!paxos.killThread) {
 			// System.out.println("Deque size in THREAD: " + paxos.deque.size());
 
 			// start new paxos instance
