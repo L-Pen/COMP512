@@ -15,8 +15,6 @@ import java.util.List;
 import java.util.Queue;
 import java.util.logging.*;
 
-import javax.sound.midi.SysexMessage;
-
 import java.net.UnknownHostException;
 import java.lang.Thread;
 
@@ -89,7 +87,8 @@ public class Paxos {
 		Object[] vals = (Object[]) val;
 		PlayerMoveData playerMoveData = new PlayerMoveData((int) vals[0], (char) vals[1]);
 		deque.addLast(playerMoveData);
-		System.out.println("[broadcastTOMsg] Added move to dequeue in: " + deque.peek().toString() + " deque size: " + deque.size());
+		System.out.println("[broadcastTOMsg] Added move to dequeue in: " + deque.peek().toString() + " deque size: "
+				+ deque.size());
 	}
 
 	// This is what the application layer is calling to figure out what is the next
@@ -128,7 +127,7 @@ class PaxosListener implements Runnable {
 
 				Object val = gcmsg.val;
 
-				PaxosLogger logger = new PaxosLogger(paxos.roundNumber);
+				PaxosLogger logger = new PaxosLogger(paxos);
 				logger.addBreadcrumb("Paxos Listener");
 
 				logger.log("Received payload: " + val.getClass().getName() + " from: "
@@ -235,7 +234,7 @@ class PaxosListener implements Runnable {
 					paxos.paxosInstanceRunning = false;
 				}
 
-                Thread.sleep(50);
+				Thread.sleep(50);
 
 			} catch (InterruptedException e) {
 				e.printStackTrace();
@@ -255,7 +254,7 @@ class PaxosBroadcaster implements Runnable {
 
 		while (!paxos.killThread) {
 
-			PaxosLogger logger = new PaxosLogger(paxos.roundNumber);
+			PaxosLogger logger = new PaxosLogger(paxos);
 			logger.addBreadcrumb("PaxosBroadcaster");
 
 			if (paxos.deque.isEmpty())
@@ -389,11 +388,11 @@ class LeaderElection implements Serializable {
 
 class PaxosLogger {
 
-	int round;
+	Paxos paxos;
 	ArrayList<String> breadcrumbs;
 
-	public PaxosLogger(int round) {
-		this.round = round;
+	public PaxosLogger(Paxos paxos) {
+		this.paxos = paxos;
 		this.breadcrumbs = new ArrayList<>();
 	}
 
@@ -409,7 +408,7 @@ class PaxosLogger {
 
 		String s = "";
 
-		s += String.format("[%d] ", this.round);
+		s += String.format("[%d] ", this.paxos.roundNumber);
 
 		for (String string : this.breadcrumbs) {
 			s += String.format("[%s] ", string);
