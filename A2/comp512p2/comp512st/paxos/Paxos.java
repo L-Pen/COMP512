@@ -270,7 +270,7 @@ class PaxosBroadcaster implements Runnable {
 			// start leader election
 			if (!paxos.startedLeaderElection && !paxos.paxosInstanceRunning) {
 				logger.log("Starting Leader Election");
-				long timestamp = paxos.deque.peek().timestamp;
+				long timestamp = paxos.deque.peekFirst().timestamp;
 				LeaderElection le = new LeaderElection(paxos.processId, timestamp);
 				paxos.gcl.broadcastMsg(le);
 				paxos.failCheck.checkFailure(FailCheck.FailureType.AFTERSENDPROPOSE);
@@ -396,6 +396,7 @@ class PaxosLogger {
 
 	Paxos paxos;
 	ArrayList<String> breadcrumbs;
+	boolean doLog = false;
 
 	public PaxosLogger(Paxos paxos) {
 		this.paxos = paxos;
@@ -411,6 +412,8 @@ class PaxosLogger {
 	}
 
 	public void log(String msg) {
+		if (!doLog)
+			return;
 
 		String s = "";
 
