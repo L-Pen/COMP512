@@ -128,34 +128,37 @@ class PaxosListener implements Runnable {
 
 				Object val = gcmsg.val;
 
-				System.out.println(
-						"[Paxos Listener] Received payload: " + val.getClass().getName() + " from: "
-								+ gcmsg.senderProcess);
+				PaxosLogger logger = new PaxosLogger(paxos.roundNumber);
+				logger.addBreadcrumb("Paxos Listener");
+
+				logger.log("Received payload: " + val.getClass().getName() + " from: "
+						+ gcmsg.senderProcess);
 
 				if (val instanceof LeaderElection) {
+					logger.addBreadcrumb("Leader Election");
 					paxos.acceptedRoundNumber = -1;
 					paxos.acceptedValue = null;
 					LeaderElection le = (LeaderElection) val;
-					System.out.println("[Paxos Listener] [Leader Election] leader election object: " + le.toString());
+					logger.log("leader election object: " + le.toString());
 					paxos.paxosInstanceRunning = false;
 					// if im not the leader or my idis less than propoper or my id is bigger but i
 					// have nothing to send
 					boolean elect = (paxos.processId == le.processId) || (paxos.processId < le.processId)
 							|| (paxos.processId > le.processId && paxos.deque.isEmpty());
-					System.out.println(String.format("[Paxos Listener] [Leader Election] Elect %d to be leader: %b",
+					logger.log(String.format("Elect %d to be leader: %b",
 							le.processId, elect));
 					paxos.paxosInstanceRunning = elect;
 					LeaderElectionAck leaderElectionMessage = new LeaderElectionAck(elect);
 					paxos.gcl.sendMsg(leaderElectionMessage, gcmsg.senderProcess);
 					paxos.failCheck.checkFailure(FailCheck.FailureType.AFTERSENDVOTE);
 				} else if (val instanceof LeaderElectionAck && paxos.phase == PaxosPhase.LEADER_ELECTION_ACK) {
+					logger.addBreadcrumb("Leader Election Ack");
 					LeaderElectionAck lea = (LeaderElectionAck) val;
-					System.out.println(
-							"[Paxos Listener] [Leader Election Ack] leader election ack object: " + lea.toString());
+					logger.log("leader election ack object: " + lea.toString());
 					receivedLeAcks.add(lea);
 
 					if (receivedLeAcks.size() == paxos.numberProcesses) {
-						System.out.println("[Paxos Listener] [Leader Election Ack] received all acks");
+						logger.log("Received all acks");
 						boolean electLeader = true;
 						for (LeaderElectionAck lea1 : receivedLeAcks) {
 							if (!lea1.electLeader) { // if not elected the leader break
@@ -174,57 +177,59 @@ class PaxosListener implements Runnable {
 							paxos.startedLeaderElection = false;
 						}
 						receivedLeAcks.clear();
-						System.out.println(
-								"[Paxos Listener] [Leader Election Ack] Result of my leader election: " + electLeader);
+						logger.log("Result of my leader election: " + electLeader);
 					}
 				} else if (val instanceof Proposal) {
+					logger.addBreadcrumb("Proposal");
 					paxos.failCheck.checkFailure(FailCheck.FailureType.RECEIVEPROPOSE);
 					Proposal p = (Proposal) val;
-					System.out.println(
-							"[Paxos Listener] [Proposal] proposal object: " + p.toString());
+					logger.log("proposal object: " + p.toString());
 					Promise promise = new Promise(p.roundNumber, paxos.acceptedRoundNumber, paxos.acceptedValue);
 
-					System.out.println(String.format(
-							"[Paxos Listener] [Proposal] proposal round number %d >= %d current paxos round number",
+					logger.log(String.format(
+							"proposal round number %d >= %d current paxos round number",
 							p.roundNumber, paxos.roundNumber));
 					if (p.roundNumber >= paxos.roundNumber) {
 						paxos.roundNumber = p.roundNumber;
-						System.out.println("[Paxos Listener] [Proposal] Sending promise: " + promise.toString()
+						logger.log("Sending promise: " + promise.toString()
 								+ " to: " + gcmsg.senderProcess);
 						paxos.gcl.sendMsg(promise, gcmsg.senderProcess);
 					}
 				} else if (val instanceof Promise && paxos.phase == PaxosPhase.PROMISE) {
+					logger.addBreadcrumb("Promise");
 					Promise promise = (Promise) gcmsg.val;
-					System.out.println("[Paxos Listener] [Promise] promise object: " + promise.toString()
-							+ " | Current paxos round: " + paxos.roundNumber);
+					logger.log("promise object: " + promise.toString());
 					if (promise.receivedRoundNumber != paxos.roundNumber)
 						continue;
 					if (promise.acceptedRoundNumber != -1) {
 						paxos.promisesWithAcceptedRound.add(promise);
 					}
 					paxos.promiseCount++;
-					System.out.println("[Paxos Listener] [Promise] Promise count: " + paxos.promiseCount);
+					logger.log("Promise count: " + paxos.promiseCount);
 				} else if (val instanceof Accept) {
+					logger.addBreadcrumb("Accept");
 					Accept acceptMessage = (Accept) val;
-					System.out.println("[Paxos Listener] [Accept] promise object: " + acceptMessage.toString());
+					logger.log("promise object: " + acceptMessage.toString());
 					paxos.acceptedValue = acceptMessage.pmd;
 					paxos.acceptedRoundNumber = acceptMessage.roundNumber;
-					System.out.println("Accepted Round Number: " + paxos.acceptedRoundNumber);
-					System.out.println("Accepted Value: " + paxos.acceptedValue.toString());
 					AcceptAck acceptAck = new AcceptAck(acceptMessage.roundNumber);
+					logger.log("Accept ack object: " + acceptAck.toString());
 					paxos.gcl.sendMsg(acceptAck, gcmsg.senderProcess);
-					System.out.println("Exiting Accept in paxos listener");
 				} else if (val instanceof AcceptAck && paxos.phase == PaxosPhase.ACCEPT_ACK) {
+					logger.addBreadcrumb("Accept Ack");
 					AcceptAck acceptAck = (AcceptAck) gcmsg.val;
+					logger.log("Accept ack object: " + acceptAck.toString());
 					if (acceptAck.roundNumber != paxos.roundNumber)
 						continue;
 					paxos.acceptAckCount++;
-					System.out.println("Accept ack count: " + paxos.acceptAckCount);
+					logger.log("Accept ack count: " + paxos.acceptAckCount);
 				} else if (val instanceof Confirm) {
-					System.out.println("In Confirm in paxos listener");
+					logger.addBreadcrumb("Confirm");
 					Confirm confirm = (Confirm) val;
+					logger.log("Confirm object: " + confirm.toString());
+					logger.log(String.format("confirm round number %d == %d paxos accepted round number",
+							confirm.roundNumber, paxos.acceptedRoundNumber));
 					if (confirm.roundNumber == paxos.acceptedRoundNumber) {
-						System.out.println("Were you false?");
 						paxos.deliveryQueue.add(paxos.acceptedValue);
 					}
 					paxos.paxosInstanceRunning = false;
@@ -244,12 +249,12 @@ class PaxosBroadcaster implements Runnable {
 	}
 
 	public void run() {
-		
+
 		while (!paxos.killThread) {
 
 			PaxosLogger logger = new PaxosLogger(paxos.roundNumber);
 			logger.addBreadcrumb("PaxosBroadcaster");
-			
+
 			if (paxos.deque.isEmpty())
 				continue;
 
@@ -257,8 +262,6 @@ class PaxosBroadcaster implements Runnable {
 			if (!paxos.startedLeaderElection && !paxos.paxosInstanceRunning) {
 				logger.log("Starting Leader Election");
 				LeaderElection le = new LeaderElection(paxos.processId, paxos.processName);
-				System.out.println(le);
-				logger.log("Sending Leader Election");
 				paxos.gcl.broadcastMsg(le);
 				paxos.failCheck.checkFailure(FailCheck.FailureType.AFTERSENDPROPOSE);
 				paxos.startedLeaderElection = true;
@@ -271,21 +274,21 @@ class PaxosBroadcaster implements Runnable {
 			paxos.startedLeaderElection = false;
 			paxos.roundNumber++;
 			try {
-				propose();
+				propose(logger);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 
 			// wait for majority to accept
 			try {
-				accept();
+				accept(logger);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 
 			// broadcast confirm
 			try {
-				confirm();
+				confirm(logger);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -295,12 +298,11 @@ class PaxosBroadcaster implements Runnable {
 		}
 	}
 
-	private void propose() throws InterruptedException {
+	private void propose(PaxosLogger logger) throws InterruptedException {
 		// propose to be leader, ie round value
 
-		PaxosLogger logger = new PaxosLogger(paxos.roundNumber);
-		logger.addBreadcrumb("[PROPOSE]");
-		
+		logger.addBreadcrumb("PROPOSE");
+
 		Proposal proposal = new Proposal(paxos.roundNumber);
 		paxos.gcl.broadcastMsg(proposal);
 
@@ -324,13 +326,14 @@ class PaxosBroadcaster implements Runnable {
 		}
 		paxos.promisesWithAcceptedRound.clear();
 		logger.log("Number of moves left to send (deque Size): " + paxos.deque.size());
+
+		logger.removeBreadCrumb();
 		return;
 	}
 
-	private void accept() throws InterruptedException {
+	private void accept(PaxosLogger logger) throws InterruptedException {
 
-		PaxosLogger logger = new PaxosLogger(paxos.roundNumber);
-		logger.addBreadcrumb("[ACCEPT]");
+		logger.addBreadcrumb("ACCEPT");
 
 		PlayerMoveData pmd = paxos.deque.peekFirst();
 		logger.log("Peeking first move from deque: " + pmd.toString());
@@ -344,17 +347,20 @@ class PaxosBroadcaster implements Runnable {
 		paxos.failCheck.checkFailure(FailCheck.FailureType.AFTERVALUEACCEPT);
 		paxos.deque.removeFirst();
 		logger.log("PMD accepted, remove move from deque: " + pmd.toString());
+
+		logger.removeBreadCrumb();
 		return;
 	}
 
-	private void confirm() throws InterruptedException {
+	private void confirm(PaxosLogger logger) throws InterruptedException {
 
-		PaxosLogger logger = new PaxosLogger(paxos.roundNumber);
-		logger.addBreadcrumb("[CONFIRM]");
+		logger.addBreadcrumb("CONFIRM");
 
 		Confirm confirm = new Confirm(paxos.roundNumber);
 		logger.log("Broadcasting confirm");
 		paxos.gcl.broadcastMsg(confirm);
+
+		logger.removeBreadCrumb();
 		return;
 	}
 }
@@ -388,6 +394,10 @@ class PaxosLogger {
 
 	public void addBreadcrumb(String b) {
 		this.breadcrumbs.add(b);
+	}
+
+	public void removeBreadCrumb() {
+		this.breadcrumbs.removeLast();
 	}
 
 	public void log(String msg) {
