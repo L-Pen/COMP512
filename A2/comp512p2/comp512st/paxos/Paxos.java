@@ -234,6 +234,9 @@ class PaxosListener implements Runnable {
 					}
 					paxos.paxosInstanceRunning = false;
 				}
+
+                Thread.sleep(500);
+
 			} catch (InterruptedException e) {
 				// e.printStackTrace();
 			}
@@ -293,8 +296,14 @@ class PaxosBroadcaster implements Runnable {
 				e.printStackTrace();
 			}
 
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+			}
 			paxos.phase = PaxosPhase.LEADER_ELECTION_ACK;
 			paxos.isLeader = false;
+
 		}
 	}
 
