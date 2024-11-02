@@ -273,7 +273,7 @@ public class TreasureIslandAppAuto implements Runnable {
 													// May have to increase this for higher maxmoves and smaller
 													// intervals.
 		try {
-			Thread.sleep(duration);
+			Thread.sleep(1000 * 60 * 2);
 		} catch (InterruptedException ie) {
 			logger.log(Level.SEVERE, "I got InterruptedException when I was chilling after all my moves.", ie);
 		}
