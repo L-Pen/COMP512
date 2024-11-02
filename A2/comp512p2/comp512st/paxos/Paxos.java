@@ -431,6 +431,15 @@ class Promise implements Serializable {
 		this.acceptedRoundNumber = acceptedRoundNumber;
 		this.acceptedValue = acceptedValue;
 	}
+
+	@Override
+	public String toString() {
+		return "Promise{" +
+				"receivedRoundNumber=" + receivedRoundNumber +
+				", acceptedRoundNumber=" + acceptedRoundNumber +
+				", acceptedValue=" + acceptedValue +
+				'}';
+	}
 }
 
 class Proposal implements Serializable {
