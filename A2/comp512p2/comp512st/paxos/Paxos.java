@@ -226,7 +226,7 @@ class PaxosListener implements Runnable {
 					paxos.paxosInstanceRunning = false;
 				}
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				// e.printStackTrace();
 			}
 		}
 	}
