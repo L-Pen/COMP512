@@ -135,21 +135,27 @@ class PaxosListener implements Runnable {
 
 				if (val instanceof LeaderElection) {
 					logger.addBreadcrumb("Leader Election");
-					paxos.acceptedRoundNumber = -1;
-					paxos.acceptedValue = null;
-					LeaderElection le = (LeaderElection) val;
-					logger.log("leader election object: " + le.toString());
-					paxos.paxosInstanceRunning = false;
-					// if im not the leader or my idis less than propoper or my id is bigger but i
-					// have nothing to send
-					boolean elect = (paxos.processId == le.processId) || (paxos.processId < le.processId)
-							|| (paxos.processId > le.processId && paxos.deque.isEmpty());
-					logger.log(String.format("Elect %d to be leader: %b",
-							le.processId, elect));
-					paxos.paxosInstanceRunning = elect;
-					LeaderElectionAck leaderElectionMessage = new LeaderElectionAck(elect);
-					paxos.gcl.sendMsg(leaderElectionMessage, gcmsg.senderProcess);
-					paxos.failCheck.checkFailure(FailCheck.FailureType.AFTERSENDVOTE);
+					if (paxos.paxosInstanceRunning) {
+						logger.log("Paxos instance still running... send auto decline");
+						LeaderElectionAck leaderElectionMessage = new LeaderElectionAck(false);
+						paxos.gcl.sendMsg(leaderElectionMessage, gcmsg.senderProcess);
+					} else {
+						paxos.acceptedRoundNumber = -1;
+						paxos.acceptedValue = null;
+						LeaderElection le = (LeaderElection) val;
+						logger.log("leader election object: " + le.toString());
+						paxos.paxosInstanceRunning = false;
+						// if im not the leader or my idis less than propoper or my id is bigger but i
+						// have nothing to send
+						boolean elect = (paxos.processId == le.processId) || (paxos.processId < le.processId)
+								|| (paxos.processId > le.processId && paxos.deque.isEmpty());
+						logger.log(String.format("Elect %d to be leader: %b",
+								le.processId, elect));
+						paxos.paxosInstanceRunning = elect;
+						LeaderElectionAck leaderElectionMessage = new LeaderElectionAck(elect);
+						paxos.gcl.sendMsg(leaderElectionMessage, gcmsg.senderProcess);
+						paxos.failCheck.checkFailure(FailCheck.FailureType.AFTERSENDVOTE);
+					}
 				} else if (val instanceof LeaderElectionAck && paxos.phase == PaxosPhase.LEADER_ELECTION_ACK) {
 					logger.addBreadcrumb("Leader Election Ack");
 					LeaderElectionAck lea = (LeaderElectionAck) val;
@@ -208,7 +214,7 @@ class PaxosListener implements Runnable {
 				} else if (val instanceof Accept) {
 					logger.addBreadcrumb("Accept");
 					Accept acceptMessage = (Accept) val;
-					logger.log("promise object: " + acceptMessage.toString());
+					logger.log("accept object: " + acceptMessage.toString());
 					paxos.acceptedValue = acceptMessage.pmd;
 					paxos.acceptedRoundNumber = acceptMessage.roundNumber;
 					AcceptAck acceptAck = new AcceptAck(acceptMessage.roundNumber);
