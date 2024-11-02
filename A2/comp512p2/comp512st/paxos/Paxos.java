@@ -14,6 +14,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.logging.*;
+
+import javax.sound.midi.SysexMessage;
+
 import java.net.UnknownHostException;
 import java.lang.Thread;
 
@@ -241,17 +244,16 @@ class PaxosBroadcaster implements Runnable {
 
 	public void run() {
 		while (!paxos.killThread) {
-			// System.out.println("Deque size in THREAD: " + paxos.deque.size());
 
-			// start new paxos instance
 			if (paxos.deque.isEmpty())
 				continue;
 
 			// start leader election
 			if (!paxos.startedLeaderElection && !paxos.paxosInstanceRunning) {
-				System.out.println("Beginning Leader Election in Paxos Broadcaster");
+				System.out.println("[PaxosBroadcaster] Starting Leader Election");
 				LeaderElection le = new LeaderElection(paxos.processId, paxos.processName);
 				System.out.println(le);
+				System.out.println("[PaxosBroadcaster] Sending Leader Election");
 				paxos.gcl.broadcastMsg(le);
 				paxos.failCheck.checkFailure(FailCheck.FailureType.AFTERSENDPROPOSE);
 				paxos.startedLeaderElection = true;
@@ -260,11 +262,10 @@ class PaxosBroadcaster implements Runnable {
 			if (!paxos.isLeader)
 				continue;
 
-			System.out.println("In the middle of Paxos Broadcaster");
+			System.out.println("[PaxosBroadcaster] Process" + paxos.processId + " is the leader");
 			paxos.startedLeaderElection = false;
 			paxos.roundNumber++;
 			try {
-				System.out.println("Proposing");
 				propose();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
@@ -291,47 +292,53 @@ class PaxosBroadcaster implements Runnable {
 
 	private void propose() throws InterruptedException {
 		// propose to be leader, ie round value
-		System.out.println("Inside Propose message");
+		
 		Proposal proposal = new Proposal(paxos.roundNumber);
-
 		paxos.gcl.broadcastMsg(proposal);
-		System.out.println("Broadcasted proposal");
+
+		System.out.println("[PROPOSE] Broadcasting proposal: " + proposal.roundNumber);
+
 		while (paxos.promiseCount < paxos.majority) {
 		}
+
+		System.out.println("[PROPOSE] Received majority promises");
+
 		paxos.phase = PaxosPhase.ACCEPT_ACK;
+
+		System.out.println("[PROPOSE] [PHASE] changed to ACCEPT_ACK");
+
 		paxos.promisesWithAcceptedRound
 				.sort((p1, p2) -> Integer.compare(p1.acceptedRoundNumber, p2.acceptedRoundNumber));
 
-		System.out.println("Promises with accepted round size in propose: " + paxos.promisesWithAcceptedRound.size());
+		System.out.println("[PROPOSE] Promises received with accepted round size in propose: " + paxos.promisesWithAcceptedRound.size());
 		for (int i = paxos.promisesWithAcceptedRound.size() - 1; i >= 0; i--) {
 			paxos.deque.addFirst(paxos.promisesWithAcceptedRound.get(i).acceptedValue);
 		}
 		paxos.promisesWithAcceptedRound.clear();
-		System.out.println("Deque size in propose: " + paxos.deque.size());
+		System.out.println("[PROPOSE] Number of moves left to send (deque Size): " + paxos.deque.size());
 		return;
 	}
 
 	private void accept() throws InterruptedException {
-		System.out.println("Inside Accept message");
 		PlayerMoveData pmd = paxos.deque.peekFirst();
-		System.out.println("PRINTING PMD IN ACCEPT: " + pmd.toString());
+		System.out.println("[ACCEPT] PMD: " + pmd.toString());
 
 		paxos.acceptAckCount = 0;
 		Accept accept = new Accept(paxos.roundNumber, pmd);
 		paxos.gcl.broadcastMsg(accept);
+		System.out.println("[ACCEPT] Broadcasting accept: " + accept.roundNumber);
 		while (paxos.acceptAckCount < paxos.majority) {
 		}
 		paxos.failCheck.checkFailure(FailCheck.FailureType.AFTERVALUEACCEPT);
 		paxos.deque.removeFirst();
-		System.out.println("FINISHED ACCEPT");
+		System.out.println("[ACCEPT] PMD accepted: " + pmd.toString());
 		return;
 	}
 
 	private void confirm() throws InterruptedException {
-		System.out.println("Inside Confirm message");
 		Confirm confirm = new Confirm(paxos.roundNumber);
+		System.out.println("[CONFIRM] Broadcasting confirm: " + confirm.roundNumber);
 		paxos.gcl.broadcastMsg(confirm);
-		System.out.println("FINISHED CONFIRM");
 		return;
 	}
 }
