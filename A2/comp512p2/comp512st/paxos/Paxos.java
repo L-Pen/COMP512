@@ -140,18 +140,14 @@ class PaxosListener implements Runnable {
 						LeaderElectionAck leaderElectionMessage = new LeaderElectionAck(false);
 						paxos.gcl.sendMsg(leaderElectionMessage, gcmsg.senderProcess);
 					} else {
-						paxos.acceptedRoundNumber = -1;
-						paxos.acceptedValue = null;
 						LeaderElection le = (LeaderElection) val;
 						logger.log("leader election object: " + le.toString());
-						paxos.paxosInstanceRunning = false;
 						// if im not the leader or my idis less than propoper or my id is bigger but i
 						// have nothing to send
 						boolean elect = (paxos.processId == le.processId) || (paxos.processId < le.processId)
 								|| (paxos.processId > le.processId && paxos.deque.isEmpty());
 						logger.log(String.format("Elect %d to be leader: %b",
 								le.processId, elect));
-						paxos.paxosInstanceRunning = elect;
 						LeaderElectionAck leaderElectionMessage = new LeaderElectionAck(elect);
 						paxos.gcl.sendMsg(leaderElectionMessage, gcmsg.senderProcess);
 						paxos.failCheck.checkFailure(FailCheck.FailureType.AFTERSENDVOTE);
@@ -177,6 +173,7 @@ class PaxosListener implements Runnable {
 							paxos.isLeader = true;
 							paxos.failCheck.checkFailure(FailCheck.FailureType.AFTERBECOMINGLEADER);
 							paxos.phase = PaxosPhase.PROMISE;
+							paxos.paxosInstanceRunning = true;
 						} else {
 							// if you get rejected, we want you to be able to run for leader again
 							paxos.startedLeaderElection = false;
@@ -187,6 +184,7 @@ class PaxosListener implements Runnable {
 				} else if (val instanceof Proposal) {
 					logger.addBreadcrumb("Proposal");
 					paxos.failCheck.checkFailure(FailCheck.FailureType.RECEIVEPROPOSE);
+					paxos.paxosInstanceRunning = true;
 					Proposal p = (Proposal) val;
 					logger.log("proposal object: " + p.toString());
 					Promise promise = new Promise(p.roundNumber, paxos.acceptedRoundNumber, paxos.acceptedValue);
@@ -237,6 +235,8 @@ class PaxosListener implements Runnable {
 					if (confirm.roundNumber == paxos.acceptedRoundNumber) {
 						paxos.deliveryQueue.add(paxos.acceptedValue);
 					}
+					paxos.acceptedRoundNumber = -1;
+					paxos.acceptedValue = null;
 					paxos.paxosInstanceRunning = false;
 				}
 
@@ -303,7 +303,6 @@ class PaxosBroadcaster implements Runnable {
 
 			paxos.phase = PaxosPhase.LEADER_ELECTION_ACK;
 			paxos.isLeader = false;
-
 		}
 	}
 
