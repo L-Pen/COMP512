@@ -228,6 +228,7 @@ public class TreasureIslandAppAuto implements Runnable
 		ta.displayIsland(); // display the initial map
 
 		AutoMoveGenerator moveGen = new AutoMoveGenerator(maxmoves, interval, randseed, failmode, logger);
+	 	double start = System.currentTimeMillis();
 		while(true) // Just keep polling for the user's input.
 		{
 			String cmd = moveGen.nextMove();
@@ -266,10 +267,12 @@ public class TreasureIslandAppAuto implements Runnable
 					logger.warning("Command " + cmd + " is not a valid command for this app.");
 			}
 		}
+		double end = System.currentTimeMillis();
+		long duration = (long) ((long) (maxmoves * numPlayers * 150) - (end - start));
 
 		logger.info("Done with all my moves ..."); // we just chill for a bit to ensure we got all the messages from others before we shutdown.
 																							// May have to increase this for higher maxmoves and smaller intervals.
-		try{ Thread.sleep(5000); } catch (InterruptedException ie) { logger.log(Level.SEVERE, "I got InterruptedException when I was chilling after all my moves.", ie); }
+		try{ Thread.sleep(duration); } catch (InterruptedException ie) { logger.log(Level.SEVERE, "I got InterruptedException when I was chilling after all my moves.", ie); }
 		ta.keepExploring = false;
 		ta.tiThread.join(5000); // Wait maximum 1s for the app to process any more incomming messages that was in the queue.
 		logger.info("Shutting down Paxos");
