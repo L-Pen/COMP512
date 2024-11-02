@@ -85,7 +85,7 @@ public class Paxos {
 	// such as the player and the move
 	public void broadcastTOMsg(Object val) throws InterruptedException {
 		Object[] vals = (Object[]) val;
-		PlayerMoveData playerMoveData = new PlayerMoveData((int) vals[0], (char) vals[1]);
+		PlayerMoveData playerMoveData = new PlayerMoveData((int) vals[0], (char) vals[1], System.currentTimeMillis());
 		deque.addLast(playerMoveData);
 		System.out.println("[broadcastTOMsg] Added move to dequeue in: " + deque.peek().toString() + " deque size: "
 				+ deque.size());
@@ -144,8 +144,9 @@ class PaxosListener implements Runnable {
 						logger.log("leader election object: " + le.toString());
 						// if im not the leader or my idis less than propoper or my id is bigger but i
 						// have nothing to send
-						boolean elect = (paxos.processId == le.processId) || (paxos.processId < le.processId)
-								|| (paxos.processId > le.processId && paxos.deque.isEmpty());
+						PlayerMoveData pmd = paxos.deque.peekFirst();
+						boolean elect = paxos.processId == le.processId
+								|| pmd == null || le.moveTimestamp < pmd.timestamp;
 						logger.log(String.format("Elect %d to be leader: %b",
 								le.processId, elect));
 						LeaderElectionAck leaderElectionMessage = new LeaderElectionAck(elect);
@@ -269,7 +270,8 @@ class PaxosBroadcaster implements Runnable {
 			// start leader election
 			if (!paxos.startedLeaderElection && !paxos.paxosInstanceRunning) {
 				logger.log("Starting Leader Election");
-				LeaderElection le = new LeaderElection(paxos.processId, paxos.processName);
+				long timestamp = paxos.deque.peek().timestamp;
+				LeaderElection le = new LeaderElection(paxos.processId, timestamp);
 				paxos.gcl.broadcastMsg(le);
 				paxos.failCheck.checkFailure(FailCheck.FailureType.AFTERSENDPROPOSE);
 				paxos.startedLeaderElection = true;
@@ -375,18 +377,17 @@ class PaxosBroadcaster implements Runnable {
 
 class LeaderElection implements Serializable {
 	int processId;
-	String processName;
+	long moveTimestamp;
 
-	public LeaderElection(int processId, String processName) {
+	public LeaderElection(int processId, long timestamp) {
 		this.processId = processId;
-		this.processName = processName;
+		this.moveTimestamp = timestamp;
 	}
 
 	@Override
 	public String toString() {
 		return "LeaderElection{" +
-				"processId=" + processId +
-				", processName='" + processName + '\'' +
+				"moveTimestamp=" + moveTimestamp +
 				'}';
 	}
 }
@@ -464,10 +465,12 @@ class Proposal implements Serializable {
 class PlayerMoveData implements Serializable {
 	int player;
 	char move;
+	long timestamp;
 
-	public PlayerMoveData(int player, char move) {
+	public PlayerMoveData(int player, char move, long timestamp) {
 		this.player = player;
 		this.move = move;
+		this.timestamp = timestamp;
 	}
 
 	@Override
@@ -475,6 +478,7 @@ class PlayerMoveData implements Serializable {
 		return "PlayerMoveData{" +
 				"player=" + player +
 				", move=" + move +
+				", timestamp=" + timestamp +
 				'}';
 	}
 }
