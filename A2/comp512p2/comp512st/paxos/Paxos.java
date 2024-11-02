@@ -89,7 +89,7 @@ public class Paxos {
 		Object[] vals = (Object[]) val;
 		PlayerMoveData playerMoveData = new PlayerMoveData((int) vals[0], (char) vals[1]);
 		deque.addLast(playerMoveData);
-		System.out.println("[broadcastTOMsg] Added move to dequeue in: " + deque.peek().toString());
+		System.out.println("[broadcastTOMsg] Added move to dequeue in: " + deque.peek().toString() + " deque size: " + deque.size());
 	}
 
 	// This is what the application layer is calling to figure out what is the next
