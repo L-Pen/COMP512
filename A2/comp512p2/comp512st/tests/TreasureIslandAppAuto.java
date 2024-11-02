@@ -275,7 +275,6 @@ public class TreasureIslandAppAuto implements Runnable
 		logger.info("Shutting down Paxos");
 		paxos.shutdownPaxos(); // shutdown paxos.
 		ta.tiThread.interrupt(); // interrupt the app thread if it has not terminated.
-		System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 		ta.displayIsland(); // display the final map
 		logger.info("Process terminated.");
 		System.exit(0);
