@@ -232,16 +232,6 @@ class PaxosListener implements Runnable {
 	}
 }
 
-class LeaderElection implements Serializable {
-	int processId;
-	String processName;
-
-	public LeaderElection(int processId, String processName) {
-		this.processId = processId;
-		this.processName = processName;
-	}
-}
-
 class PaxosBroadcaster implements Runnable {
 	Paxos paxos;
 
@@ -346,6 +336,24 @@ class PaxosBroadcaster implements Runnable {
 	}
 }
 
+class LeaderElection implements Serializable {
+	int processId;
+	String processName;
+
+	public LeaderElection(int processId, String processName) {
+		this.processId = processId;
+		this.processName = processName;
+	}
+
+	@Override
+	public String toString() {
+		return "LeaderElection{" +
+				"processId=" + processId +
+				", processName='" + processName + '\'' +
+				'}';
+	}
+}
+
 class Promise implements Serializable {
 	int receivedRoundNumber;
 	int acceptedRoundNumber; // -1 for none
@@ -364,6 +372,13 @@ class Proposal implements Serializable {
 	public Proposal(int roundNumber) {
 		this.roundNumber = roundNumber;
 	}
+
+	@Override
+	public String toString() {
+		return "Proposal{" +
+				"roundNumber=" + roundNumber +
+				'}';
+	}
 }
 
 class PlayerMoveData implements Serializable {
@@ -377,7 +392,10 @@ class PlayerMoveData implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Player: " + player + " Move: " + move;
+		return "PlayerMoveData{" +
+				"player=" + player +
+				", move=" + move +
+				'}';
 	}
 }
 
@@ -389,6 +407,14 @@ class Accept implements Serializable {
 		this.roundNumber = roundNumber;
 		this.pmd = pmd;
 	}
+
+	@Override
+	public String toString() {
+		return "Accept{" +
+				"roundNumber=" + roundNumber +
+				", pmd=" + pmd +
+				'}';
+	}
 }
 
 class AcceptAck implements Serializable {
@@ -396,6 +422,13 @@ class AcceptAck implements Serializable {
 
 	public AcceptAck(int roundNumber) {
 		this.roundNumber = roundNumber;
+	}
+
+	@Override
+	public String toString() {
+		return "AcceptAck{" +
+				"roundNumber=" + roundNumber +
+				'}';
 	}
 }
 
@@ -405,6 +438,13 @@ class Confirm implements Serializable {
 	public Confirm(int roundNumber) {
 		this.roundNumber = roundNumber;
 	}
+
+	@Override
+	public String toString() {
+		return "Confirm{" +
+				"roundNumber=" + roundNumber +
+				'}';
+	}
 }
 
 class LeaderElectionAck implements Serializable {
@@ -412,6 +452,13 @@ class LeaderElectionAck implements Serializable {
 
 	public LeaderElectionAck(boolean electLeader) {
 		this.electLeader = electLeader;
+	}
+
+	@Override
+	public String toString() {
+		return "LeaderElectionAck{" +
+				"electLeader=" + electLeader +
+				'}';
 	}
 }
 
