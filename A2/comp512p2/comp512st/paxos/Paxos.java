@@ -244,20 +244,21 @@ class PaxosBroadcaster implements Runnable {
 	}
 
 	public void run() {
+		
 		while (!paxos.killThread) {
 
+			PaxosLogger logger = new PaxosLogger(paxos.roundNumber);
+			logger.addBreadcrumb("PaxosBroadcaster");
+			
 			if (paxos.deque.isEmpty())
 				continue;
 
 			// start leader election
 			if (!paxos.startedLeaderElection && !paxos.paxosInstanceRunning) {
-				System.out.println("[PaxosBroadcaster] Starting Leader Election");
+				logger.log("Starting Leader Election");
 				LeaderElection le = new LeaderElection(paxos.processId, paxos.processName);
-<<<<<<< Updated upstream
 				System.out.println(le);
-				System.out.println("[PaxosBroadcaster] Sending Leader Election");
-=======
->>>>>>> Stashed changes
+				logger.log("Sending Leader Election");
 				paxos.gcl.broadcastMsg(le);
 				paxos.failCheck.checkFailure(FailCheck.FailureType.AFTERSENDPROPOSE);
 				paxos.startedLeaderElection = true;
@@ -266,7 +267,7 @@ class PaxosBroadcaster implements Runnable {
 			if (!paxos.isLeader)
 				continue;
 
-			System.out.println("[PaxosBroadcaster] Process" + paxos.processId + " is the leader");
+			logger.log("Process" + paxos.processId + " is the leader");
 			paxos.startedLeaderElection = false;
 			paxos.roundNumber++;
 			try {
@@ -296,52 +297,63 @@ class PaxosBroadcaster implements Runnable {
 
 	private void propose() throws InterruptedException {
 		// propose to be leader, ie round value
+
+		PaxosLogger logger = new PaxosLogger(paxos.roundNumber);
+		logger.addBreadcrumb("[PROPOSE]");
 		
 		Proposal proposal = new Proposal(paxos.roundNumber);
 		paxos.gcl.broadcastMsg(proposal);
 
-		System.out.println("[PROPOSE] Broadcasting proposal: " + proposal.roundNumber);
+		logger.log("Broadcasting proposal");
 
 		while (paxos.promiseCount < paxos.majority) {
 		}
 
-		System.out.println("[PROPOSE] Received majority promises");
+		logger.log("Received majority promises");
 
 		paxos.phase = PaxosPhase.ACCEPT_ACK;
 
-		System.out.println("[PROPOSE] [PHASE] changed to ACCEPT_ACK");
+		logger.log("PHASE changed to ACCEPT_ACK");
 
 		paxos.promisesWithAcceptedRound
 				.sort((p1, p2) -> Integer.compare(p1.acceptedRoundNumber, p2.acceptedRoundNumber));
 
-		System.out.println("[PROPOSE] Promises received with accepted round size in propose: " + paxos.promisesWithAcceptedRound.size());
+		logger.log("Promises received with accepted round size in propose: " + paxos.promisesWithAcceptedRound.size());
 		for (int i = paxos.promisesWithAcceptedRound.size() - 1; i >= 0; i--) {
 			paxos.deque.addFirst(paxos.promisesWithAcceptedRound.get(i).acceptedValue);
 		}
 		paxos.promisesWithAcceptedRound.clear();
-		System.out.println("[PROPOSE] Number of moves left to send (deque Size): " + paxos.deque.size());
+		logger.log("Number of moves left to send (deque Size): " + paxos.deque.size());
 		return;
 	}
 
 	private void accept() throws InterruptedException {
+
+		PaxosLogger logger = new PaxosLogger(paxos.roundNumber);
+		logger.addBreadcrumb("[ACCEPT]");
+
 		PlayerMoveData pmd = paxos.deque.peekFirst();
-		System.out.println("[ACCEPT] PMD: " + pmd.toString());
+		logger.log("Peeking first move from deque: " + pmd.toString());
 
 		paxos.acceptAckCount = 0;
 		Accept accept = new Accept(paxos.roundNumber, pmd);
 		paxos.gcl.broadcastMsg(accept);
-		System.out.println("[ACCEPT] Broadcasting accept: " + accept.roundNumber);
+		logger.log("Broadcasting accept");
 		while (paxos.acceptAckCount < paxos.majority) {
 		}
 		paxos.failCheck.checkFailure(FailCheck.FailureType.AFTERVALUEACCEPT);
 		paxos.deque.removeFirst();
-		System.out.println("[ACCEPT] PMD accepted: " + pmd.toString());
+		logger.log("PMD accepted, remove move from deque: " + pmd.toString());
 		return;
 	}
 
 	private void confirm() throws InterruptedException {
+
+		PaxosLogger logger = new PaxosLogger(paxos.roundNumber);
+		logger.addBreadcrumb("[CONFIRM]");
+
 		Confirm confirm = new Confirm(paxos.roundNumber);
-		System.out.println("[CONFIRM] Broadcasting confirm: " + confirm.roundNumber);
+		logger.log("Broadcasting confirm");
 		paxos.gcl.broadcastMsg(confirm);
 		return;
 	}
