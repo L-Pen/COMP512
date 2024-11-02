@@ -43,6 +43,7 @@ public class Paxos {
 	volatile int promiseCount;
 	volatile PaxosPhase phase;
 	volatile boolean killThread;
+	volatile ArrayList<Long> avg = new ArrayList<>();
 
 	public Paxos(String myProcess, String[] allGroupProcesses, Logger logger, FailCheck failCheck)
 			throws IOException, UnknownHostException {
@@ -396,7 +397,7 @@ class PaxosLogger {
 
 	Paxos paxos;
 	ArrayList<String> breadcrumbs;
-	boolean doLog = false;
+	boolean doLog = true;
 
 	public PaxosLogger(Paxos paxos) {
 		this.paxos = paxos;

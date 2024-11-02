@@ -266,14 +266,14 @@ public class TreasureIslandAppAuto implements Runnable {
 			}
 		}
 		double end = System.currentTimeMillis();
-		long duration = (long) ((long) (maxmoves * numPlayers * 150));
+		long duration = (long) ((long) (maxmoves * numPlayers * 150) - (end - start));
 
 		logger.info("Done with all my moves ..."); // we just chill for a bit to ensure we got all the messages from
 													// others before we shutdown.
 													// May have to increase this for higher maxmoves and smaller
 													// intervals.
 		try {
-			Thread.sleep(1000 * 60 * 2);
+			Thread.sleep(duration);
 		} catch (InterruptedException ie) {
 			logger.log(Level.SEVERE, "I got InterruptedException when I was chilling after all my moves.", ie);
 		}
