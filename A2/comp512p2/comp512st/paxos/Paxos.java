@@ -390,6 +390,7 @@ class PaxosLogger {
 
 	public PaxosLogger(int round) {
 		this.round = round;
+		this.breadcrumbs = new ArrayList<>();
 	}
 
 	public void addBreadcrumb(String b) {
