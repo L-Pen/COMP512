@@ -85,7 +85,7 @@ public class Paxos {
 	// such as the player and the move
 	public void broadcastTOMsg(Object val) throws InterruptedException {
 		Object[] vals = (Object[]) val;
-		PlayerMoveData playerMoveData = new PlayerMoveData((int) vals[0], (char) vals[1], System.currentTimeMillis());
+		PlayerMoveData playerMoveData = new PlayerMoveData((int) vals[0], (char) vals[1], System.nanoTime());
 		deque.addLast(playerMoveData);
 		System.out.println("[broadcastTOMsg] Added move to dequeue in: " + deque.peek().toString() + " deque size: "
 				+ deque.size());
