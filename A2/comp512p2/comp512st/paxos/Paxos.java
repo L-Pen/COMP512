@@ -159,8 +159,15 @@ class PaxosListener implements Runnable {
 						// if im not the leader or my idis less than propoper or my id is bigger but i
 						// have nothing to send
 						PlayerMoveData pmd = paxos.deque.peekFirst();
-						boolean elect = paxos.processId == le.processId
-								|| pmd == null || le.moveTimestamp < pmd.timestamp;
+						boolean pids = paxos.processId == le.processId;
+						boolean pmdNull = pmd == null;
+						boolean timestamps = !pmdNull && le.moveTimestamp < pmd.timestamp;
+						boolean sameTimestamps = le.moveTimestamp == pmd.timestamp && le.processId > paxos.processId;
+						logger.log(String.format(
+								"Elect condition = pids: %b or pmd null: %b or timestamps: %b or sameTimestamps: %b",
+								pids,
+								pmdNull, timestamps, sameTimestamps));
+						boolean elect = pids || pmdNull || timestamps || sameTimestamps;
 						logger.log(String.format("Elect %d to be leader: %b",
 								le.processId, elect));
 						LeaderElectionAck leaderElectionMessage = new LeaderElectionAck(elect);
