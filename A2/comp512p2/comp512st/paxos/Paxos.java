@@ -187,8 +187,8 @@ class PaxosListener implements Runnable {
 					logger.log("leader election ack object: " + lea.toString());
 					receivedLeAcks.add(lea);
 
-					if (receivedLeAcks.size() == paxos.numberProcesses) {
-						logger.log("Received all acks");
+					if (receivedLeAcks.size() >= paxos.majority) {
+						logger.log("Received majority acks");
 						boolean electLeader = true;
 						for (LeaderElectionAck lea1 : receivedLeAcks) {
 							if (!lea1.electLeader) { // if not elected the leader break
