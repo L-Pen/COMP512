@@ -266,7 +266,8 @@ public class TreasureIslandAppAuto implements Runnable {
 			}
 		}
 		double end = System.currentTimeMillis();
-		long duration = (long) ((long) (maxmoves * numPlayers * 150) - (end - start));
+		long duration = (long) ((long) (maxmoves * numPlayers * 150));
+		System.out.println("Duration: " + duration);
 
 		logger.info("Done with all my moves ..."); // we just chill for a bit to ensure we got all the messages from
 													// others before we shutdown.

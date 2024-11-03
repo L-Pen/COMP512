@@ -44,6 +44,7 @@ public class Paxos {
 	volatile PaxosPhase phase;
 	volatile boolean killThread;
 	volatile ArrayList<Long> avg = new ArrayList<>();
+	volatile long start;
 
 	public Paxos(String myProcess, String[] allGroupProcesses, Logger logger, FailCheck failCheck)
 			throws IOException, UnknownHostException {
@@ -62,6 +63,7 @@ public class Paxos {
 		this.promiseCount = 0;
 		this.phase = PaxosPhase.LEADER_ELECTION_ACK;
 		this.killThread = false;
+		this.start = 0;
 
 		System.out.println("NUM PROCESSES: " + allGroupProcesses.length + " HI PROCESS ID: " + processId);
 
@@ -88,7 +90,8 @@ public class Paxos {
 		Object[] vals = (Object[]) val;
 		PlayerMoveData playerMoveData = new PlayerMoveData((int) vals[0], (char) vals[1], System.nanoTime());
 		deque.addLast(playerMoveData);
-		System.out.println("[broadcastTOMsg] Added move to dequeue in: " + deque.peek().toString() + " deque size: "
+		System.out.println("[broadcastTOMsg] Added move to dequeue in: " +
+				deque.peek().toString() + " deque size: "
 				+ deque.size());
 	}
 
@@ -106,9 +109,19 @@ public class Paxos {
 	}
 
 	// Add any of your own shutdown code into this method.
-	public void shutdownPaxos() {
+	public void shutdownPaxos() throws InterruptedException {
 		this.killThread = true;
 		gcl.shutdownGCL();
+		Thread.sleep(10);
+		int sum = 0;
+		int size = avg.size();
+		for (int i = 0; i < size; i++) {
+			long x = avg.get(i);
+			sum += x;
+			System.out.println("Paxos runtime: " + x);
+		}
+		System.out.println("Paxos avg runtime: " + sum / size);
+		System.out.println("Total Paxos runtime: " + sum);
 	}
 }
 
@@ -242,8 +255,6 @@ class PaxosListener implements Runnable {
 					paxos.paxosInstanceRunning = false;
 				}
 
-				Thread.sleep(50);
-
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -276,6 +287,7 @@ class PaxosBroadcaster implements Runnable {
 				paxos.gcl.broadcastMsg(le);
 				paxos.failCheck.checkFailure(FailCheck.FailureType.AFTERSENDPROPOSE);
 				paxos.startedLeaderElection = true;
+				paxos.start = System.currentTimeMillis();
 			}
 
 			if (!paxos.isLeader)
@@ -303,6 +315,8 @@ class PaxosBroadcaster implements Runnable {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
+			long end = System.currentTimeMillis();
+			paxos.avg.add((end - paxos.start));
 
 			paxos.phase = PaxosPhase.LEADER_ELECTION_ACK;
 			paxos.isLeader = false;
