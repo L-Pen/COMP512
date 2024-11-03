@@ -156,8 +156,6 @@ class PaxosListener implements Runnable {
 					} else {
 						LeaderElection le = (LeaderElection) val;
 						logger.log("leader election object: " + le.toString());
-						// if im not the leader or my idis less than propoper or my id is bigger but i
-						// have nothing to send
 						PlayerMoveData pmd = paxos.deque.peekFirst();
 						boolean pids = paxos.processId == le.processId;
 						boolean pmdNull = pmd == null;
@@ -173,6 +171,9 @@ class PaxosListener implements Runnable {
 						LeaderElectionAck leaderElectionMessage = new LeaderElectionAck(elect);
 						paxos.gcl.sendMsg(leaderElectionMessage, gcmsg.senderProcess);
 						paxos.failCheck.checkFailure(FailCheck.FailureType.AFTERSENDVOTE);
+						logger.log(String.format(
+								"Started leader election: %b, Paxos instance running: %b, deque empty: %b",
+								paxos.startedLeaderElection, paxos.paxosInstanceRunning, paxos.deque.isEmpty()));
 					}
 				} else if (val instanceof LeaderElectionAck && paxos.phase == PaxosPhase.LEADER_ELECTION_ACK) {
 					logger.addBreadcrumb("Leader Election Ack");
@@ -190,16 +191,12 @@ class PaxosListener implements Runnable {
 							}
 						}
 						if (electLeader) {
-							// dont set started leader election false here because we dont want to start
-							// another one
 							paxos.isLeader = true;
 							paxos.failCheck.checkFailure(FailCheck.FailureType.AFTERBECOMINGLEADER);
 							paxos.phase = PaxosPhase.PROMISE;
 							paxos.paxosInstanceRunning = true;
-						} else {
-							// if you get rejected, we want you to be able to run for leader again
-							paxos.startedLeaderElection = false;
 						}
+						paxos.startedLeaderElection = false;
 						receivedLeAcks.clear();
 						logger.log("Result of my leader election: " + electLeader);
 					}
@@ -303,7 +300,6 @@ class PaxosBroadcaster implements Runnable {
 				continue;
 
 			logger.log("Process" + paxos.processId + " is the leader");
-			paxos.startedLeaderElection = false;
 			paxos.roundNumber++;
 			try {
 				propose(logger);
