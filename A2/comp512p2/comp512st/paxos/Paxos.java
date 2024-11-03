@@ -253,6 +253,8 @@ class PaxosListener implements Runnable {
 					paxos.acceptedRoundNumber = -1;
 					paxos.acceptedValue = null;
 					paxos.paxosInstanceRunning = false;
+					paxos.acceptAckCount = 0;
+					paxos.promiseCount = 0;
 				}
 
 			} catch (InterruptedException e) {
@@ -363,7 +365,6 @@ class PaxosBroadcaster implements Runnable {
 		PlayerMoveData pmd = paxos.deque.peekFirst();
 		logger.log("Peeking first move from deque: " + pmd.toString());
 
-		paxos.acceptAckCount = 0;
 		Accept accept = new Accept(paxos.roundNumber, pmd);
 		paxos.gcl.broadcastMsg(accept);
 		logger.log("Broadcasting accept");
