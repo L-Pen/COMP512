@@ -122,12 +122,14 @@ public class Paxos {
 		Thread.sleep(10);
 		int sum = 0;
 		int size = avg.size();
-		for (int i = 0; i < size; i++) {
-			long x = avg.get(i);
-			sum += x;
-			System.out.println("Paxos runtime: " + x);
+		if (size != 0) {
+			for (int i = 0; i < size; i++) {
+				long x = avg.get(i);
+				sum += x;
+				System.out.println("Paxos runtime: " + x);
+			}
+			System.out.println("Paxos avg runtime: " + sum / size);
 		}
-		System.out.println("Paxos avg runtime: " + sum / size);
 		System.out.println("Total Paxos runtime: " + sum);
 	}
 }
