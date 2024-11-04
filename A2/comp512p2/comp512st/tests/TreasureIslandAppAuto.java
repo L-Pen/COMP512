@@ -221,7 +221,6 @@ public class TreasureIslandAppAuto implements Runnable {
 		ta.displayIsland(); // display the initial map
 
 		AutoMoveGenerator moveGen = new AutoMoveGenerator(maxmoves, interval, randseed, failmode, logger);
-		double start = System.currentTimeMillis();
 		while (true) // Just keep polling for the user's input.
 		{
 			String cmd = moveGen.nextMove();
@@ -265,7 +264,6 @@ public class TreasureIslandAppAuto implements Runnable {
 					logger.warning("Command " + cmd + " is not a valid command for this app.");
 			}
 		}
-		double end = System.currentTimeMillis();
 		long duration = (long) ((long) (maxmoves * numPlayers * 150));
 		System.out.println("Duration: " + duration);
 
