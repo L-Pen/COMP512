@@ -12,7 +12,7 @@ gameid=game-$group-99
 
 #TODO edit these entries to put the name of the server that you are using and the associated ports.
 # Remember to start the script from this host
-export autotesthost=Liamos-MBP-2.localdomain
+export autotesthost=Liamos-MacBook-Pro-2.local
 # player1 -> process 1, player 2 -> process 2, etc .. add more depending on how many players are playing.
 # Script automatically counts the variables to figure out the number of players.
 export process1=${autotesthost}:401$group
@@ -26,7 +26,7 @@ export process3=${autotesthost}:403$group
 # export process9=${autotesthost}:409$group
 
 #TODO update these values as needed
-maxmoves=10 interval=30 randseed=42
+maxmoves=50 interval=30 randseed=42
 #TODO IF (and only if) you want to simulate failures, enable this for corresponding player numbers.
 # export failmode_1=RECEIVEPROPOSE
 # export failmode_1=AFTERSENDVOTE

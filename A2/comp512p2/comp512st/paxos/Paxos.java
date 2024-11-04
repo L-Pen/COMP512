@@ -14,6 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.*;
 
 import java.net.UnknownHostException;
@@ -42,7 +43,12 @@ public class Paxos {
 	volatile int promiseCount;
 	volatile int acceptAckCount;
 	volatile boolean killThread;
-	volatile int numTimesNoMajority;
+	volatile boolean killMoveThread;
+	volatile AtomicInteger acceptedMoveCounter;
+	MoveDeliveryCounter moveDeliveryCounter;
+
+	// volatile int numDelivered = 0;
+	// volatile ArrayList<Integer> averageNumDelivered = new ArrayList<>();
 
 	// locks
 	volatile Object lock1;
@@ -62,7 +68,9 @@ public class Paxos {
 		this.promisesWithAcceptedRound = new ArrayList<>();
 		this.promiseCount = 0;
 		this.killThread = false;
+		this.killMoveThread = false;
 		this.lock1 = new Object();
+		this.acceptedMoveCounter = new AtomicInteger(0);
 
 		System.out.println("NUM PROCESSES: " + allGroupProcesses.length + " HI PROCESS ID: " + processId);
 
@@ -73,6 +81,10 @@ public class Paxos {
 		PaxosListener pl = new PaxosListener(this);
 		Thread plThread = new Thread(pl);
 		plThread.start();
+
+		this.moveDeliveryCounter = new MoveDeliveryCounter(this);
+		Thread moveDeliveryCounterThread = new Thread(moveDeliveryCounter);
+		moveDeliveryCounterThread.start();
 	}
 
 	private int calculateMajority(int numProcesses) {
@@ -82,7 +94,6 @@ public class Paxos {
 	// This is what the application layer is going to call to send a message/value,
 	// such as the player and the move
 	public synchronized void broadcastTOMsg(Object val) throws InterruptedException {
-		numTimesNoMajority = 0;
 		Object[] vals = (Object[]) val;
 		synchronized (lock1) {
 			PlayerMoveData playerMoveData = new PlayerMoveData((int) vals[0], (char) vals[1], moveCount);
@@ -94,7 +105,7 @@ public class Paxos {
 
 		PaxosLogger logger = new PaxosLogger(this);
 
-		while (!deque.isEmpty() && numTimesNoMajority < 10) {
+		while (!deque.isEmpty()) {
 
 			synchronized (lock1) {
 				ballotId = Float.parseFloat((++moveCount) + "." + processId);
@@ -142,9 +153,10 @@ public class Paxos {
 	public Object acceptTOMsg() throws InterruptedException {
 		while (deliveryQueue.isEmpty()) {
 		}
+
 		synchronized (lock1) {
 			PlayerMoveData pmd = deliveryQueue.remove();
-
+			acceptedMoveCounter.incrementAndGet();
 			System.out.println("[acceptTOMsg] delivering move: " + pmd.toString());
 			return new Object[] { pmd.player, pmd.move };
 		}
@@ -153,8 +165,23 @@ public class Paxos {
 	// Add any of your own shutdown code into this method.
 	public void shutdownPaxos() throws InterruptedException {
 		this.killThread = true;
+		this.killMoveThread = true;
+
 		gcl.shutdownGCL();
 		Thread.sleep(10);
+
+		List<Integer> numDeliveredMovesList = moveDeliveryCounter.getAcceptedMovesList();
+
+		int totalAcceptedMoves = 0;
+        for (int moves : numDeliveredMovesList) {
+            totalAcceptedMoves += moves;
+        }
+
+        double averageRate = (double) totalAcceptedMoves / numDeliveredMovesList.size(); // Moves per 100  millisecond
+
+        System.out.println("Average moves accepted per millisecond: " + averageRate);
+
+
 		int sum = 0;
 		int size = avg.size();
 		if (size != 0) {
@@ -166,6 +193,7 @@ public class Paxos {
 			System.out.println("Paxos avg runtime: " + sum / size);
 		}
 		System.out.println("Total Paxos runtime: " + sum);
+
 	}
 
 	private boolean propose(PaxosLogger logger) throws InterruptedException {
@@ -183,7 +211,6 @@ public class Paxos {
 			if (System.currentTimeMillis() - start > ThreadLocalRandom.current().nextInt(50, 200)) {
 				logger.log("Didn't received majority");
 				promiseCount = 0;
-				numTimesNoMajority++;
 				return false;
 			}
 		}
@@ -224,7 +251,6 @@ public class Paxos {
 			if (System.currentTimeMillis() - start > ThreadLocalRandom.current().nextInt(50, 200)) {
 				logger.log("Didn't received majority");
 				acceptAckCount = 0;
-				numTimesNoMajority++;
 				return false;
 			}
 		}
@@ -507,4 +533,33 @@ class Confirm implements Serializable {
 				"ballotId=" + ballotId +
 				'}';
 	}
+}
+
+class MoveDeliveryCounter implements Runnable {
+	private Paxos paxos;
+	private List<Integer> numDeliveredMovesList;
+
+	public MoveDeliveryCounter(Paxos paxos) {
+		this.paxos = paxos;
+		this.numDeliveredMovesList = new ArrayList<>();
+	}
+
+	@Override
+	public void run() {
+		while (!paxos.killMoveThread) {
+
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			int movesAccepted = paxos.acceptedMoveCounter.getAndSet(0);
+			numDeliveredMovesList.add(movesAccepted);
+			System.out.println("Moves delivered in the last 100ms: " + movesAccepted + " " + String.valueOf(paxos.killMoveThread));
+		}
+	}
+
+	public List<Integer> getAcceptedMovesList() {
+        return numDeliveredMovesList;
+    }
 }
