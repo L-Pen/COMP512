@@ -46,6 +46,7 @@ public class Paxos {
 	volatile boolean killMoveThread;
 	volatile AtomicInteger acceptedMoveCounter;
 	MoveDeliveryCounter moveDeliveryCounter;
+	Thread moveDeliveryCounterThread;
 
 	// volatile int numDelivered = 0;
 	// volatile ArrayList<Integer> averageNumDelivered = new ArrayList<>();
@@ -68,7 +69,6 @@ public class Paxos {
 		this.promisesWithAcceptedRound = new ArrayList<>();
 		this.promiseCount = 0;
 		this.killThread = false;
-		this.killMoveThread = false;
 		this.lock1 = new Object();
 		this.acceptedMoveCounter = new AtomicInteger(0);
 
@@ -83,7 +83,7 @@ public class Paxos {
 		plThread.start();
 
 		this.moveDeliveryCounter = new MoveDeliveryCounter(this);
-		Thread moveDeliveryCounterThread = new Thread(moveDeliveryCounter);
+		this.moveDeliveryCounterThread = new Thread(moveDeliveryCounter);
 		moveDeliveryCounterThread.start();
 	}
 
@@ -164,23 +164,13 @@ public class Paxos {
 
 	// Add any of your own shutdown code into this method.
 	public void shutdownPaxos() throws InterruptedException {
-		this.killThread = true;
-		this.killMoveThread = true;
 
+		synchronized (lock1){
+			this.killThread = true;
+		}
+		
 		gcl.shutdownGCL();
 		Thread.sleep(10);
-
-		List<Integer> numDeliveredMovesList = moveDeliveryCounter.getAcceptedMovesList();
-
-		int totalAcceptedMoves = 0;
-        for (int moves : numDeliveredMovesList) {
-            totalAcceptedMoves += moves;
-        }
-
-        double averageRate = (double) totalAcceptedMoves / numDeliveredMovesList.size(); // Moves per 100  millisecond
-
-        System.out.println("Average moves accepted per millisecond: " + averageRate);
-
 
 		int sum = 0;
 		int size = avg.size();
@@ -188,12 +178,24 @@ public class Paxos {
 			for (int i = 0; i < size; i++) {
 				long x = avg.get(i);
 				sum += x;
-				System.out.println("Paxos runtime: " + x);
+				// System.out.println("Paxos runtime: " + x);
 			}
 			System.out.println("Paxos avg runtime: " + sum / size);
 		}
 		System.out.println("Total Paxos runtime: " + sum);
 
+		List<Integer> numDeliveredMovesList = moveDeliveryCounter.getAcceptedMovesList();
+
+		// int totalAcceptedMoves = 0;
+		// double averageRate = 0;
+		// double maxAverageRate = 0;
+		// for (int moves : numDeliveredMovesList) {
+		// 	totalAcceptedMoves += moves;
+		// 	averageRate = (double) totalAcceptedMoves / numDeliveredMovesList.size(); // Moves per 100  millisecond
+		// 	maxAverageRate = Math.max(maxAverageRate, averageRate);
+		// }
+
+		// System.out.println("Average moves accepted per millisecond: " + maxAverageRate);
 	}
 
 	private boolean propose(PaxosLogger logger) throws InterruptedException {
@@ -393,7 +395,7 @@ class PaxosLogger {
 
 	Paxos paxos;
 	ArrayList<String> breadcrumbs;
-	boolean doLog = true;
+	boolean doLog = false;
 
 	public PaxosLogger(Paxos paxos) {
 		this.paxos = paxos;
@@ -546,7 +548,7 @@ class MoveDeliveryCounter implements Runnable {
 
 	@Override
 	public void run() {
-		while (!paxos.killMoveThread) {
+		while (!paxos.killThread) {
 
 			try {
 				Thread.sleep(100);
@@ -555,7 +557,17 @@ class MoveDeliveryCounter implements Runnable {
 			}
 			int movesAccepted = paxos.acceptedMoveCounter.getAndSet(0);
 			numDeliveredMovesList.add(movesAccepted);
-			System.out.println("Moves delivered in the last 100ms: " + movesAccepted + " " + String.valueOf(paxos.killMoveThread));
+
+			int totalAcceptedMoves = 0;
+			for (int moves : numDeliveredMovesList) {
+				totalAcceptedMoves += moves;
+			}
+
+			double averageRate = (double) totalAcceptedMoves / numDeliveredMovesList.size(); // Moves per 100  millisecond
+
+			System.out.println("Average moves accepted per millisecond: " + averageRate);
+
+			System.out.println("Moves delivered in the last 100ms: " + movesAccepted + " " + String.valueOf(paxos.killThread));
 		}
 	}
 
