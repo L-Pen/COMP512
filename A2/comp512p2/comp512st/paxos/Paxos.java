@@ -33,8 +33,8 @@ public class Paxos {
 	int majority = 0;
 
 	// impl stuff
-	volatile float ballotId;
-	volatile float maxBallotId = 0;
+	volatile double ballotId;
+	volatile double maxBallotId = 0;
 	volatile int moveCount = 0;
 	volatile Deque<PlayerMoveData> deque = new ArrayDeque<>();
 	volatile Queue<PlayerMoveData> deliveryQueue = new LinkedList<>();
@@ -42,7 +42,10 @@ public class Paxos {
 	volatile int promiseCount;
 	volatile int acceptAckCount;
 	volatile boolean killThread;
-	volatile int numTimesNoMajority;
+	long initialBackoff = 10;
+	long maxBackoff = 200;
+	double multiplier = 2;
+	long currentBackoff = initialBackoff;
 
 	// locks
 	volatile Object lock1;
@@ -63,6 +66,7 @@ public class Paxos {
 		this.promiseCount = 0;
 		this.killThread = false;
 		this.lock1 = new Object();
+		this.currentBackoff = Math.min((long) (currentBackoff * multiplier), maxBackoff);
 
 		System.out.println("NUM PROCESSES: " + allGroupProcesses.length + " HI PROCESS ID: " + processId);
 
@@ -82,7 +86,6 @@ public class Paxos {
 	// This is what the application layer is going to call to send a message/value,
 	// such as the player and the move
 	public synchronized void broadcastTOMsg(Object val) throws InterruptedException {
-		numTimesNoMajority = 0;
 		Object[] vals = (Object[]) val;
 		synchronized (lock1) {
 			PlayerMoveData playerMoveData = new PlayerMoveData((int) vals[0], (char) vals[1], moveCount);
@@ -94,10 +97,19 @@ public class Paxos {
 
 		PaxosLogger logger = new PaxosLogger(this);
 
-		while (!deque.isEmpty() && numTimesNoMajority < 10) {
+		while (!deque.isEmpty()) {
 
 			synchronized (lock1) {
-				ballotId = Float.parseFloat((++moveCount) + "." + processId);
+				ballotId = Double.parseDouble((++moveCount) + "." + processId);
+			}
+
+			try {
+				long randomizedDelay = ThreadLocalRandom.current().nextLong(initialBackoff, currentBackoff);
+				Thread.sleep(Math.min(randomizedDelay, maxBackoff));
+				currentBackoff = Math.min((long) (currentBackoff * multiplier), maxBackoff);
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+				continue;
 			}
 
 			long start = System.currentTimeMillis();
@@ -150,7 +162,6 @@ public class Paxos {
 		}
 	}
 
-	// Add any of your own shutdown code into this method.
 	public void shutdownPaxos() throws InterruptedException {
 		this.killThread = true;
 		gcl.shutdownGCL();
@@ -181,9 +192,10 @@ public class Paxos {
 		long start = System.currentTimeMillis();
 		while (promiseCount < majority) {
 			if (System.currentTimeMillis() - start > ThreadLocalRandom.current().nextInt(50, 200)) {
-				logger.log("Didn't received majority");
-				promiseCount = 0;
-				numTimesNoMajority++;
+				logger.log("Didn't receive majority");
+				synchronized (lock1) {
+					promiseCount = 0;
+				}
 				return false;
 			}
 		}
@@ -196,7 +208,7 @@ public class Paxos {
 			logger.log("PHASE changed to ACCEPT_ACK");
 
 			promisesWithAcceptedRound
-					.sort((p1, p2) -> Float.compare(p1.ballotId, p2.ballotId));
+					.sort((p1, p2) -> Double.compare(p1.ballotId, p2.ballotId));
 
 			logger.log(
 					"Promises received with accepted round size in propose: " + promisesWithAcceptedRound.size());
@@ -222,9 +234,10 @@ public class Paxos {
 		long start = System.currentTimeMillis();
 		while (acceptAckCount < majority) {
 			if (System.currentTimeMillis() - start > ThreadLocalRandom.current().nextInt(50, 200)) {
-				logger.log("Didn't received majority");
-				acceptAckCount = 0;
-				numTimesNoMajority++;
+				logger.log("Didn't receive majority");
+				synchronized (lock1) {
+					acceptAckCount = 0;
+				}
 				return false;
 			}
 		}
@@ -251,7 +264,7 @@ class PaxosListener implements Runnable {
 
 	Paxos paxos;
 	PlayerMoveData acceptedValue;
-	float acceptedBallotId;
+	double acceptedBallotId;
 	ArrayList<String> duplicateCheck;
 
 	public PaxosListener(Paxos paxos) {
@@ -299,12 +312,12 @@ class PaxosListener implements Runnable {
 						logger.addBreadcrumb("Promise");
 						Promise promise = (Promise) gcmsg.val;
 						logger.log("promise object: " + promise.toString());
-						if (promise.ballotId != paxos.ballotId)
-							continue;
+						if (promise.ballotId == paxos.ballotId) {
+							paxos.promiseCount++;
+						}
 						if (promise.acceptedValue != null && promise.acceptedBallotId != -1) {
 							paxos.promisesWithAcceptedRound.add(promise);
 						}
-						paxos.promiseCount++;
 						logger.log("Promise count: " + paxos.promiseCount);
 					}
 				} else if (val instanceof Accept) {
@@ -401,11 +414,11 @@ class PaxosLogger {
 }
 
 class Promise implements Serializable {
-	float ballotId;
-	float acceptedBallotId;
+	double ballotId;
+	double acceptedBallotId;
 	PlayerMoveData acceptedValue;
 
-	public Promise(float ballotId, PlayerMoveData acceptedValue, float acceptedBallotId) {
+	public Promise(double ballotId, PlayerMoveData acceptedValue, double acceptedBallotId) {
 		this.ballotId = ballotId;
 		this.acceptedValue = acceptedValue;
 		this.acceptedBallotId = acceptedBallotId;
@@ -422,9 +435,9 @@ class Promise implements Serializable {
 }
 
 class Proposal implements Serializable {
-	float ballotId;
+	double ballotId;
 
-	public Proposal(float ballotId) {
+	public Proposal(double ballotId) {
 		this.ballotId = ballotId;
 	}
 
@@ -462,10 +475,10 @@ class PlayerMoveData implements Serializable {
 }
 
 class Accept implements Serializable {
-	float ballotId;
+	double ballotId;
 	PlayerMoveData pmd;
 
-	public Accept(float ballotId, PlayerMoveData pmd) {
+	public Accept(double ballotId, PlayerMoveData pmd) {
 		this.ballotId = ballotId;
 		this.pmd = pmd;
 	}
@@ -480,9 +493,9 @@ class Accept implements Serializable {
 }
 
 class AcceptAck implements Serializable {
-	float ballotId;
+	double ballotId;
 
-	public AcceptAck(float ballotId) {
+	public AcceptAck(double ballotId) {
 		this.ballotId = ballotId;
 	}
 
@@ -495,9 +508,9 @@ class AcceptAck implements Serializable {
 }
 
 class Confirm implements Serializable {
-	float ballotId;
+	double ballotId;
 
-	public Confirm(float ballotId) {
+	public Confirm(double ballotId) {
 		this.ballotId = ballotId;
 	}
 
