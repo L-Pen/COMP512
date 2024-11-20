@@ -12,28 +12,28 @@ gameid=game-$group-99
 
 #TODO edit these entries to put the name of the server that you are using and the associated ports.
 # Remember to start the script from this host
-export autotesthost=Liamos-MBP-2.localdomain
+export autotesthost=MacBook-Pro-2.local
 # player1 -> process 1, player 2 -> process 2, etc .. add more depending on how many players are playing.
 # Script automatically counts the variables to figure out the number of players.
 export process1=${autotesthost}:401$group
 export process2=${autotesthost}:402$group
 export process3=${autotesthost}:403$group
-export process4=${autotesthost}:404$group
-export process5=${autotesthost}:405$group
-export process6=${autotesthost}:406$group
-export process7=${autotesthost}:407$group
+# export process4=${autotesthost}:404$group
+# export process5=${autotesthost}:405$group
+# export process6=${autotesthost}:406$group
+# export process7=${autotesthost}:407$group
 # export process8=${autotesthost}:408$group
 # export process9=${autotesthost}:409$group
 
 #TODO update these values as needed
-maxmoves=10 interval=30 randseed=42
+maxmoves=50 interval=100 randseed=42
 #TODO IF (and only if) you want to simulate failures, enable this for corresponding player numbers.
 # export failmode_1=RECEIVEPROPOSE
 # export failmode_1=AFTERSENDVOTE
 # export failmode_1=AFTERSENDPROPOSE
 # export failmode_3=AFTERBECOMINGLEADER
 # export failmode_1=AFTERBECOMINGLEADER
-#export failmode_N=AFTERVALUEACCEPT
+# export failmode_1=AFTERVALUEACCEPT
 #For example this enabled failmode AFTERBECOMINGLEADER for player/process 2 (only one failmode can be set per process). It is important to have the export.
 # export failmode_1=AFTERVALUEACCEPT
 

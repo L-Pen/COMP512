@@ -50,9 +50,6 @@ public class Paxos {
 	// locks
 	volatile Object lock1;
 
-	// perf
-	volatile ArrayList<Long> avg = new ArrayList<>();
-
 	public Paxos(String myProcess, String[] allGroupProcesses, Logger logger, FailCheck failCheck)
 			throws IOException, UnknownHostException {
 		// Rember to call the failCheck.checkFailure(..) with appropriate arguments
@@ -112,7 +109,6 @@ public class Paxos {
 				continue;
 			}
 
-			long start = System.currentTimeMillis();
 			try {
 				logger.addBreadcrumb("PROPOSE");
 				boolean suc = propose(logger);
@@ -140,9 +136,6 @@ public class Paxos {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			long end = System.currentTimeMillis();
-			avg.add((end - start));
-
 		}
 
 	}
@@ -166,17 +159,6 @@ public class Paxos {
 		this.killThread = true;
 		gcl.shutdownGCL();
 		Thread.sleep(10);
-		int sum = 0;
-		int size = avg.size();
-		if (size != 0) {
-			for (int i = 0; i < size; i++) {
-				long x = avg.get(i);
-				sum += x;
-				System.out.println("Paxos runtime: " + x);
-			}
-			System.out.println("Paxos avg runtime: " + sum / size);
-		}
-		System.out.println("Total Paxos runtime: " + sum);
 	}
 
 	private boolean propose(PaxosLogger logger) throws InterruptedException {
