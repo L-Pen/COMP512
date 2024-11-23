@@ -153,10 +153,11 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 		zk.getChildren("/dist30/workers", this, this, null);
 	}
 
-	void deleteSelfFromWorkers() throws InterruptedException, KeeperException {
+	void deleteSelfFromWorkers() {
 		try {
 			zk.delete("/dist30/workers/" + pinfo, -1);
 		} catch (Exception e) {
+			System.out.println("Node wasn't in worker znode");
 		}
 	}
 
@@ -174,7 +175,7 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 			zk.create("/dist30/workers/" + pinfo, pinfo.getBytes(), Ids.OPEN_ACL_UNSAFE,
 					CreateMode.PERSISTENT);
 		} catch (Exception e) {
-			e.printStackTrace();
+			System.out.println("Node already registered to worker znode");
 		}
 	}
 
