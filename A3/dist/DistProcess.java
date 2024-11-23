@@ -157,6 +157,18 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Run
 		// The worker must invoke the "compute" function of the Task send by the client.
 		// What to do if you do not have a free worker process?
 		System.out.println("DISTAPP : processResult : " + rc + ":" + path + ":" + ctx);
+		if (path.equals("/dist30/workers")) {
+			synchronized (workers) {
+				for (String c : children) {
+					if (workers.containsKey(c))
+						continue;
+					workers.put(c, false);
+				}
+				System.out.println(convertWithIteration(workers));
+			}
+		} else if (path.equals("/dist30/tasks")) {
+
+		}
 		for (String c : children) {
 			System.out.println(c);
 			// try {
@@ -201,6 +213,15 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Run
 			// System.out.println(cne);
 			// }
 		}
+	}
+
+	private String convertWithIteration(HashMap<?, ?> map) {
+		StringBuilder mapAsString = new StringBuilder("{");
+		for (Object key : map.keySet()) {
+			mapAsString.append(key + "=" + String.valueOf(map.get(key)) + ", ");
+		}
+		mapAsString.delete(mapAsString.length() - 2, mapAsString.length()).append("}");
+		return mapAsString.toString();
 	}
 
 	public static void main(String args[]) throws Exception {
