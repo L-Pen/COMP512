@@ -220,7 +220,7 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Run
 		for (Object key : map.keySet()) {
 			mapAsString.append(key + "=" + String.valueOf(map.get(key)) + ", ");
 		}
-		mapAsString.delete(mapAsString.length() - 2, mapAsString.length()).append("}");
+		mapAsString.append("}");
 		return mapAsString.toString();
 	}
 
