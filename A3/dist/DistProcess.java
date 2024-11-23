@@ -106,6 +106,8 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 									Ids.OPEN_ACL_UNSAFE,
 									CreateMode.PERSISTENT);
 							zk.delete("/dist30/workers/" + pinfo + "/" + taskId, 0);
+							taskObject = null;
+							taskId = null;
 						} catch (NodeExistsException nee) {
 							System.out.println(nee);
 						} catch (KeeperException ke) {
