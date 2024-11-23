@@ -136,7 +136,7 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 	void registerWorker() {
 		try {
 			zk.create("/dist30/workers/" + pinfo, pinfo.getBytes(), Ids.OPEN_ACL_UNSAFE,
-					CreateMode.EPHEMERAL);
+					CreateMode.PERSISTENT);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
