@@ -34,9 +34,12 @@ import java.lang.Thread;
 public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, AsyncCallback.DataCallback, Runnable {
 	ZooKeeper zk;
 	String zkServer, pinfo;
-	boolean isManager = false;
+	volatile boolean isManager = false;
 	boolean initialized = false;
-	private HashMap<String, Boolean> workers = new HashMap<>();
+	volatile private HashMap<String, Boolean> workers = new HashMap<>();
+	volatile private HashMap<String, Boolean> taskStatus = new HashMap<>();
+	volatile private Queue<String> taskQueue = new LinkedList<>();
+	volatile private Object taskLock = new Object();
 
 	DistProcess(String zkhost) {
 		zkServer = zkhost;
@@ -51,6 +54,38 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 
 	public void run() {
 		while (true) {
+
+			if (isManager) {
+				while (taskQueue.isEmpty()) {
+				}
+
+				synchronized (workers) {
+					Set<String> workerIds = workers.keySet();
+					for (String workerId : workerIds) {
+						if (workers.get(workerId))
+							continue;
+
+						workers.put(workerId, true);
+						synchronized (taskLock) {
+							String taskId = taskQueue.remove();
+							try {
+								zk.create("/dist30/workers/" + workerId + "/" + taskId, taskId.getBytes(),
+										Ids.OPEN_ACL_UNSAFE,
+										CreateMode.PERSISTENT);
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+						}
+					}
+				}
+
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+
 		}
 	}
 
@@ -163,30 +198,29 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 		// What to do if you do not have a free worker process?
 		System.out.println("DISTAPP : processResult : " + rc + ":" + path + ":" + ctx);
 
-		// manager stuff
-		if (isManager) {
-			if (path.equals("/dist30/workers")) {
-				synchronized (workers) {
-					for (String c : children) {
-						if (workers.containsKey(c))
-							continue;
-						workers.put(c, false);
-					}
-					System.out.println(convertWithIteration(workers));
-				}
-			} else if (path.equals("/dist30/tasks")) {
+		if (path.equals("/dist30/workers")) {
+			synchronized (workers) {
 				for (String c : children) {
-					System.out.println(c);
+					if (workers.containsKey(c))
+						continue;
+					workers.put(c, false);
+				}
+				System.out.println(convertWithIteration(workers));
+			}
+		} else if (path.equals("/dist30/tasks")) {
+			synchronized (taskLock) {
+				for (String c : children) {
+					if (taskStatus.containsKey(c))
+						continue;
+					taskStatus.put(c, false);
+					taskQueue.add(c);
 				}
 			}
-		} else {
-			// worker stuff
-			// should only ever have one child
-			if (path.equals("/dist30/workers/" + pinfo)) {
-				if (children.size() == 0)
-					return;
-				zk.getData("/dist30/tasks/" + children.get(0), false, this, null);
-			}
+		}
+		if (path.equals("/dist30/workers/" + pinfo)) {
+			if (children.size() == 0)
+				return;
+			zk.getData("/dist30/tasks/" + children.get(0), false, this, null);
 		}
 	}
 
