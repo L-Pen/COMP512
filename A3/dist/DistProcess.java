@@ -187,39 +187,41 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 	}
 
 	public void processResult(int rc, String path, Object ctx, byte[] data, Stat stat) {
-		try {
-			System.out.println("Data return - rc: " + rc + " path: " + path + " ctx: " + ctx);
-			// // Re-construct our task object.
-			// ByteArrayInputStream bis = new ByteArrayInputStream(data);
-			// ObjectInput in = new ObjectInputStream(bis);
-			// DistTask dt = (DistTask) in.readObject();
+		System.out.println("Data return - rc: " + rc + " path: " + path + " ctx: " + ctx);
+		// try {
+		// // // Re-construct our task object.
+		// // ByteArrayInputStream bis = new ByteArrayInputStream(data);
+		// // ObjectInput in = new ObjectInputStream(bis);
+		// // DistTask dt = (DistTask) in.readObject();
 
-			// // Execute the task.
-			// // TODO: Again, time consuming stuff. Should be done by some other thread and
-			// // not inside a callback!
-			// dt.compute();
+		// // // Execute the task.
+		// // // TODO: Again, time consuming stuff. Should be done by some other thread
+		// and
+		// // // not inside a callback!
+		// // dt.compute();
 
-			// // Serialize our Task object back to a byte array!
-			// ByteArrayOutputStream bos = new ByteArrayOutputStream();
-			// ObjectOutputStream oos = new ObjectOutputStream(bos);
-			// oos.writeObject(dt);
-			// oos.flush();
-			// taskSerial = bos.toByteArray();
+		// // // Serialize our Task object back to a byte array!
+		// // ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		// // ObjectOutputStream oos = new ObjectOutputStream(bos);
+		// // oos.writeObject(dt);
+		// // oos.flush();
+		// // taskSerial = bos.toByteArray();
 
-			// // Store it inside the result node.
-			// zk.create("/dist30/tasks/" + c + "/result", taskSerial, Ids.OPEN_ACL_UNSAFE,
-			// CreateMode.PERSISTENT);
-		} catch (NodeExistsException nee) {
-			System.out.println(nee);
-		} catch (KeeperException ke) {
-			System.out.println(ke);
-		} catch (InterruptedException ie) {
-			System.out.println(ie);
-		} catch (IOException io) {
-			System.out.println(io);
-		} catch (ClassNotFoundException cne) {
-			System.out.println(cne);
-		}
+		// // // Store it inside the result node.
+		// // zk.create("/dist30/tasks/" + c + "/result", taskSerial,
+		// Ids.OPEN_ACL_UNSAFE,
+		// // CreateMode.PERSISTENT);
+		// } catch (NodeExistsException nee) {
+		// System.out.println(nee);
+		// } catch (KeeperException ke) {
+		// System.out.println(ke);
+		// } catch (InterruptedException ie) {
+		// System.out.println(ie);
+		// } catch (IOException io) {
+		// System.out.println(io);
+		// } catch (ClassNotFoundException cne) {
+		// System.out.println(cne);
+		// }
 	}
 
 	private String convertWithIteration(HashMap<?, ?> map) {
