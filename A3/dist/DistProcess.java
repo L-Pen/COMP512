@@ -31,7 +31,7 @@ import java.lang.Thread;
 //		you manage the code more modularly.
 //	REMEMBER !! Managers and Workers are also clients of ZK and the ZK client library is single thread - Watches & CallBacks should not be used for time consuming tasks.
 //		In particular, if the process is a worker, Watches & CallBacks should only be used to assign the "work" to a separate thread inside your program.
-public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Runnable {
+public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, AsyncCallback.DataCallback, Runnable {
 	ZooKeeper zk;
 	String zkServer, pinfo;
 	boolean isManager = false;
@@ -63,6 +63,7 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Run
 		} catch (NodeExistsException nee) {
 			isManager = false;
 			registerWorker();
+			checkForTask();
 		} catch (UnknownHostException uhe) {
 			System.out.println(uhe);
 		} catch (KeeperException ke) {
@@ -95,11 +96,15 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Run
 
 	void registerWorker() {
 		try {
-			zk.create("/dist30/workers/worker-", pinfo.getBytes(), Ids.OPEN_ACL_UNSAFE,
-					CreateMode.EPHEMERAL_SEQUENTIAL);
+			zk.create("/dist30/workers/worker-" + pinfo, pinfo.getBytes(), Ids.OPEN_ACL_UNSAFE,
+					CreateMode.EPHEMERAL);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	void checkForTask() {
+		zk.getChildren("/dist30/workers/worker-" + pinfo, this, this, null);
 	}
 
 	public void process(WatchedEvent e) {
@@ -157,30 +162,35 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Run
 		// The worker must invoke the "compute" function of the Task send by the client.
 		// What to do if you do not have a free worker process?
 		System.out.println("DISTAPP : processResult : " + rc + ":" + path + ":" + ctx);
-		if (path.equals("/dist30/workers")) {
-			synchronized (workers) {
-				for (String c : children) {
-					if (workers.containsKey(c))
-						continue;
-					workers.put(c, false);
+
+		// manager stuff
+		if (isManager) {
+			if (path.equals("/dist30/workers")) {
+				synchronized (workers) {
+					for (String c : children) {
+						if (workers.containsKey(c))
+							continue;
+						workers.put(c, false);
+					}
+					System.out.println(convertWithIteration(workers));
 				}
-				System.out.println(convertWithIteration(workers));
+			} else if (path.equals("/dist30/tasks")) {
+				for (String c : children) {
+					System.out.println(c);
+				}
 			}
-		} else if (path.equals("/dist30/tasks")) {
-
+		} else {
+			// worker stuff
+			// should only ever have one child
+			zk.getData("/dist30/tasks/" + children.get(0), false, this, null);
 		}
-		for (String c : children) {
-			System.out.println(c);
-			// try {
-			// // TODO There is quite a bit of worker specific activities here,
-			// // that should be moved done by a process function as the worker.
+	}
 
-			// // TODO!! This is not a good approach, you should get the data using an async
-			// // version of the API.
-			// byte[] taskSerial = zk.getData("/dist30/tasks/" + c, false, null);
-
+	public void processResult(int rc, String path, Object ctx, byte[] data, Stat stat) {
+		try {
+			System.out.println("Data return - rc: " + rc + " path: " + path + " ctx: " + ctx);
 			// // Re-construct our task object.
-			// ByteArrayInputStream bis = new ByteArrayInputStream(taskSerial);
+			// ByteArrayInputStream bis = new ByteArrayInputStream(data);
 			// ObjectInput in = new ObjectInputStream(bis);
 			// DistTask dt = (DistTask) in.readObject();
 
@@ -199,19 +209,16 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Run
 			// // Store it inside the result node.
 			// zk.create("/dist30/tasks/" + c + "/result", taskSerial, Ids.OPEN_ACL_UNSAFE,
 			// CreateMode.PERSISTENT);
-			// // zk.create("/dist30/tasks/"+c+"/result", ("Hello from "+pinfo).getBytes(),
-			// // Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
-			// } catch (NodeExistsException nee) {
-			// System.out.println(nee);
-			// } catch (KeeperException ke) {
-			// System.out.println(ke);
-			// } catch (InterruptedException ie) {
-			// System.out.println(ie);
-			// } catch (IOException io) {
-			// System.out.println(io);
-			// } catch (ClassNotFoundException cne) {
-			// System.out.println(cne);
-			// }
+		} catch (NodeExistsException nee) {
+			System.out.println(nee);
+		} catch (KeeperException ke) {
+			System.out.println(ke);
+		} catch (InterruptedException ie) {
+			System.out.println(ie);
+		} catch (IOException io) {
+			System.out.println(io);
+		} catch (ClassNotFoundException cne) {
+			System.out.println(cne);
 		}
 	}
 
