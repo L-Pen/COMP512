@@ -36,6 +36,7 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Run
 	String zkServer, pinfo;
 	boolean isManager = false;
 	boolean initialized = false;
+	private HashMap<String, Boolean> availableWorkers = new HashMap<>();
 
 	DistProcess(String zkhost) {
 		zkServer = zkhost;
@@ -58,7 +59,7 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Run
 			runForManager(); // See if you can become the manager (i.e, no other manager exists)
 			isManager = true;
 			getTasks(); // Install monitoring on any new tasks that will be created.
-						// TODO monitor for worker tasks?
+			getWorkers();
 		} catch (NodeExistsException nee) {
 			isManager = false;
 			registerWorker();
@@ -77,6 +78,10 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Run
 	// Manager fetching task znodes...
 	void getTasks() {
 		zk.getChildren("/dist30/tasks", this, this, null);
+	}
+
+	void getWorkers() {
+		zk.getChildren("/dist30/workers", this, this, null);
 	}
 
 	// Try to become the manager.
@@ -127,6 +132,10 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Run
 			// children.
 			getTasks();
 		}
+
+		if (e.getType() == Watcher.Event.EventType.NodeChildrenChanged && e.getPath().equals("/dist30/workers")) {
+			System.out.println("new worker");
+		}
 	}
 
 	// Asynchronous callback that is invoked by the zk.getChildren request.
@@ -150,46 +159,47 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Run
 		System.out.println("DISTAPP : processResult : " + rc + ":" + path + ":" + ctx);
 		for (String c : children) {
 			System.out.println(c);
-			try {
-				// TODO There is quite a bit of worker specific activities here,
-				// that should be moved done by a process function as the worker.
+			// try {
+			// // TODO There is quite a bit of worker specific activities here,
+			// // that should be moved done by a process function as the worker.
 
-				// TODO!! This is not a good approach, you should get the data using an async
-				// version of the API.
-				byte[] taskSerial = zk.getData("/dist30/tasks/" + c, false, null);
+			// // TODO!! This is not a good approach, you should get the data using an async
+			// // version of the API.
+			// byte[] taskSerial = zk.getData("/dist30/tasks/" + c, false, null);
 
-				// Re-construct our task object.
-				ByteArrayInputStream bis = new ByteArrayInputStream(taskSerial);
-				ObjectInput in = new ObjectInputStream(bis);
-				DistTask dt = (DistTask) in.readObject();
+			// // Re-construct our task object.
+			// ByteArrayInputStream bis = new ByteArrayInputStream(taskSerial);
+			// ObjectInput in = new ObjectInputStream(bis);
+			// DistTask dt = (DistTask) in.readObject();
 
-				// Execute the task.
-				// TODO: Again, time consuming stuff. Should be done by some other thread and
-				// not inside a callback!
-				dt.compute();
+			// // Execute the task.
+			// // TODO: Again, time consuming stuff. Should be done by some other thread and
+			// // not inside a callback!
+			// dt.compute();
 
-				// Serialize our Task object back to a byte array!
-				ByteArrayOutputStream bos = new ByteArrayOutputStream();
-				ObjectOutputStream oos = new ObjectOutputStream(bos);
-				oos.writeObject(dt);
-				oos.flush();
-				taskSerial = bos.toByteArray();
+			// // Serialize our Task object back to a byte array!
+			// ByteArrayOutputStream bos = new ByteArrayOutputStream();
+			// ObjectOutputStream oos = new ObjectOutputStream(bos);
+			// oos.writeObject(dt);
+			// oos.flush();
+			// taskSerial = bos.toByteArray();
 
-				// Store it inside the result node.
-				zk.create("/dist30/tasks/" + c + "/result", taskSerial, Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
-				// zk.create("/dist30/tasks/"+c+"/result", ("Hello from "+pinfo).getBytes(),
-				// Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
-			} catch (NodeExistsException nee) {
-				System.out.println(nee);
-			} catch (KeeperException ke) {
-				System.out.println(ke);
-			} catch (InterruptedException ie) {
-				System.out.println(ie);
-			} catch (IOException io) {
-				System.out.println(io);
-			} catch (ClassNotFoundException cne) {
-				System.out.println(cne);
-			}
+			// // Store it inside the result node.
+			// zk.create("/dist30/tasks/" + c + "/result", taskSerial, Ids.OPEN_ACL_UNSAFE,
+			// CreateMode.PERSISTENT);
+			// // zk.create("/dist30/tasks/"+c+"/result", ("Hello from "+pinfo).getBytes(),
+			// // Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
+			// } catch (NodeExistsException nee) {
+			// System.out.println(nee);
+			// } catch (KeeperException ke) {
+			// System.out.println(ke);
+			// } catch (InterruptedException ie) {
+			// System.out.println(ie);
+			// } catch (IOException io) {
+			// System.out.println(io);
+			// } catch (ClassNotFoundException cne) {
+			// System.out.println(cne);
+			// }
 		}
 	}
 
