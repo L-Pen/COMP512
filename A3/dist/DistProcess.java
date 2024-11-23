@@ -78,6 +78,7 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 								zk.create("/dist30/workers/" + workerId + "/" + taskId, taskId.getBytes(),
 										Ids.OPEN_ACL_UNSAFE,
 										CreateMode.PERSISTENT);
+								zk.exists("/dist30/workers/" + workerId + "/" + taskId, true);
 							} catch (Exception e) {
 								e.printStackTrace();
 							}
@@ -238,7 +239,6 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 		// This logic is for manager !!
 		// Every time a new task znode is created by the client, this will be invoked.
 
-		// TODO: Filter out and go over only the newly created task znodes.
 		// Also have a mechanism to assign these tasks to a "Worker" process.
 		// The worker must invoke the "compute" function of the Task send by the client.
 		// What to do if you do not have a free worker process?
