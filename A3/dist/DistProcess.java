@@ -37,7 +37,7 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 	volatile boolean isManager = false;
 	boolean initialized = false;
 
-	volatile private HashMap<String, Boolean> workers = new HashMap<>();
+	volatile private HashMap<String, String> workers = new HashMap<>();
 
 	volatile private HashMap<String, Boolean> taskStatus = new HashMap<>();
 	volatile private Queue<String> taskQueue = new LinkedList<>();
@@ -68,19 +68,18 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 				synchronized (workers) {
 					Set<String> workerIds = workers.keySet();
 					for (String workerId : workerIds) {
-						if (workers.get(workerId))
+						if (workers.get(workerId) != null)
 							continue;
 
-						workers.put(workerId, true);
 						synchronized (taskLock) {
 							String taskId = taskQueue.remove();
+							workers.put(workerId, taskId);
 							try {
 								String path = "/dist30/workers/" + workerId + "/" + taskId;
 								zk.create(path, taskId.getBytes(),
 										Ids.OPEN_ACL_UNSAFE,
 										CreateMode.PERSISTENT);
 								zk.exists(path, true);
-								System.out.println("setting watcher on: " + path);
 							} catch (Exception e) {
 								e.printStackTrace();
 							}
@@ -111,7 +110,6 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 
 							String path = "/dist30/workers/" + pinfo + "/" + workerTaskId;
 							zk.delete(path, -1);
-							System.out.println("Deleting on: " + path);
 							taskObject = null;
 							workerTaskId = null;
 						} catch (NodeExistsException nee) {
@@ -228,6 +226,17 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 				&& e.getPath().equals("/dist30/workers/" + pinfo)) {
 			checkForTask();
 		}
+
+		if (e.getType() == Watcher.Event.EventType.NodeDeleted) {
+			String workerId = e.getPath().split("/")[3];
+			synchronized (workers) {
+				String taskId = workers.get(workerId);
+				workers.put(workerId, null);
+				synchronized (taskLock) {
+					taskStatus.remove(taskId);
+				}
+			}
+		}
 	}
 
 	// Asynchronous callback that is invoked by the zk.getChildren request.
@@ -254,7 +263,7 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 				for (String c : children) {
 					if (workers.containsKey(c))
 						continue;
-					workers.put(c, false);
+					workers.put(c, null);
 				}
 				System.out.println(convertWithIteration(workers));
 			}
