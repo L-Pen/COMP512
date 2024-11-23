@@ -36,10 +36,15 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 	String zkServer, pinfo;
 	volatile boolean isManager = false;
 	boolean initialized = false;
+
 	volatile private HashMap<String, Boolean> workers = new HashMap<>();
+
 	volatile private HashMap<String, Boolean> taskStatus = new HashMap<>();
 	volatile private Queue<String> taskQueue = new LinkedList<>();
 	volatile private Object taskLock = new Object();
+
+	volatile private DistTask taskObject = null;
+	volatile private String taskId = null;
 
 	DistProcess(String zkhost) {
 		zkServer = zkhost;
@@ -55,6 +60,7 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 	public void run() {
 		while (true) {
 
+			// manager stuff
 			if (isManager) {
 				while (taskQueue.isEmpty()) {
 				}
@@ -76,18 +82,47 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 								e.printStackTrace();
 							}
 						}
+						break;
 					}
-				}
-
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
 				}
 			}
 
+			// worker stuff
 			else {
+				if (taskObject != null) {
+					synchronized (taskLock) {
+						try {
+							taskObject.compute();
 
+							// Serialize our Task object back to a byte array!
+							ByteArrayOutputStream bos = new ByteArrayOutputStream();
+							ObjectOutputStream oos = new ObjectOutputStream(bos);
+							oos.writeObject(taskObject);
+							oos.flush();
+							byte[] taskSerial = bos.toByteArray();
+
+							// Store it inside the result node.
+							zk.create("/dist30/tasks/" + taskId + "/result", taskSerial,
+									Ids.OPEN_ACL_UNSAFE,
+									CreateMode.PERSISTENT);
+							zk.delete("/dist30/workers/" + pinfo + "/" + taskId, 0);
+						} catch (NodeExistsException nee) {
+							System.out.println(nee);
+						} catch (KeeperException ke) {
+							System.out.println(ke);
+						} catch (InterruptedException ie) {
+							System.out.println(ie);
+						} catch (IOException io) {
+							System.out.println(io);
+						}
+					}
+				}
+			}
+
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
 
 		}
@@ -229,46 +264,29 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 		if (path.equals("/dist30/workers/" + pinfo)) {
 			if (children.size() == 0)
 				return;
-			zk.getData("/dist30/tasks/" + children.get(0), false, this, null);
+			synchronized (taskLock) {
+				taskId = children.get(0);
+				zk.getData("/dist30/tasks/" + taskId, false, this, null);
+			}
 		}
 	}
 
 	public void processResult(int rc, String path, Object ctx, byte[] data, Stat stat) {
 		System.out.println("Data return - rc: " + rc + " path: " + path + " ctx: " + ctx);
-		// try {
-		// // // Re-construct our task object.
-		// // ByteArrayInputStream bis = new ByteArrayInputStream(data);
-		// // ObjectInput in = new ObjectInputStream(bis);
-		// // DistTask dt = (DistTask) in.readObject();
+		try {
+			// Re-construct our task object.
+			ByteArrayInputStream bis = new ByteArrayInputStream(data);
+			ObjectInput in = new ObjectInputStream(bis);
+			DistTask dt = (DistTask) in.readObject();
 
-		// // // Execute the task.
-		// // // TODO: Again, time consuming stuff. Should be done by some other thread
-		// and
-		// // // not inside a callback!
-		// // dt.compute();
-
-		// // // Serialize our Task object back to a byte array!
-		// // ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		// // ObjectOutputStream oos = new ObjectOutputStream(bos);
-		// // oos.writeObject(dt);
-		// // oos.flush();
-		// // taskSerial = bos.toByteArray();
-
-		// // // Store it inside the result node.
-		// // zk.create("/dist30/tasks/" + c + "/result", taskSerial,
-		// Ids.OPEN_ACL_UNSAFE,
-		// // CreateMode.PERSISTENT);
-		// } catch (NodeExistsException nee) {
-		// System.out.println(nee);
-		// } catch (KeeperException ke) {
-		// System.out.println(ke);
-		// } catch (InterruptedException ie) {
-		// System.out.println(ie);
-		// } catch (IOException io) {
-		// System.out.println(io);
-		// } catch (ClassNotFoundException cne) {
-		// System.out.println(cne);
-		// }
+			synchronized (taskLock) {
+				taskObject = dt;
+			}
+		} catch (IOException io) {
+			System.out.println(io);
+		} catch (ClassNotFoundException cne) {
+			System.out.println(cne);
+		}
 	}
 
 	private String convertWithIteration(HashMap<?, ?> map) {
