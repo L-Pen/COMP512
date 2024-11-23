@@ -18,10 +18,9 @@ import org.apache.zookeeper.*;
 import org.apache.zookeeper.ZooDefs.Ids;
 import org.apache.zookeeper.KeeperException.*;
 import org.apache.zookeeper.data.*;
-import org.apache.zookeeper.KeeperException.Code;
 
-// TODO
-// Replace 30 with your group number.
+import java.lang.Thread;
+
 // You may have to add other interfaces such as for threading, etc., as needed.
 // This class will contain the logic for both your manager process as well as the worker processes.
 //  Make sure that the callbacks and watch do not conflict between your manager's logic and worker's logic.
@@ -32,7 +31,7 @@ import org.apache.zookeeper.KeeperException.Code;
 //		you manage the code more modularly.
 //	REMEMBER !! Managers and Workers are also clients of ZK and the ZK client library is single thread - Watches & CallBacks should not be used for time consuming tasks.
 //		In particular, if the process is a worker, Watches & CallBacks should only be used to assign the "work" to a separate thread inside your program.
-public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback {
+public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Runnable {
 	ZooKeeper zk;
 	String zkServer, pinfo;
 	boolean isManager = false;
@@ -47,6 +46,11 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback {
 
 	void startProcess() throws IOException, UnknownHostException, KeeperException, InterruptedException {
 		zk = new ZooKeeper(zkServer, 10000, this); // connect to ZK.
+	}
+
+	public void run() {
+		while (true) {
+		}
 	}
 
 	void initialize() {
@@ -188,6 +192,7 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback {
 
 		// Replace this with an approach that will make sure that the process is up and
 		// running forever.
-		Thread.sleep(20000);
+		Thread dtThread = new Thread(dt);
+		dtThread.start();
 	}
 }
