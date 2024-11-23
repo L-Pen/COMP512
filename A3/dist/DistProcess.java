@@ -26,7 +26,6 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 	String zkServer, pinfo;
 	volatile boolean isManager = false;
 	boolean initialized = false;
-	String hostname;
 
 	volatile private HashMap<String, String> workers = new HashMap<>();
 
@@ -126,6 +125,7 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 		try {
 			runForManager(); // See if you can become the manager (i.e, no other manager exists)
 			isManager = true;
+			deleteSelfFromWorkers();
 			getTasks(); // Install monitoring on any new tasks that will be created.
 			getWorkers();
 		} catch (NodeExistsException nee) {
@@ -151,6 +151,10 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 
 	void getWorkers() {
 		zk.getChildren("/dist30/workers", this, this, null);
+	}
+
+	void deleteSelfFromWorkers() throws InterruptedException, KeeperException {
+		zk.delete("/dist30/workers/" + pinfo, -1);
 	}
 
 	// Try to become the manager.
