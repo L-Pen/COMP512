@@ -187,7 +187,7 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 	public void process(WatchedEvent e) {
 		// Get watcher notifications.
 
-		System.out.println("DISTAPP : Event received : " + e + " - " + e.getPath());
+		System.out.println("DISTAPP : Event received : " + e);
 
 		if (e.getType() == Watcher.Event.EventType.None) // This seems to be the event type associated with connections.
 		{
