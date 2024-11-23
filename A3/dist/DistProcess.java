@@ -73,7 +73,9 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 
 						synchronized (taskLock) {
 							String taskId = taskQueue.remove();
+							System.out.println("==== Removed task from queue, length : " + taskQueue.size());
 							workers.put(workerId, taskId);
+							System.out.println(convertWithIteration(workers));
 							try {
 								String path = "/dist30/workers/" + workerId + "/" + taskId;
 								zk.create(path, taskId.getBytes(),
@@ -192,7 +194,7 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 		// Instead include another thread in your program logic that
 		// does the time consuming "work" and notify that thread from here.
 
-		System.out.println("DISTAPP : Event received : " + e);
+		// System.out.println("DISTAPP : Event received : " + e);
 
 		if (e.getType() == Watcher.Event.EventType.None) // This seems to be the event type associated with connections.
 		{
@@ -226,6 +228,7 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 			synchronized (workers) {
 				String taskId = workers.get(workerId);
 				workers.put(workerId, null);
+				System.out.println(convertWithIteration(workers));
 				synchronized (taskLock) {
 					taskStatus.remove(taskId);
 				}
@@ -250,7 +253,8 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 		// Also have a mechanism to assign these tasks to a "Worker" process.
 		// The worker must invoke the "compute" function of the Task send by the client.
 		// What to do if you do not have a free worker process?
-		System.out.println("DISTAPP : processResult : " + rc + ":" + path + ":" + ctx);
+		// System.out.println("DISTAPP : processResult : " + rc + ":" + path + ":" +
+		// ctx);
 
 		if (path.equals("/dist30/workers")) {
 			synchronized (workers) {
@@ -268,6 +272,7 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 						continue;
 					taskStatus.put(c, false);
 					taskQueue.add(c);
+					System.out.println("==== Added task to queue, length : " + taskQueue.size());
 				}
 			}
 		}
@@ -282,7 +287,10 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 	}
 
 	public void processResult(int rc, String path, Object ctx, byte[] data, Stat stat) {
-		System.out.println("Data return - rc: " + rc + " path: " + path + " ctx: " + ctx);
+		// System.out.println("Data return - rc: " + rc + " path: " + path + " ctx: " +
+		// ctx);
+		if (data == null)
+			return;
 		try {
 			// Re-construct our task object.
 			ByteArrayInputStream bis = new ByteArrayInputStream(data);
