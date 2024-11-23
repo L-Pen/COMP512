@@ -183,6 +183,8 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 			// worker stuff
 			// should only ever have one child
 			if (path.equals("/dist30/workers/" + pinfo)) {
+				if (children.size() == 0)
+					return;
 				zk.getData("/dist30/tasks/" + children.get(0), false, this, null);
 			}
 		}
