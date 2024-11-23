@@ -61,8 +61,8 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Run
 						// TODO monitor for worker tasks?
 		} catch (NodeExistsException nee) {
 			isManager = false;
-		} // TODO: What else will you need if this was a worker process?
-		catch (UnknownHostException uhe) {
+			registerWorker();
+		} catch (UnknownHostException uhe) {
 			System.out.println(uhe);
 		} catch (KeeperException ke) {
 			System.out.println(ke);
@@ -86,6 +86,15 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Run
 		// This is an example of Synchronous API invocation as the function waits for
 		// the execution and no callback is involved..
 		zk.create("/dist30/manager", pinfo.getBytes(), Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
+	}
+
+	void registerWorker() {
+		try {
+			zk.create("/dist30/workers/worker-", pinfo.getBytes(), Ids.OPEN_ACL_UNSAFE,
+					CreateMode.EPHEMERAL_SEQUENTIAL);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void process(WatchedEvent e) {

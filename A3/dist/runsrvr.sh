@@ -1,5 +1,5 @@
 #!/bin/bash
-export ZOOBINDIR=~/apache-zookeeper-3.8.4-bin/bin
+./compilesrvr.sh
 
 if [[ -z "$ZOOBINDIR" ]]
 then
