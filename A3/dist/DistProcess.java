@@ -154,7 +154,10 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 	}
 
 	void deleteSelfFromWorkers() throws InterruptedException, KeeperException {
-		zk.delete("/dist30/workers/" + pinfo, -1);
+		try {
+			zk.delete("/dist30/workers/" + pinfo, -1);
+		} catch (Exception e) {
+		}
 	}
 
 	// Try to become the manager.
