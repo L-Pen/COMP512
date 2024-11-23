@@ -180,6 +180,11 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 		if (e.getType() == Watcher.Event.EventType.NodeChildrenChanged && e.getPath().equals("/dist30/workers")) {
 			getWorkers();
 		}
+
+		if (e.getType() == Watcher.Event.EventType.NodeChildrenChanged
+				&& e.getPath().equals("/dist30/workers/" + pinfo)) {
+			checkForTask();
+		}
 	}
 
 	// Asynchronous callback that is invoked by the zk.getChildren request.
