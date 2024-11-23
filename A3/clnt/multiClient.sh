@@ -4,5 +4,5 @@ num_runs=$1
 
 for i in $(seq 1 "$num_runs");
 do
-    ./runclnt.sh 5000000 &
+    ./runclnt.sh 5000000 >/dev/null 2>&1 &
 done
