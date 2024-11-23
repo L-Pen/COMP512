@@ -158,6 +158,7 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 			System.out.println("/dist30/workers/" + pinfo);
 			zk.delete("/dist30/workers/" + pinfo, -1);
 		} catch (Exception e) {
+			e.printStackTrace();
 			System.out.println("Node wasn't in worker znode");
 		}
 	}
