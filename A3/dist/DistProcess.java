@@ -36,7 +36,7 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Run
 	String zkServer, pinfo;
 	boolean isManager = false;
 	boolean initialized = false;
-	private HashMap<String, Boolean> availableWorkers = new HashMap<>();
+	private HashMap<String, Boolean> workers = new HashMap<>();
 
 	DistProcess(String zkhost) {
 		zkServer = zkhost;
@@ -134,7 +134,7 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Run
 		}
 
 		if (e.getType() == Watcher.Event.EventType.NodeChildrenChanged && e.getPath().equals("/dist30/workers")) {
-			System.out.println("new worker");
+			getWorkers();
 		}
 	}
 
