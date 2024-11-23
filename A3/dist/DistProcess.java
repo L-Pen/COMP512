@@ -155,7 +155,6 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 
 	void deleteSelfFromWorkers() {
 		try {
-			System.out.println("/dist30/workers/" + pinfo);
 			zk.delete("/dist30/workers/" + pinfo, -1);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -188,7 +187,7 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 	public void process(WatchedEvent e) {
 		// Get watcher notifications.
 
-		// System.out.println("DISTAPP : Event received : " + e);
+		System.out.println("DISTAPP : Event received : " + e + " - " + e.getPath());
 
 		if (e.getType() == Watcher.Event.EventType.None) // This seems to be the event type associated with connections.
 		{
@@ -231,8 +230,8 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 
 	// Asynchronous callback that is invoked by the zk.getChildren request.
 	public void processResult(int rc, String path, Object ctx, List<String> children) {
-		// System.out.println("DISTAPP : processResult : " + rc + ":" + path + ":" +
-		// ctx);
+		System.out.println("DISTAPP : processResult : " + rc + ":" + path + ":" +
+				ctx);
 
 		if (isManager && path.equals("/dist30/workers")) {
 			synchronized (workers) {
@@ -264,8 +263,8 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 	}
 
 	public void processResult(int rc, String path, Object ctx, byte[] data, Stat stat) {
-		// System.out.println("Data return - rc: " + rc + " path: " + path + " ctx: " +
-		// ctx);
+		System.out.println("Data return - rc: " + rc + " path: " + path + " ctx: " +
+				ctx);
 		if (data == null)
 			return;
 		try {
