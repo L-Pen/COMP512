@@ -96,7 +96,7 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 
 	void registerWorker() {
 		try {
-			zk.create("/dist30/workers/worker-" + pinfo, pinfo.getBytes(), Ids.OPEN_ACL_UNSAFE,
+			zk.create("/dist30/workers/" + pinfo, pinfo.getBytes(), Ids.OPEN_ACL_UNSAFE,
 					CreateMode.EPHEMERAL);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -104,7 +104,7 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 	}
 
 	void checkForTask() {
-		zk.getChildren("/dist30/workers/worker-" + pinfo, this, this, null);
+		zk.getChildren("/dist30/workers/" + pinfo, this, this, null);
 	}
 
 	public void process(WatchedEvent e) {
@@ -182,7 +182,9 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 		} else {
 			// worker stuff
 			// should only ever have one child
-			zk.getData("/dist30/tasks/" + children.get(0), false, this, null);
+			if (path.equals("/dist30/workers/" + pinfo)) {
+				zk.getData("/dist30/tasks/" + children.get(0), false, this, null);
+			}
 		}
 	}
 
