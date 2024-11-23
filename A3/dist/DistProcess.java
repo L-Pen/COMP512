@@ -44,7 +44,7 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 	volatile private Object taskLock = new Object();
 
 	volatile private DistTask taskObject = null;
-	volatile private String taskId = null;
+	volatile private String workerTaskId = null;
 
 	DistProcess(String zkhost) {
 		zkServer = zkhost;
@@ -75,10 +75,12 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 						synchronized (taskLock) {
 							String taskId = taskQueue.remove();
 							try {
-								zk.create("/dist30/workers/" + workerId + "/" + taskId, taskId.getBytes(),
+								String path = "/dist30/workers/" + workerId + "/" + taskId;
+								zk.create(path, taskId.getBytes(),
 										Ids.OPEN_ACL_UNSAFE,
 										CreateMode.PERSISTENT);
-								zk.exists("/dist30/workers/" + workerId + "/" + taskId, true);
+								zk.exists(path, true);
+								System.out.println("setting watcher on: " + path);
 							} catch (Exception e) {
 								e.printStackTrace();
 							}
@@ -103,12 +105,15 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 							byte[] taskSerial = bos.toByteArray();
 
 							// Store it inside the result node.
-							zk.create("/dist30/tasks/" + taskId + "/result", taskSerial,
+							zk.create("/dist30/tasks/" + workerTaskId + "/result", taskSerial,
 									Ids.OPEN_ACL_UNSAFE,
 									CreateMode.PERSISTENT);
-							zk.delete("/dist30/workers/" + pinfo + "/" + taskId, 0);
+
+							String path = "/dist30/workers/" + pinfo + "/" + workerTaskId;
+							zk.delete(path, -1);
+							System.out.println("Deleting on: " + path);
 							taskObject = null;
-							taskId = null;
+							workerTaskId = null;
 						} catch (NodeExistsException nee) {
 							System.out.println(nee);
 						} catch (KeeperException ke) {
@@ -267,8 +272,8 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 			if (children.size() == 0)
 				return;
 			synchronized (taskLock) {
-				taskId = children.get(0);
-				zk.getData("/dist30/tasks/" + taskId, false, this, null);
+				workerTaskId = children.get(0);
+				zk.getData("/dist30/tasks/" + workerTaskId, false, this, null);
 			}
 		}
 	}
