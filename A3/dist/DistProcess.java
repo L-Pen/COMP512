@@ -125,12 +125,6 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 				}
 			}
 
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-
 		}
 	}
 
