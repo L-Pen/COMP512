@@ -202,7 +202,7 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 		if (e.getType() == Watcher.Event.EventType.NodeDataChanged
 				&& e.getPath().equals("/dist30/workers/" + pinfo)) {
 			checkForTask();
-		} else {
+		} else if (e.getType() == Watcher.Event.EventType.NodeDataChanged) {
 			String workerId = e.getPath().split("/")[3];
 			synchronized (workers) {
 				String taskId = workers.get(workerId);
