@@ -142,15 +142,6 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 
 	}
 
-	// Manager fetching task znodes...
-	void getTasks() {
-		zk.getChildren("/dist30/tasks", this, this, null);
-	}
-
-	void getWorkers() {
-		zk.getChildren("/dist30/workers", this, this, null);
-	}
-
 	// Try to become the manager.
 	void runForManager() throws UnknownHostException, KeeperException, InterruptedException {
 		// Try to create an ephemeral node to be the manager, put the hostname and pid
@@ -167,6 +158,15 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 		} catch (Exception e) {
 			System.out.println("Node already registered to worker znode");
 		}
+	}
+
+	// Manager fetching task znodes...
+	void getTasks() {
+		zk.getChildren("/dist30/tasks", this, this, null);
+	}
+
+	void getWorkers() {
+		zk.getChildren("/dist30/workers", this, this, null);
 	}
 
 	void checkForTask() {
@@ -249,7 +249,6 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 			return;
 
 		try {
-
 			if (path.contains("workers")) {
 				synchronized (taskLock) {
 					workerTaskId = new String(data, StandardCharsets.UTF_8);
