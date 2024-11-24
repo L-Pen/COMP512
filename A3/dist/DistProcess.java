@@ -10,7 +10,7 @@ import java.util.*;
 
 // To get the name of the host.
 import java.net.*;
-
+import java.nio.charset.StandardCharsets;
 //To get the process id.
 import java.lang.management.*;
 
@@ -249,12 +249,14 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 			return;
 
 		try {
-			ByteArrayInputStream bis = new ByteArrayInputStream(data);
-			ObjectInput in = new ObjectInputStream(bis);
 
 			if (path.contains("workers")) {
-				zk.getData("/dist30/tasks/" + (String) in.readObject(), false, this, null);
+				String s = new String(data, StandardCharsets.UTF_8);
+
+				zk.getData("/dist30/tasks/" + s, false, this, null);
 			} else if (path.contains("tasks")) {
+				ByteArrayInputStream bis = new ByteArrayInputStream(data);
+				ObjectInput in = new ObjectInputStream(bis);
 				synchronized (taskLock) {
 					taskObject = (DistTask) in.readObject();
 				}
