@@ -251,9 +251,10 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 		try {
 
 			if (path.contains("workers")) {
-				String s = new String(data, StandardCharsets.UTF_8);
-
-				zk.getData("/dist30/tasks/" + s, false, this, null);
+				synchronized (taskLock) {
+					workerTaskId = new String(data, StandardCharsets.UTF_8);
+					zk.getData("/dist30/tasks/" + workerTaskId, false, this, null);
+				}
 			} else if (path.contains("tasks")) {
 				ByteArrayInputStream bis = new ByteArrayInputStream(data);
 				ObjectInput in = new ObjectInputStream(bis);
