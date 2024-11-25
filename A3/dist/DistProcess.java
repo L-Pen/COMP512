@@ -160,6 +160,7 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 		zk.create("/dist30/manager", pinfo.getBytes(), Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
 	}
 
+	// register self in worker znode
 	void registerWorker() {
 		try {
 			zk.create("/dist30/workers/" + pinfo, null, Ids.OPEN_ACL_UNSAFE,
@@ -169,15 +170,17 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 		}
 	}
 
-	// Manager fetching task znodes...
+	// Manager fetching task znodes.
 	void getTasks() {
 		zk.getChildren("/dist30/tasks", this, this, null);
 	}
 
+	// Manager fetching worker znodes.
 	void getWorkers() {
 		zk.getChildren("/dist30/workers", this, this, null);
 	}
 
+	// Worker fetching data from its own znode
 	void checkForTask() {
 		zk.getData("/dist30/workers/" + pinfo, this, this, null);
 	}
@@ -251,6 +254,7 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 		}
 	}
 
+	// Async callback invoked by getData
 	public void processResult(int rc, String path, Object ctx, byte[] data, Stat stat) {
 		// System.out.println("Data return - rc: " + rc + " path: " + path + " ctx: " +
 		// ctx);
@@ -258,12 +262,15 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 			return;
 
 		try {
+			// invoked when worker gets data from self znode
 			if (path.contains("workers")) {
 				synchronized (taskLock) {
 					workerTaskId = new String(data, StandardCharsets.UTF_8);
 					zk.getData("/dist30/tasks/" + workerTaskId, false, this, null);
 				}
-			} else if (path.contains("tasks")) {
+			}
+			// invoked when worker gets data from task znode
+			else if (path.contains("tasks")) {
 				ByteArrayInputStream bis = new ByteArrayInputStream(data);
 				ObjectInput in = new ObjectInputStream(bis);
 				synchronized (taskLock) {
