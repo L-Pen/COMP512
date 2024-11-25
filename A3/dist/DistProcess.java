@@ -215,8 +215,10 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 		else if (e.getType() == Watcher.Event.EventType.NodeDataChanged) {
 			String workerId = e.getPath().split("/")[3];
 			synchronized (workerLock) {
+				if (workerQueue.contains(workerId))
+					return;
 				workerQueue.add(workerId);
-				System.out.println("==== Added worker to queue: " + workerId);
+				System.out.println("2==== Added worker to queue: " + workerId);
 			}
 		}
 	}
@@ -232,7 +234,7 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 					if (workerQueue.contains(c))
 						continue;
 					workerQueue.add(c);
-					System.out.println("==== Added worker to queue: " + c);
+					System.out.println("1==== Added worker to queue: " + c);
 				}
 			}
 		} else if (isManager && path.equals("/dist30/tasks")) {
