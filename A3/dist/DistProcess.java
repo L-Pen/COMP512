@@ -65,11 +65,11 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 				synchronized (workerLock) {
 					// get the next idle worker
 					String workerId = workerQueue.remove();
-					System.out.println("==== Removed worker from queue, length : " + workerQueue.size());
+					System.out.println("==== Removed worker from queue: " + workerId);
 					synchronized (taskLock) {
 						// get the next task
 						String taskId = taskQueue.remove();
-						System.out.println("==== Removed task from queue, length : " + taskQueue.size());
+						System.out.println("==== Removed task from queue: " + taskId);
 						try {
 							String path = "/dist30/workers/" + workerId;
 							// set the data of worker to the task id
@@ -183,7 +183,7 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 	public void process(WatchedEvent e) {
 		// Get watcher notifications.
 
-		System.out.println("DISTAPP : Event received : " + e);
+		// System.out.println("DISTAPP : Event received : " + e);
 
 		if (e.getType() == Watcher.Event.EventType.None) // This seems to be the event type associated with connections.
 		{
@@ -215,14 +215,15 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 			String workerId = e.getPath().split("/")[3];
 			synchronized (workerLock) {
 				workerQueue.add(workerId);
+				System.out.println("==== Added worker to queue: " + workerId);
 			}
 		}
 	}
 
 	// Asynchronous callback that is invoked by the zk.getChildren request.
 	public void processResult(int rc, String path, Object ctx, List<String> children) {
-		System.out.println("DISTAPP : processResult : " + rc + ":" + path + ":" +
-				ctx);
+		// System.out.println("DISTAPP : processResult : " + rc + ":" + path + ":" +
+		// ctx);
 
 		if (isManager && path.equals("/dist30/workers")) {
 			synchronized (workerLock) {
@@ -230,7 +231,7 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 					if (workerQueue.contains(c))
 						continue;
 					workerQueue.add(c);
-					System.out.println("==== Added worker to queue, length : " + workerQueue.size());
+					System.out.println("==== Added worker to queue: " + c);
 				}
 			}
 		} else if (isManager && path.equals("/dist30/tasks")) {
@@ -239,15 +240,15 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 					if (taskQueue.contains(c))
 						continue;
 					taskQueue.add(c);
-					System.out.println("==== Added task to queue, length : " + taskQueue.size());
+					System.out.println("==== Added task to queue: " + c);
 				}
 			}
 		}
 	}
 
 	public void processResult(int rc, String path, Object ctx, byte[] data, Stat stat) {
-		System.out.println("Data return - rc: " + rc + " path: " + path + " ctx: " +
-				ctx);
+		// System.out.println("Data return - rc: " + rc + " path: " + path + " ctx: " +
+		// ctx);
 		if (data == null)
 			return;
 
