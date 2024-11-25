@@ -27,8 +27,9 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 	volatile boolean isManager = false;
 	boolean initialized = false;
 
-	// keep track of workers
+	// keep track of all workers and idle workers
 	volatile private Queue<String> workerQueue = new LinkedList<>();
+	private List<String> allWorkers = new ArrayList<>();
 
 	// keep track of tasks and current task number
 	private int currentTaskNumber = 0;
@@ -215,8 +216,6 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 		else if (e.getType() == Watcher.Event.EventType.NodeDataChanged) {
 			String workerId = e.getPath().split("/")[3];
 			synchronized (workerLock) {
-				if (workerQueue.contains(workerId))
-					return;
 				workerQueue.add(workerId);
 				System.out.println("2==== Added worker to queue: " + workerId);
 			}
@@ -231,9 +230,10 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 		if (isManager && path.equals("/dist30/workers")) {
 			synchronized (workerLock) {
 				for (String c : children) {
-					if (workerQueue.contains(c))
+					if (allWorkers.contains(c))
 						continue;
 					workerQueue.add(c);
+					allWorkers.add(c);
 					System.out.println("1==== Added worker to queue: " + c);
 				}
 			}
