@@ -30,8 +30,8 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 	// keep track of workers
 	volatile private Queue<String> workerQueue = new LinkedList<>();
 
-	// keep track of tasks and highest seen task number
-	private int highestTaskNumber = 0;
+	// keep track of tasks and current task number
+	private int currentTaskNumber = 0;
 	volatile private Queue<String> taskQueue = new LinkedList<>();
 
 	// objects to communicate between callback and thread for worker
@@ -239,10 +239,10 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 			synchronized (taskLock) {
 				for (String c : children) {
 					int taskNumber = Integer.parseInt(c.split("-")[1]);
-					if (taskNumber < highestTaskNumber)
+					if (taskNumber < currentTaskNumber)
 						continue;
 					taskQueue.add(c);
-					highestTaskNumber = taskNumber;
+					currentTaskNumber++;
 					System.out.println("==== Added task to queue: " + c);
 				}
 			}
