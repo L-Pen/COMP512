@@ -27,15 +27,19 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 	volatile boolean isManager = false;
 	boolean initialized = false;
 
-	volatile private HashMap<String, String> workers = new HashMap<>();
+	// keep track of workers
+	volatile private Queue<String> workerQueue = new LinkedList<>();
 
-	volatile private HashMap<String, Boolean> taskStatus = new HashMap<>();
+	// keep track of tasks
 	volatile private Queue<String> taskQueue = new LinkedList<>();
 
+	// objects to communicate between callback and thread for worker
 	volatile private DistTask taskObject = null;
 	volatile private String workerTaskId = null;
 
+	// locks for thread
 	volatile private Object taskLock = new Object();
+	volatile private Object workerLock = new Object();
 
 	DistProcess(String zkhost) {
 		zkServer = zkhost;
@@ -55,64 +59,67 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 			if (isManager) {
 				while (taskQueue.isEmpty()) {
 				}
+				while (workerQueue.isEmpty()) {
+				}
 
-				synchronized (workers) {
-					Set<String> workerIds = workers.keySet();
-					for (String workerId : workerIds) {
-						if (workers.get(workerId) != null)
-							continue;
+				synchronized (workerLock) {
+					// get the next idle worker
+					String workerId = workerQueue.remove();
+					System.out.println("==== Removed worker from queue, length : " + workerQueue.size());
+					synchronized (taskLock) {
+						// get the next task
+						String taskId = taskQueue.remove();
+						System.out.println("==== Removed task from queue, length : " + taskQueue.size());
+						try {
+							String path = "/dist30/workers/" + workerId;
+							// set the data of worker to the task id
+							zk.setData(path, taskId.getBytes(), -1,
+									null, null);
 
-						synchronized (taskLock) {
-							String taskId = taskQueue.remove();
-							System.out.println("==== Removed task from queue, length : " + taskQueue.size());
-							workers.put(workerId, taskId);
-							System.out.println(stringifyMap(workers));
-							try {
-								String path = "/dist30/workers/" + workerId;
-								zk.setData(path, taskId.getBytes(), -1,
-										null, null);
-								zk.getData(path, true, null, null);
-							} catch (Exception e) {
-								e.printStackTrace();
-							}
+							// install watcher on the data
+							zk.getData(path, true, null, null);
+						} catch (Exception e) {
+							e.printStackTrace();
 						}
-						break;
 					}
 				}
 			}
 
 			// worker stuff
 			else {
-				if (taskObject != null) {
-					synchronized (taskLock) {
-						try {
-							taskObject.compute();
+				// wait until task is set through the callbacks
+				if (taskObject == null) {
+					continue;
+				}
+				synchronized (taskLock) {
+					try {
+						taskObject.compute();
 
-							// Serialize our Task object back to a byte array!
-							ByteArrayOutputStream bos = new ByteArrayOutputStream();
-							ObjectOutputStream oos = new ObjectOutputStream(bos);
-							oos.writeObject(taskObject);
-							oos.flush();
-							byte[] taskSerial = bos.toByteArray();
+						// Serialize our Task object back to a byte array!
+						ByteArrayOutputStream bos = new ByteArrayOutputStream();
+						ObjectOutputStream oos = new ObjectOutputStream(bos);
+						oos.writeObject(taskObject);
+						oos.flush();
+						byte[] taskSerial = bos.toByteArray();
 
-							// Store it inside the result node.
-							zk.create("/dist30/tasks/" + workerTaskId + "/result", taskSerial,
-									Ids.OPEN_ACL_UNSAFE,
-									CreateMode.PERSISTENT);
+						// Store it inside the result node.
+						zk.create("/dist30/tasks/" + workerTaskId + "/result", taskSerial,
+								Ids.OPEN_ACL_UNSAFE,
+								CreateMode.PERSISTENT);
 
-							String path = "/dist30/workers/" + pinfo;
-							zk.setData(path, null, -1, null, null);
-							taskObject = null;
-							workerTaskId = null;
-						} catch (NodeExistsException nee) {
-							System.out.println(nee);
-						} catch (KeeperException ke) {
-							System.out.println(ke);
-						} catch (InterruptedException ie) {
-							System.out.println(ie);
-						} catch (IOException io) {
-							System.out.println(io);
-						}
+						// set data at self back to null, notifies manager
+						String path = "/dist30/workers/" + pinfo;
+						zk.setData(path, null, -1, null, null);
+						taskObject = null;
+						workerTaskId = null;
+					} catch (NodeExistsException nee) {
+						System.out.println(nee);
+					} catch (KeeperException ke) {
+						System.out.println(ke);
+					} catch (InterruptedException ie) {
+						System.out.println(ie);
+					} catch (IOException io) {
+						System.out.println(io);
 					}
 				}
 			}
@@ -202,15 +209,12 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 		if (e.getType() == Watcher.Event.EventType.NodeDataChanged
 				&& e.getPath().equals("/dist30/workers/" + pinfo)) {
 			checkForTask();
-		} else if (e.getType() == Watcher.Event.EventType.NodeDataChanged) {
+		}
+		// manager is notified when worker data is changed
+		else if (e.getType() == Watcher.Event.EventType.NodeDataChanged) {
 			String workerId = e.getPath().split("/")[3];
-			synchronized (workers) {
-				String taskId = workers.get(workerId);
-				workers.put(workerId, null);
-				System.out.println(stringifyMap(workers));
-				synchronized (taskLock) {
-					taskStatus.remove(taskId);
-				}
+			synchronized (workerLock) {
+				workerQueue.add(workerId);
 			}
 		}
 	}
@@ -221,20 +225,19 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 				ctx);
 
 		if (isManager && path.equals("/dist30/workers")) {
-			synchronized (workers) {
+			synchronized (workerLock) {
 				for (String c : children) {
-					if (workers.containsKey(c))
+					if (workerQueue.contains(c))
 						continue;
-					workers.put(c, null);
+					workerQueue.add(c);
 				}
-				System.out.println(stringifyMap(workers));
+				System.out.println("==== Added worker to queue, length : " + workerQueue.size());
 			}
 		} else if (isManager && path.equals("/dist30/tasks")) {
 			synchronized (taskLock) {
 				for (String c : children) {
-					if (taskStatus.containsKey(c))
+					if (taskQueue.contains(c))
 						continue;
-					taskStatus.put(c, false);
 					taskQueue.add(c);
 					System.out.println("==== Added task to queue, length : " + taskQueue.size());
 				}
@@ -266,15 +269,6 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 		} catch (ClassNotFoundException cne) {
 			System.out.println(cne);
 		}
-	}
-
-	private String stringifyMap(HashMap<?, ?> map) {
-		StringBuilder mapAsString = new StringBuilder("{");
-		for (Object key : map.keySet()) {
-			mapAsString.append(key + "=" + String.valueOf(map.get(key)) + ", ");
-		}
-		mapAsString.append("}");
-		return mapAsString.toString();
 	}
 
 	public static void main(String args[]) throws Exception {
