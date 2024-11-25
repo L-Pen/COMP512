@@ -230,8 +230,8 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 					if (workerQueue.contains(c))
 						continue;
 					workerQueue.add(c);
+					System.out.println("==== Added worker to queue, length : " + workerQueue.size());
 				}
-				System.out.println("==== Added worker to queue, length : " + workerQueue.size());
 			}
 		} else if (isManager && path.equals("/dist30/tasks")) {
 			synchronized (taskLock) {
