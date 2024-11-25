@@ -243,7 +243,7 @@ public class DistProcess implements Watcher, AsyncCallback.ChildrenCallback, Asy
 						continue;
 					taskQueue.add(c);
 					currentTaskNumber++;
-					System.out.println("==== Added task to queue: " + c);
+					System.out.println("==== Added task to queue: " + c + " current task number: " + currentTaskNumber);
 				}
 			}
 		}
